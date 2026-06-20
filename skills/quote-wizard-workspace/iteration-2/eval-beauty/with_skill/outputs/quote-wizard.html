@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glow Beauty Studio — Quote Request</title>
+</head>
+<body>
+
+<section id="quote-wizard">
+<style>
+  #quote-wizard {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f9f9f9;
+    padding: 24px 16px 40px;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  #quote-wizard * {
+    box-sizing: border-box;
+  }
+
+  /* Container */
+  #qw-container {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(26,10,46,0.10);
+    overflow: hidden;
+  }
+
+  /* Header */
+  #qw-header {
+    background: #1a0a2e;
+    padding: 24px 24px 20px;
+    text-align: center;
+  }
+
+  #qw-header h2 {
+    color: #fff;
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  #qw-header p {
+    color: #c9a96e;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  /* Progress bar */
+  #qw-progress-wrap {
+    background: #1a0a2e;
+    padding: 0 24px 20px;
+  }
+
+  #qw-step-label {
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  #qw-progress-bar-bg {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  #qw-progress-bar-fill {
+    background: #c9a96e;
+    height: 6px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 20%;
+  }
+
+  /* Body */
+  #qw-body {
+    padding: 28px 24px 24px;
+  }
+
+  /* Step */
+  .qw-step {
+    display: none;
+  }
+
+  .qw-step.active {
+    display: block;
+  }
+
+  .qw-step-title {
+    color: #1a0a2e;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  .qw-step-subtitle {
+    color: #555;
+    font-size: 15px;
+    margin: 0 0 24px;
+  }
+
+  /* Service cards — 2-col on mobile, 3-col on wider */
+  #qw-services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  @media (min-width: 480px) {
+    #qw-services-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .qw-service-card {
+    border: 2px solid #e0d5ee;
+    border-radius: 10px;
+    padding: 14px 10px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a0a2e;
+    line-height: 1.3;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .qw-service-card:hover {
+    border-color: #c9a96e;
+    background: #fdf8f2;
+  }
+
+  .qw-service-card.selected {
+    border-color: #c9a96e;
+    background: #c9a96e;
+    color: #fff;
+  }
+
+  .qw-service-card:focus-visible {
+    outline: 3px solid #c9a96e;
+    outline-offset: 2px;
+  }
+
+  /* Form fields */
+  .qw-field {
+    margin-bottom: 20px;
+  }
+
+  .qw-field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a0a2e;
+    margin-bottom: 6px;
+  }
+
+  .qw-field .qw-optional {
+    font-weight: 400;
+    color: #888;
+    font-size: 13px;
+    margin-left: 4px;
+  }
+
+  .qw-field input,
+  .qw-field textarea,
+  .qw-field select {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 14px;
+    border: 2px solid #e0d5ee;
+    border-radius: 8px;
+    background: #fff;
+    color: #1a0a2e;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+
+  .qw-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231a0a2e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .qw-field input:focus,
+  .qw-field textarea:focus,
+  .qw-field select:focus {
+    border-color: #c9a96e;
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.15);
+  }
+
+  .qw-field textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  /* Photo upload */
+  #qw-photo-drop {
+    border: 2px dashed #c9a96e;
+    border-radius: 10px;
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    background: #fdf8f2;
+    color: #1a0a2e;
+    font-size: 15px;
+    margin-bottom: 12px;
+    transition: background 0.15s;
+  }
+
+  #qw-photo-drop:hover {
+    background: #f5ede0;
+  }
+
+  #qw-photo-drop p {
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+
+  #qw-photo-drop span {
+    font-size: 13px;
+    color: #777;
+  }
+
+  #qw-photo-input {
+    display: none;
+  }
+
+  #qw-photo-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .qw-thumb-wrap {
+    position: relative;
+    width: 72px;
+    height: 72px;
+  }
+
+  .qw-thumb-wrap img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0d5ee;
+  }
+
+  .qw-thumb-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background: #1a0a2e;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+  }
+
+  /* Summary */
+  #qw-summary {
+    background: #f9f6ff;
+    border: 1.5px solid #e0d5ee;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+
+  #qw-summary h4 {
+    color: #1a0a2e;
+    font-size: 15px;
+    margin: 0 0 10px;
+  }
+
+  #qw-summary-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .qw-summary-tag {
+    background: #c9a96e;
+    color: #fff;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  #qw-summary-details {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+  }
+
+  #qw-summary-details p {
+    margin: 4px 0;
+  }
+
+  #qw-summary-details strong {
+    color: #1a0a2e;
+  }
+
+  /* Buttons */
+  #qw-nav {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  /* Full-width on mobile, side-by-side on desktop */
+  @media (max-width: 479px) {
+    #qw-nav {
+      flex-direction: column;
+    }
+  }
+
+  .qw-btn {
+    flex: 1;
+    padding: 14px 20px;
+    min-height: 48px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  #qw-btn-back {
+    background: #f0eaf8;
+    color: #1a0a2e;
+    border: 2px solid #e0d5ee;
+  }
+
+  #qw-btn-back:hover {
+    background: #e5ddf2;
+  }
+
+  #qw-btn-next {
+    background: #c9a96e;
+    color: #fff;
+  }
+
+  #qw-btn-next:hover {
+    opacity: 0.9;
+  }
+
+  #qw-btn-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Error state */
+  .qw-field.has-error input,
+  .qw-field.has-error textarea,
+  .qw-field.has-error select {
+    border-color: #dc2626;
+  }
+
+  .qw-error-msg {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .qw-field.has-error .qw-error-msg {
+    display: block;
+  }
+
+  #qw-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* Success */
+  #qw-success {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  #qw-success h3 {
+    color: #1a0a2e;
+    font-size: 22px;
+    margin: 0 0 12px;
+  }
+
+  #qw-success p {
+    color: #555;
+    font-size: 15px;
+    margin: 0;
+  }
+
+  #qw-success .qw-success-icon {
+    width: 60px;
+    height: 60px;
+    background: #c9a96e;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 28px;
+  }
+
+  /* Spinner */
+  #qw-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: qw-spin 0.7s linear infinite;
+    margin: 0 auto;
+  }
+
+  @keyframes qw-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Live region for a11y */
+  #qw-live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+  }
+</style>
+
+<div id="qw-container" role="main" aria-label="Quote Request Wizard">
+  <div aria-live="polite" id="qw-live-region"></div>
+
+  <div id="qw-header">
+    <h2>Glow Beauty Studio</h2>
+    <p>Request a quote — it takes under 2 minutes</p>
+  </div>
+
+  <div id="qw-progress-wrap">
+    <span id="qw-step-label">Step 1 of 5 — Services</span>
+    <div id="qw-progress-bar-bg" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5" aria-label="Progress">
+      <div id="qw-progress-bar-fill"></div>
+    </div>
+  </div>
+
+  <div id="qw-body">
+    <div id="qw-error-banner" role="alert" aria-live="assertive"></div>
+
+    <!-- STEP 1: Services -->
+    <div class="qw-step active" id="qw-step-1" aria-label="Step 1: What do you need?">
+      <h3 class="qw-step-title">What do you need?</h3>
+      <p class="qw-step-subtitle">Select all that apply — you can pick more than one.</p>
+      <div id="qw-services-grid" role="group" aria-label="Service selection">
+        <button type="button" class="qw-service-card" data-service="Haircut &amp; blow-dry" aria-pressed="false">Haircut &amp; blow-dry</button>
+        <button type="button" class="qw-service-card" data-service="Colour &amp; highlights" aria-pressed="false">Colour &amp; highlights</button>
+        <button type="button" class="qw-service-card" data-service="Hair extensions" aria-pressed="false">Hair extensions</button>
+        <button type="button" class="qw-service-card" data-service="Lash extensions" aria-pressed="false">Lash extensions</button>
+        <button type="button" class="qw-service-card" data-service="Brow shaping &amp; tinting" aria-pressed="false">Brow shaping &amp; tinting</button>
+        <button type="button" class="qw-service-card" data-service="Other" aria-pressed="false">Other</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Tell us more -->
+    <div class="qw-step" id="qw-step-2" aria-label="Step 2: Tell us more">
+      <h3 class="qw-step-title">Tell us more</h3>
+      <p class="qw-step-subtitle">Help us understand what you're looking for so we can give you an accurate quote.</p>
+
+      <div class="qw-field" id="qw-field-details">
+        <label for="qw-details">Describe what you need in a few words…</label>
+        <textarea id="qw-details" name="details" placeholder="e.g. I'd like a full balayage with a trim, first appointment" rows="4"></textarea>
+        <span class="qw-error-msg" id="qw-error-details">Please add a brief description.</span>
+      </div>
+
+      <!-- Beauty follow-up Q1: First time? -->
+      <div class="qw-field" id="qw-field-firsttime">
+        <label for="qw-firsttime">Is this your first appointment with us?</label>
+        <select id="qw-firsttime" name="first_appointment">
+          <option value="">Please select…</option>
+          <option value="First time">First time</option>
+          <option value="Returning client">Returning client</option>
+        </select>
+        <span class="qw-error-msg" id="qw-error-firsttime">Please make a selection.</span>
+      </div>
+
+      <!-- Beauty follow-up Q2: Allergies -->
+      <div class="qw-field">
+        <label for="qw-allergies">Allergies or sensitivities <span class="qw-optional">(optional)</span></label>
+        <input type="text" id="qw-allergies" name="allergies" placeholder="e.g. latex, certain dyes (optional)">
+      </div>
+    </div>
+
+    <!-- STEP 3: Photos -->
+    <div class="qw-step" id="qw-step-3" aria-label="Step 3: Photos">
+      <h3 class="qw-step-title">Photos <span style="font-size:15px;font-weight:400;color:#777;">(optional)</span></h3>
+      <p class="qw-step-subtitle">Upload up to 4 photos — a picture helps us give you an accurate quote.</p>
+
+      <div id="qw-photo-drop" role="button" tabindex="0" aria-label="Upload photos — click or tap to browse">
+        <p>Tap to add photos</p>
+        <span>JPG, PNG, WebP or HEIC &middot; Max 5MB each &middot; Up to 4 photos</span>
+      </div>
+      <input type="file" id="qw-photo-input" accept="image/jpeg,image/png,image/webp,image/heic,.heic" multiple aria-label="Photo file input">
+      <div id="qw-photo-thumbs" aria-label="Selected photos" role="list"></div>
+    </div>
+
+    <!-- STEP 4: Contact details -->
+    <div class="qw-step" id="qw-step-4" aria-label="Step 4: Your details">
+      <h3 class="qw-step-title">Your details</h3>
+      <p class="qw-step-subtitle">How should we get back to you with your quote?</p>
+
+      <div class="qw-field" id="qw-field-name">
+        <label for="qw-name">Full name</label>
+        <input type="text" id="qw-name" name="name" placeholder="e.g. Sophie Williams" autocomplete="name">
+        <span class="qw-error-msg" id="qw-error-name">Please enter your name.</span>
+      </div>
+
+      <div class="qw-field" id="qw-field-phone">
+        <label for="qw-phone">Phone number</label>
+        <input type="tel" id="qw-phone" name="phone" placeholder="e.g. 07700 900123" autocomplete="tel">
+        <span class="qw-error-msg" id="qw-error-phone">Please enter a phone number.</span>
+      </div>
+
+      <div class="qw-field" id="qw-field-email">
+        <label for="qw-email">Email address</label>
+        <input type="email" id="qw-email" name="email" placeholder="e.g. sophie@email.com" autocomplete="email">
+        <span class="qw-error-msg" id="qw-error-email">Please enter a valid email address.</span>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-postcode">Postcode <span class="qw-optional">(recommended)</span></label>
+        <input type="text" id="qw-postcode" name="postcode" placeholder="e.g. SW1A 1AA" autocomplete="postal-code" style="max-width:180px;">
+      </div>
+    </div>
+
+    <!-- STEP 5: Confirm & submit -->
+    <div class="qw-step" id="qw-step-5" aria-label="Step 5: Confirm and submit">
+      <h3 class="qw-step-title">Almost done!</h3>
+      <p class="qw-step-subtitle">Check everything looks right, then send your quote request.</p>
+
+      <div id="qw-summary">
+        <h4>Your selected services</h4>
+        <div id="qw-summary-services"></div>
+        <div id="qw-summary-details"></div>
+      </div>
+
+      <p style="font-size:14px;color:#555;margin:0 0 8px;">We'll be in touch with your personalised quote — usually within 24 hours.</p>
+    </div>
+
+    <!-- Success -->
+    <div id="qw-success" aria-live="polite">
+      <div class="qw-success-icon" aria-hidden="true">&#10003;</div>
+      <h3>Quote request sent!</h3>
+      <p>Thank you! The team at Glow Beauty Studio will be in touch with your quote soon.</p>
+    </div>
+
+    <!-- Navigation -->
+    <div id="qw-nav">
+      <button type="button" class="qw-btn" id="qw-btn-back" style="display:none;" aria-label="Go back to previous step">Back</button>
+      <button type="button" class="qw-btn" id="qw-btn-next" aria-label="Continue to next step">Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- HubSpot Embedded Forms JS API -->
+<script>
+(function() {
+  // ── Config ──────────────────────────────────────────────
+  var PORTAL_ID  = '987654';
+  var FORM_ID    = '123456789';
+  var TOTAL_STEPS = 5;
+  var STEP_LABELS = [
+    'Services',
+    'Tell us more',
+    'Photos',
+    'Your details',
+    'Confirm'
+  ];
+
+  // ── State ───────────────────────────────────────────────
+  var currentStep = 1;
+  var selectedServices = [];
+  var uploadedFiles = [];
+
+  // ── DOM refs ─────────────────────────────────────────────
+  var $ = function(id) { return document.getElementById(id); };
+  var stepLabel      = $('qw-step-label');
+  var progressFill   = $('qw-progress-bar-fill');
+  var progressBar    = $('qw-progress-bar-bg');
+  var btnBack        = $('qw-btn-back');
+  var btnNext        = $('qw-btn-next');
+  var errorBanner    = $('qw-error-banner');
+  var liveRegion     = $('qw-live-region');
+  var successDiv     = $('qw-success');
+  var navDiv         = $('qw-nav');
+
+  // ── Progress ─────────────────────────────────────────────
+  function updateProgress() {
+    var pct = (currentStep / TOTAL_STEPS) * 100;
+    progressFill.style.width = pct + '%';
+    stepLabel.textContent = 'Step ' + currentStep + ' of ' + TOTAL_STEPS + ' — ' + STEP_LABELS[currentStep - 1];
+    progressBar.setAttribute('aria-valuenow', currentStep);
+    liveRegion.textContent = 'Step ' + currentStep + ' of ' + TOTAL_STEPS + ': ' + STEP_LABELS[currentStep - 1];
+  }
+
+  function showStep(n) {
+    for (var i = 1; i <= TOTAL_STEPS; i++) {
+      var el = $('qw-step-' + i);
+      if (el) {
+        el.classList.toggle('active', i === n);
+      }
+    }
+    btnBack.style.display = n > 1 ? 'block' : 'none';
+    btnNext.textContent = n === TOTAL_STEPS ? 'Send My Quote Request' : 'Next';
+    updateProgress();
+    clearErrors();
+
+    if (n === TOTAL_STEPS) {
+      buildSummary();
+    }
+
+    // Scroll wizard into view on mobile
+    var container = $('qw-container');
+    if (container) {
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // ── Service card selection ───────────────────────────────
+  var cards = document.querySelectorAll('#quote-wizard .qw-service-card');
+  cards.forEach(function(card) {
+    card.addEventListener('click', function() {
+      var svc = this.getAttribute('data-service');
+      var idx = selectedServices.indexOf(svc);
+      if (idx === -1) {
+        selectedServices.push(svc);
+        this.classList.add('selected');
+        this.setAttribute('aria-pressed', 'true');
+      } else {
+        selectedServices.splice(idx, 1);
+        this.classList.remove('selected');
+        this.setAttribute('aria-pressed', 'false');
+      }
+    });
+    // Keyboard: space/enter
+    card.addEventListener('keydown', function(e) {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  });
+
+  // ── Photo upload ─────────────────────────────────────────
+  var photoInput = $('qw-photo-input');
+  var photoDrop  = $('qw-photo-drop');
+  var photoThumbs = $('qw-photo-thumbs');
+
+  photoDrop.addEventListener('click', function() {
+    photoInput.click();
+  });
+
+  photoDrop.addEventListener('keydown', function(e) {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      photoInput.click();
+    }
+  });
+
+  photoInput.addEventListener('change', function(e) {
+    handleFiles(e.target.files);
+    // Reset input so same file can be re-selected
+    photoInput.value = '';
+  });
+
+  // Drag-and-drop support
+  photoDrop.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    photoDrop.style.background = '#f5ede0';
+  });
+  photoDrop.addEventListener('dragleave', function() {
+    photoDrop.style.background = '#fdf8f2';
+  });
+  photoDrop.addEventListener('drop', function(e) {
+    e.preventDefault();
+    photoDrop.style.background = '#fdf8f2';
+    handleFiles(e.dataTransfer.files);
+  });
+
+  function handleFiles(files) {
+    var added = 0;
+    for (var i = 0; i < files.length; i++) {
+      if (uploadedFiles.length >= 4) break;
+      var file = files[i];
+      if (file.size > 5 * 1024 * 1024) {
+        showBanner(file.name + ' is over 5MB — please choose a smaller image.');
+        continue;
+      }
+      uploadedFiles.push(file);
+      renderThumb(file, uploadedFiles.length - 1);
+      added++;
+    }
+    if (uploadedFiles.length >= 4) {
+      photoDrop.querySelector('p').textContent = '4 photos added (maximum reached)';
+    } else {
+      photoDrop.querySelector('p').textContent = 'Tap to add photos';
+    }
+  }
+
+  function renderThumb(file, idx) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var wrap = document.createElement('div');
+      wrap.className = 'qw-thumb-wrap';
+      wrap.setAttribute('role', 'listitem');
+      var img = document.createElement('img');
+      img.src = ev.target.result;
+      img.alt = 'Photo ' + (idx + 1);
+      var btn = document.createElement('button');
+      btn.className = 'qw-thumb-remove';
+      btn.type = 'button';
+      btn.textContent = '×';
+      btn.setAttribute('aria-label', 'Remove photo ' + (idx + 1));
+      btn.addEventListener('click', function() {
+        uploadedFiles.splice(idx, 1);
+        wrap.remove();
+        // Re-index remaining buttons
+        var wraps = photoThumbs.querySelectorAll('.qw-thumb-wrap');
+        wraps.forEach(function(w, i) {
+          w.querySelector('.qw-thumb-remove').setAttribute('aria-label', 'Remove photo ' + (i + 1));
+        });
+        if (uploadedFiles.length < 4) {
+          photoDrop.querySelector('p').textContent = 'Tap to add photos';
+        }
+      });
+      wrap.appendChild(img);
+      wrap.appendChild(btn);
+      photoThumbs.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Validation ───────────────────────────────────────────
+  function clearErrors() {
+    var fields = document.querySelectorAll('#quote-wizard .qw-field.has-error');
+    fields.forEach(function(f) { f.classList.remove('has-error'); });
+    hideBanner();
+  }
+
+  function showBanner(msg) {
+    errorBanner.textContent = msg;
+    errorBanner.style.display = 'block';
+  }
+
+  function hideBanner() {
+    errorBanner.style.display = 'none';
+    errorBanner.textContent = '';
+  }
+
+  function setFieldError(fieldId, errorId, show) {
+    var field = $(fieldId);
+    var err   = $(errorId);
+    if (field && err) {
+      field.classList.toggle('has-error', show);
+    }
+  }
+
+  function validateStep(n) {
+    clearErrors();
+    var ok = true;
+
+    if (n === 1) {
+      if (selectedServices.length === 0) {
+        showBanner('Please select at least one service to continue.');
+        ok = false;
+      }
+    }
+
+    if (n === 2) {
+      var details = $('qw-details').value.trim();
+      if (!details) {
+        setFieldError('qw-field-details', 'qw-error-details', true);
+        ok = false;
+      }
+      var firsttime = $('qw-firsttime').value;
+      if (!firsttime) {
+        setFieldError('qw-field-firsttime', 'qw-error-firsttime', true);
+        ok = false;
+      }
+      if (!ok) showBanner('Please fill in the required fields before continuing.');
+    }
+
+    if (n === 4) {
+      var name = $('qw-name').value.trim();
+      var phone = $('qw-phone').value.trim();
+      var email = $('qw-email').value.trim();
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!name) { setFieldError('qw-field-name', 'qw-error-name', true); ok = false; }
+      if (!phone) { setFieldError('qw-field-phone', 'qw-error-phone', true); ok = false; }
+      if (!email || !emailOk) { setFieldError('qw-field-email', 'qw-error-email', true); ok = false; }
+      if (!ok) showBanner('Please fill in all required fields before continuing.');
+    }
+
+    return ok;
+  }
+
+  // ── Summary (Step 5) ─────────────────────────────────────
+  function buildSummary() {
+    var svcWrap = $('qw-summary-services');
+    var detWrap = $('qw-summary-details');
+    svcWrap.innerHTML = '';
+    selectedServices.forEach(function(svc) {
+      var tag = document.createElement('span');
+      tag.className = 'qw-summary-tag';
+      tag.textContent = svc;
+      svcWrap.appendChild(tag);
+    });
+
+    var details   = $('qw-details').value.trim();
+    var firsttime = $('qw-firsttime').value;
+    var allergies = $('qw-allergies').value.trim();
+    var name      = $('qw-name').value.trim();
+    var phone     = $('qw-phone').value.trim();
+    var email     = $('qw-email').value.trim();
+    var postcode  = $('qw-postcode').value.trim();
+    var photos    = uploadedFiles.length;
+
+    var html = '';
+    if (details)   html += '<p><strong>Details:</strong> ' + escHtml(details) + '</p>';
+    if (firsttime) html += '<p><strong>Appointment type:</strong> ' + escHtml(firsttime) + '</p>';
+    if (allergies) html += '<p><strong>Allergies/sensitivities:</strong> ' + escHtml(allergies) + '</p>';
+    html += '<p><strong>Name:</strong> ' + escHtml(name) + '</p>';
+    html += '<p><strong>Phone:</strong> ' + escHtml(phone) + '</p>';
+    html += '<p><strong>Email:</strong> ' + escHtml(email) + '</p>';
+    if (postcode)  html += '<p><strong>Postcode:</strong> ' + escHtml(postcode) + '</p>';
+    if (photos > 0) html += '<p><strong>Photos:</strong> ' + photos + ' attached</p>';
+    detWrap.innerHTML = html;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Navigation ───────────────────────────────────────────
+  btnNext.addEventListener('click', function() {
+    if (!validateStep(currentStep)) return;
+
+    if (currentStep < TOTAL_STEPS) {
+      currentStep++;
+      showStep(currentStep);
+    } else {
+      submitToHubSpot();
+    }
+  });
+
+  btnBack.addEventListener('click', function() {
+    if (currentStep > 1) {
+      currentStep--;
+      showStep(currentStep);
+    }
+  });
+
+  // ── HubSpot submission ───────────────────────────────────
+  function submitToHubSpot() {
+    btnNext.disabled = true;
+    btnNext.innerHTML = '<div id="qw-spinner" style="display:inline-block;"></div>';
+    hideBanner();
+
+    var name      = $('qw-name').value.trim();
+    var nameParts = name.split(' ');
+    var firstname = nameParts[0] || '';
+    var lastname  = nameParts.slice(1).join(' ') || '';
+    var email     = $('qw-email').value.trim();
+    var phone     = $('qw-phone').value.trim();
+    var postcode  = $('qw-postcode').value.trim();
+    var details   = $('qw-details').value.trim();
+    var firsttime = $('qw-firsttime').value;
+    var allergies = $('qw-allergies').value.trim();
+
+    var messageParts = [
+      'Services: ' + selectedServices.join(', '),
+      'Details: ' + details,
+      'First appointment: ' + firsttime
+    ];
+    if (allergies) messageParts.push('Allergies/sensitivities: ' + allergies);
+    if (postcode)  messageParts.push('Postcode: ' + postcode);
+    if (uploadedFiles.length > 0) messageParts.push('Photos attached: ' + uploadedFiles.length);
+    var message = messageParts.join('\n');
+
+    // Build HubSpot payload
+    var payload = {
+      fields: [
+        { name: 'firstname', value: firstname },
+        { name: 'lastname',  value: lastname  },
+        { name: 'email',     value: email     },
+        { name: 'phone',     value: phone     },
+        { name: 'message',   value: message   }
+      ],
+      context: {
+        pageUri:  window.location.href,
+        pageName: document.title
+      }
+    };
+
+    var endpoint = 'https://api.hsforms.com/submissions/v3/integration/submit/' + PORTAL_ID + '/' + FORM_ID;
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res) {
+      if (res.ok) {
+        showSuccess();
+      } else {
+        return res.json().then(function(data) {
+          throw new Error(data.message || 'Submission failed (status ' + res.status + ')');
+        });
+      }
+    })
+    .catch(function(err) {
+      btnNext.disabled = false;
+      btnNext.textContent = 'Send My Quote Request';
+      showBanner('Something went wrong — please try again or contact us directly. (' + err.message + ')');
+    });
+  }
+
+  function showSuccess() {
+    // Hide all steps, nav and error
+    for (var i = 1; i <= TOTAL_STEPS; i++) {
+      var el = $('qw-step-' + i);
+      if (el) el.classList.remove('active');
+    }
+    navDiv.style.display = 'none';
+    $('qw-progress-wrap').style.display = 'none';
+    hideBanner();
+    successDiv.style.display = 'block';
+    liveRegion.textContent = 'Your quote request has been sent! We will be in touch soon.';
+  }
+
+  // ── Init ─────────────────────────────────────────────────
+  showStep(1);
+})();
+</script>
+</section>
+
+</body>
+</html>

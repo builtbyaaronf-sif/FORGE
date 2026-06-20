@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Garden Landscaping — Quote Request</title>
+</head>
+<body>
+
+<!-- ============================================================
+     GREEN GARDEN LANDSCAPING — QUOTE WIZARD
+     Self-contained section: HTML + CSS + JS, zero dependencies
+     Contact routing: WhatsApp +447891234567
+     Brand: #2d5a1b (primary) / #f4a623 (accent)
+     ============================================================ -->
+
+<section id="quote-wizard">
+
+  <style>
+    /* ── Reset & scope ── */
+    #quote-wizard *,
+    #quote-wizard *::before,
+    #quote-wizard *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── Section wrapper ── */
+    #quote-wizard {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 60px 20px;
+      color: #1a1a1a;
+    }
+
+    /* ── Container ── */
+    #quote-wizard .qw-container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── Section heading ── */
+    #quote-wizard .qw-heading {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    #quote-wizard .qw-heading h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2d5a1b;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    #quote-wizard .qw-heading p {
+      font-size: 1.05rem;
+      color: #555;
+    }
+
+    /* ── Progress bar ── */
+    #quote-wizard .qw-progress-wrap {
+      margin-bottom: 32px;
+    }
+    #quote-wizard .qw-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    #quote-wizard .qw-progress-track {
+      height: 6px;
+      background: #ddd;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #quote-wizard .qw-progress-fill {
+      height: 100%;
+      background: #2d5a1b;
+      border-radius: 99px;
+      transition: width 0.35s ease;
+    }
+
+    /* ── Card (step panel) ── */
+    #quote-wizard .qw-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 36px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+
+    /* ── Step visibility ── */
+    #quote-wizard .qw-step { display: none; }
+    #quote-wizard .qw-step.active { display: block; }
+
+    /* ── Step title ── */
+    #quote-wizard .qw-step-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2d5a1b;
+      margin-bottom: 6px;
+    }
+    #quote-wizard .qw-step-sub {
+      font-size: 0.92rem;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    /* ── Service cards (step 1) ── */
+    #quote-wizard .qw-services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    #quote-wizard .qw-service-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 16px 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #333;
+      background: #fff;
+      text-align: center;
+      line-height: 1.3;
+    }
+    #quote-wizard .qw-service-card:hover {
+      border-color: #f4a623;
+    }
+    #quote-wizard .qw-service-card.selected {
+      border-color: #f4a623;
+      background: #fff8ec;
+      color: #2d5a1b;
+    }
+    #quote-wizard .qw-service-card .qw-tick {
+      display: none;
+      color: #f4a623;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    #quote-wizard .qw-service-card.selected .qw-tick {
+      display: block;
+    }
+    #quote-wizard .qw-service-err {
+      font-size: 0.82rem;
+      color: #dc2626;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+
+    /* ── Form fields ── */
+    #quote-wizard .qw-field {
+      margin-bottom: 20px;
+    }
+    #quote-wizard .qw-field label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    #quote-wizard .qw-field label .qw-optional {
+      font-weight: 400;
+      color: #888;
+      font-size: 0.8rem;
+      margin-left: 4px;
+    }
+    #quote-wizard .qw-field input,
+    #quote-wizard .qw-field textarea,
+    #quote-wizard .qw-field select {
+      width: 100%;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #1a1a1a;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    #quote-wizard .qw-field input:focus,
+    #quote-wizard .qw-field textarea:focus,
+    #quote-wizard .qw-field select:focus {
+      border-color: #f4a623;
+      box-shadow: 0 0 0 3px rgba(244,166,35,0.18);
+    }
+    #quote-wizard .qw-field textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+    #quote-wizard .qw-field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+    }
+    #quote-wizard .qw-field-err {
+      font-size: 0.8rem;
+      color: #dc2626;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+    #quote-wizard .qw-field input.has-error,
+    #quote-wizard .qw-field textarea.has-error,
+    #quote-wizard .qw-field select.has-error {
+      border-color: #dc2626;
+    }
+
+    /* ── Two-column row ── */
+    #quote-wizard .qw-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 480px) {
+      #quote-wizard .qw-row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Photo upload (step 3) ── */
+    #quote-wizard .qw-upload-zone {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: #fafafa;
+      position: relative;
+    }
+    #quote-wizard .qw-upload-zone:hover {
+      border-color: #f4a623;
+      background: #fff8ec;
+    }
+    #quote-wizard .qw-upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    #quote-wizard .qw-upload-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    #quote-wizard .qw-upload-text {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.5;
+    }
+    #quote-wizard .qw-upload-text strong {
+      color: #2d5a1b;
+    }
+    #quote-wizard .qw-upload-note {
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: 6px;
+    }
+    #quote-wizard .qw-thumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    #quote-wizard .qw-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid #e0e0e0;
+    }
+    #quote-wizard .qw-thumb-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    #quote-wizard .qw-thumb-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    #quote-wizard .qw-photo-optional {
+      font-size: 0.82rem;
+      color: #888;
+      margin-top: 12px;
+      text-align: center;
+    }
+    #quote-wizard .qw-whatsapp-photo-note {
+      background: #e8f5e9;
+      border-left: 4px solid #2d5a1b;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      color: #2d5a1b;
+      margin-top: 16px;
+    }
+
+    /* ── Confirm summary (step 5) ── */
+    #quote-wizard .qw-summary {
+      background: #f4f8f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    #quote-wizard .qw-summary-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #2d5a1b;
+      margin-bottom: 6px;
+    }
+    #quote-wizard .qw-summary-services {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    #quote-wizard .qw-summary-tag {
+      background: #2d5a1b;
+      color: #fff;
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    #quote-wizard .qw-summary-row {
+      font-size: 0.88rem;
+      color: #444;
+      margin-bottom: 5px;
+    }
+    #quote-wizard .qw-summary-row strong {
+      color: #1a1a1a;
+    }
+    #quote-wizard .qw-confirm-msg {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    /* ── Navigation buttons ── */
+    #quote-wizard .qw-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      gap: 12px;
+    }
+    #quote-wizard .qw-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.1s;
+      font-family: inherit;
+    }
+    #quote-wizard .qw-btn:active {
+      transform: scale(0.97);
+    }
+    #quote-wizard .qw-btn-primary {
+      background: #f4a623;
+      color: #1a1a1a;
+    }
+    #quote-wizard .qw-btn-primary:hover { opacity: 0.88; }
+    #quote-wizard .qw-btn-secondary {
+      background: transparent;
+      color: #555;
+      border: 1.5px solid #ddd;
+    }
+    #quote-wizard .qw-btn-secondary:hover { background: #f5f5f5; }
+    #quote-wizard .qw-btn-submit {
+      background: #f4a623;
+      color: #1a1a1a;
+      width: 100%;
+      padding: 15px 28px;
+      font-size: 1rem;
+    }
+    #quote-wizard .qw-btn-submit:hover { opacity: 0.88; }
+    #quote-wizard .qw-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── Success state ── */
+    #quote-wizard .qw-success {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #quote-wizard .qw-success.visible { display: block; }
+    #quote-wizard .qw-success-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    #quote-wizard .qw-success h3 {
+      font-size: 1.5rem;
+      color: #2d5a1b;
+      margin-bottom: 10px;
+    }
+    #quote-wizard .qw-success p {
+      color: #555;
+      font-size: 0.95rem;
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Error live region ── */
+    #quote-wizard .qw-live-err {
+      font-size: 0.82rem;
+      color: #dc2626;
+      margin-top: 4px;
+    }
+
+    /* ── Responsive tweaks ── */
+    @media (max-width: 520px) {
+      #quote-wizard .qw-card { padding: 24px 18px; }
+      #quote-wizard .qw-services-grid { grid-template-columns: 1fr 1fr; }
+      #quote-wizard .qw-heading h2 { font-size: 1.5rem; }
+    }
+  </style>
+
+  <div class="qw-container">
+
+    <!-- Heading -->
+    <div class="qw-heading">
+      <h2>Get Your Free Quote</h2>
+      <p>Tell us about your project and we'll get back to you within 24 hours.</p>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="qw-progress-wrap" id="qw-progress-wrap">
+      <div class="qw-progress-label">
+        <span id="qw-step-label">Step 1 of 5</span>
+        <span id="qw-step-name">What do you need?</span>
+      </div>
+      <div class="qw-progress-track">
+        <div class="qw-progress-fill" id="qw-progress-fill" style="width:20%"></div>
+      </div>
+    </div>
+
+    <!-- Main card -->
+    <div class="qw-card" id="qw-wizard-card">
+
+      <!-- ── STEP 1: Service selection ── -->
+      <div class="qw-step active" id="qw-step-1">
+        <div class="qw-step-title">What do you need?</div>
+        <div class="qw-step-sub">Select all that apply — you can choose more than one.</div>
+
+        <div class="qw-services-grid" id="qw-services-grid">
+          <!-- Cards injected by JS -->
+        </div>
+        <div class="qw-service-err" id="qw-service-err" role="alert" aria-live="assertive"></div>
+
+        <div class="qw-nav">
+          <span></span>
+          <button class="qw-btn qw-btn-primary" onclick="qwNext(1)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Details + follow-up questions ── -->
+      <div class="qw-step" id="qw-step-2">
+        <div class="qw-step-title">Tell us more</div>
+        <div class="qw-step-sub">A little detail helps us give you an accurate quote.</div>
+
+        <div class="qw-field">
+          <label for="qw-description">Describe what you need in a few words…</label>
+          <textarea id="qw-description" name="description" placeholder="e.g. Overgrown back garden needs a full redesign, new lawn, and a small patio area…"></textarea>
+          <div class="qw-field-err" id="qw-description-err" role="alert" aria-live="assertive"></div>
+        </div>
+
+        <!-- Landscaper follow-up Q1: area size -->
+        <div class="qw-field">
+          <label for="qw-area-size">What's the approximate size of the area?</label>
+          <select id="qw-area-size" name="area_size">
+            <option value="">— Please select —</option>
+            <option value="Small (under 30m²)">Small (under 30m²)</option>
+            <option value="Medium (30–100m²)">Medium (30–100m²)</option>
+            <option value="Large (100m²+)">Large (100m²+)</option>
+          </select>
+          <div class="qw-field-err" id="qw-area-size-err" role="alert" aria-live="assertive"></div>
+        </div>
+
+        <!-- Landscaper follow-up Q2: existing hard landscaping -->
+        <div class="qw-field">
+          <label for="qw-hard-landscaping">Is there existing hard landscaping to remove or work around?</label>
+          <select id="qw-hard-landscaping" name="hard_landscaping">
+            <option value="">— Please select —</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Not sure">Not sure</option>
+          </select>
+          <div class="qw-field-err" id="qw-hard-landscaping-err" role="alert" aria-live="assertive"></div>
+        </div>
+
+        <div class="qw-nav">
+          <button class="qw-btn qw-btn-secondary" onclick="qwBack(2)">&larr; Back</button>
+          <button class="qw-btn qw-btn-primary" onclick="qwNext(2)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Photos ── -->
+      <div class="qw-step" id="qw-step-3">
+        <div class="qw-step-title">Add photos <span style="font-weight:400;font-size:0.9rem;color:#888;">(optional)</span></div>
+        <div class="qw-step-sub">A picture helps us give you an accurate quote.</div>
+
+        <div class="qw-upload-zone" id="qw-upload-zone">
+          <input
+            type="file"
+            id="qw-photo-input"
+            accept=".jpg,.jpeg,.png,.webp,.heic"
+            multiple
+            aria-label="Upload up to 4 photos"
+          />
+          <div class="qw-upload-icon">📷</div>
+          <div class="qw-upload-text">
+            <strong>Upload up to 4 photos</strong><br>
+            Tap to browse or drag &amp; drop
+          </div>
+          <div class="qw-upload-note">JPG, PNG, WEBP or HEIC &mdash; max 5MB each</div>
+        </div>
+
+        <div class="qw-thumbs" id="qw-thumbs"></div>
+
+        <div class="qw-whatsapp-photo-note">
+          <strong>Tip:</strong> You can also send your photos directly in the WhatsApp conversation after submitting.
+        </div>
+
+        <p class="qw-photo-optional">This step is optional — skip it if you prefer.</p>
+
+        <div class="qw-nav">
+          <button class="qw-btn qw-btn-secondary" onclick="qwBack(3)">&larr; Back</button>
+          <button class="qw-btn qw-btn-primary" onclick="qwNext(3)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: Contact details ── -->
+      <div class="qw-step" id="qw-step-4">
+        <div class="qw-step-title">Your details</div>
+        <div class="qw-step-sub">So we know how to reach you with your quote.</div>
+
+        <div class="qw-field">
+          <label for="qw-name">Full name</label>
+          <input type="text" id="qw-name" name="name" placeholder="Jane Smith" autocomplete="name" />
+          <div class="qw-field-err" id="qw-name-err" role="alert" aria-live="assertive"></div>
+        </div>
+
+        <div class="qw-row-2">
+          <div class="qw-field">
+            <label for="qw-phone">Phone number</label>
+            <input type="tel" id="qw-phone" name="phone" placeholder="07700 900000" autocomplete="tel" />
+            <div class="qw-field-err" id="qw-phone-err" role="alert" aria-live="assertive"></div>
+          </div>
+          <div class="qw-field">
+            <label for="qw-email">Email address</label>
+            <input type="email" id="qw-email" name="email" placeholder="jane@email.com" autocomplete="email" />
+            <div class="qw-field-err" id="qw-email-err" role="alert" aria-live="assertive"></div>
+          </div>
+        </div>
+
+        <div class="qw-field">
+          <label for="qw-postcode">Postcode <span class="qw-optional">(recommended)</span></label>
+          <input type="text" id="qw-postcode" name="postcode" placeholder="e.g. SW1A 1AA" autocomplete="postal-code" style="max-width:200px;" />
+        </div>
+
+        <div class="qw-nav">
+          <button class="qw-btn qw-btn-secondary" onclick="qwBack(4)">&larr; Back</button>
+          <button class="qw-btn qw-btn-primary" onclick="qwNext(4)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 5: Confirm & submit ── -->
+      <div class="qw-step" id="qw-step-5">
+        <div class="qw-step-title">Confirm &amp; send</div>
+        <div class="qw-step-sub">Check your details below, then send your quote request.</div>
+
+        <div class="qw-summary" id="qw-summary">
+          <!-- Injected by JS -->
+        </div>
+
+        <p class="qw-confirm-msg">
+          Clicking <strong>"Send My Quote Request"</strong> will open WhatsApp with your details pre-filled.
+          Hit send in WhatsApp to submit your enquiry — we'll get back to you within 24 hours.
+        </p>
+        <p class="qw-confirm-msg" style="font-size:0.82rem;color:#888;">
+          You can also send photos of your garden or project directly in the WhatsApp chat.
+        </p>
+
+        <button class="qw-btn qw-btn-submit" onclick="qwSubmit()">
+          Send My Quote Request &rarr;
+        </button>
+
+        <div class="qw-nav" style="margin-top:14px;">
+          <button class="qw-btn qw-btn-secondary" onclick="qwBack(5)">&larr; Back</button>
+          <span></span>
+        </div>
+      </div>
+
+    </div><!-- /.qw-card -->
+
+    <!-- Success message (replaces card) -->
+    <div class="qw-success" id="qw-success">
+      <div class="qw-success-icon">🌿</div>
+      <h3>Quote request sent!</h3>
+      <p>Thanks — your WhatsApp message has been opened. Hit send if you haven't already, and we'll be in touch within 24 hours with your free quote.</p>
+    </div>
+
+  </div><!-- /.qw-container -->
+
+  <script>
+    (function () {
+
+      /* ── Config ── */
+      var BUSINESS_NAME = 'Green Garden Landscaping';
+      var WHATSAPP_NUMBER = '447891234567'; // no + prefix for wa.me
+
+      var SERVICES = [
+        'Garden design & consultation',
+        'Lawn care & maintenance',
+        'Decking & patio installation',
+        'Tree surgery',
+        'Hedge trimming & shaping',
+        'Other'
+      ];
+
+      /* ── State ── */
+      var state = {
+        currentStep: 1,
+        totalSteps: 5,
+        selectedServices: [],
+        description: '',
+        areaSize: '',
+        hardLandscaping: '',
+        photos: [],      // File objects
+        photoPreviews: [],
+        name: '',
+        phone: '',
+        email: '',
+        postcode: ''
+      };
+
+      var STEP_NAMES = [
+        'What do you need?',
+        'Tell us more',
+        'Photos (optional)',
+        'Your details',
+        'Confirm & send'
+      ];
+
+      /* ── Build service cards ── */
+      var grid = document.getElementById('qw-services-grid');
+      SERVICES.forEach(function (svc) {
+        var card = document.createElement('div');
+        card.className = 'qw-service-card';
+        card.setAttribute('role', 'checkbox');
+        card.setAttribute('aria-checked', 'false');
+        card.setAttribute('tabindex', '0');
+        card.dataset.service = svc;
+
+        card.innerHTML = '<span class="qw-tick">&#10003;</span>' + svc;
+
+        card.addEventListener('click', function () { toggleService(card, svc); });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            toggleService(card, svc);
+          }
+        });
+
+        grid.appendChild(card);
+      });
+
+      function toggleService(card, svc) {
+        var idx = state.selectedServices.indexOf(svc);
+        if (idx === -1) {
+          state.selectedServices.push(svc);
+          card.classList.add('selected');
+          card.setAttribute('aria-checked', 'true');
+        } else {
+          state.selectedServices.splice(idx, 1);
+          card.classList.remove('selected');
+          card.setAttribute('aria-checked', 'false');
+        }
+        document.getElementById('qw-service-err').textContent = '';
+      }
+
+      /* ── Photo upload ── */
+      var photoInput = document.getElementById('qw-photo-input');
+      photoInput.addEventListener('change', function () {
+        var files = Array.from(photoInput.files);
+        files.forEach(function (file) {
+          if (state.photos.length >= 4) return;
+          if (file.size > 5 * 1024 * 1024) return; // skip >5MB
+          state.photos.push(file);
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            state.photoPreviews.push(e.target.result);
+            renderThumbs();
+          };
+          reader.readAsDataURL(file);
+        });
+        // reset so same file can be re-selected if removed
+        photoInput.value = '';
+      });
+
+      function renderThumbs() {
+        var thumbs = document.getElementById('qw-thumbs');
+        thumbs.innerHTML = '';
+        state.photoPreviews.forEach(function (src, i) {
+          var wrap = document.createElement('div');
+          wrap.className = 'qw-thumb-wrap';
+
+          var img = document.createElement('img');
+          img.className = 'qw-thumb';
+          img.src = src;
+          img.alt = 'Photo ' + (i + 1);
+
+          var btn = document.createElement('button');
+          btn.className = 'qw-thumb-remove';
+          btn.setAttribute('aria-label', 'Remove photo ' + (i + 1));
+          btn.innerHTML = '&times;';
+          btn.addEventListener('click', function () {
+            state.photos.splice(i, 1);
+            state.photoPreviews.splice(i, 1);
+            renderThumbs();
+          });
+
+          wrap.appendChild(img);
+          wrap.appendChild(btn);
+          thumbs.appendChild(wrap);
+        });
+      }
+
+      /* ── Progress ── */
+      function updateProgress(step) {
+        var pct = Math.round((step / state.totalSteps) * 100);
+        document.getElementById('qw-progress-fill').style.width = pct + '%';
+        document.getElementById('qw-step-label').textContent = 'Step ' + step + ' of ' + state.totalSteps;
+        document.getElementById('qw-step-name').textContent = STEP_NAMES[step - 1];
+      }
+
+      /* ── Show step ── */
+      function showStep(step) {
+        document.querySelectorAll('#quote-wizard .qw-step').forEach(function (el) {
+          el.classList.remove('active');
+        });
+        var target = document.getElementById('qw-step-' + step);
+        if (target) target.classList.add('active');
+        state.currentStep = step;
+        updateProgress(step);
+        window.scrollTo({ top: document.getElementById('quote-wizard').offsetTop - 20, behavior: 'smooth' });
+      }
+
+      /* ── Validate step ── */
+      function validateStep(step) {
+        var ok = true;
+
+        if (step === 1) {
+          if (state.selectedServices.length === 0) {
+            document.getElementById('qw-service-err').textContent = 'Please select at least one service.';
+            ok = false;
+          }
+        }
+
+        if (step === 2) {
+          var desc = document.getElementById('qw-description').value.trim();
+          if (!desc) {
+            showFieldErr('qw-description', 'qw-description-err', 'Please describe what you need.');
+            ok = false;
+          } else {
+            clearFieldErr('qw-description', 'qw-description-err');
+            state.description = desc;
+          }
+
+          var areaSize = document.getElementById('qw-area-size').value;
+          if (!areaSize) {
+            showFieldErr('qw-area-size', 'qw-area-size-err', 'Please select an area size.');
+            ok = false;
+          } else {
+            clearFieldErr('qw-area-size', 'qw-area-size-err');
+            state.areaSize = areaSize;
+          }
+
+          var hardLandscaping = document.getElementById('qw-hard-landscaping').value;
+          if (!hardLandscaping) {
+            showFieldErr('qw-hard-landscaping', 'qw-hard-landscaping-err', 'Please select an option.');
+            ok = false;
+          } else {
+            clearFieldErr('qw-hard-landscaping', 'qw-hard-landscaping-err');
+            state.hardLandscaping = hardLandscaping;
+          }
+        }
+
+        if (step === 4) {
+          var name = document.getElementById('qw-name').value.trim();
+          if (!name) {
+            showFieldErr('qw-name', 'qw-name-err', 'Please enter your name.');
+            ok = false;
+          } else {
+            clearFieldErr('qw-name', 'qw-name-err');
+            state.name = name;
+          }
+
+          var phone = document.getElementById('qw-phone').value.trim();
+          if (!phone) {
+            showFieldErr('qw-phone', 'qw-phone-err', 'Please enter your phone number.');
+            ok = false;
+          } else {
+            clearFieldErr('qw-phone', 'qw-phone-err');
+            state.phone = phone;
+          }
+
+          var email = document.getElementById('qw-email').value.trim();
+          var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!email || !emailRe.test(email)) {
+            showFieldErr('qw-email', 'qw-email-err', 'Please enter a valid email address.');
+            ok = false;
+          } else {
+            clearFieldErr('qw-email', 'qw-email-err');
+            state.email = email;
+          }
+
+          state.postcode = document.getElementById('qw-postcode').value.trim();
+        }
+
+        return ok;
+      }
+
+      function showFieldErr(inputId, errId, msg) {
+        var el = document.getElementById(inputId);
+        var err = document.getElementById(errId);
+        if (el) el.classList.add('has-error');
+        if (err) err.textContent = msg;
+      }
+
+      function clearFieldErr(inputId, errId) {
+        var el = document.getElementById(inputId);
+        var err = document.getElementById(errId);
+        if (el) el.classList.remove('has-error');
+        if (err) err.textContent = '';
+      }
+
+      /* ── Navigation ── */
+      window.qwNext = function (fromStep) {
+        if (!validateStep(fromStep)) return;
+        if (fromStep === 4) buildSummary();
+        showStep(fromStep + 1);
+      };
+
+      window.qwBack = function (fromStep) {
+        showStep(fromStep - 1);
+      };
+
+      /* ── Build summary for step 5 ── */
+      function buildSummary() {
+        var s = document.getElementById('qw-summary');
+
+        var servicesHtml = state.selectedServices.map(function (svc) {
+          return '<span class="qw-summary-tag">' + escHtml(svc) + '</span>';
+        }).join('');
+
+        var rows = [
+          ['Services', '<div class="qw-summary-services">' + servicesHtml + '</div>'],
+          ['Description', escHtml(state.description)],
+          ['Area size', escHtml(state.areaSize)],
+          ['Existing hard landscaping', escHtml(state.hardLandscaping)],
+          ['Name', escHtml(state.name)],
+          ['Phone', escHtml(state.phone)],
+          ['Email', escHtml(state.email)],
+          state.postcode ? ['Postcode', escHtml(state.postcode)] : null,
+          state.photos.length > 0 ? ['Photos', state.photos.length + ' photo(s) selected'] : null
+        ].filter(Boolean);
+
+        s.innerHTML = rows.map(function (row) {
+          if (row[0] === 'Services') {
+            return '<div class="qw-summary-label">' + row[0] + '</div>' + row[1];
+          }
+          return '<div class="qw-summary-row"><strong>' + row[0] + ':</strong> ' + row[1] + '</div>';
+        }).join('');
+      }
+
+      /* ── Submit: WhatsApp routing ── */
+      window.qwSubmit = function () {
+        // Build the pre-filled WhatsApp message
+        var services = state.selectedServices.join(', ');
+        var msgParts = [
+          'Hi ' + BUSINESS_NAME + '! I\'d like a quote for: ' + services + '.',
+          'Details: ' + state.description,
+          'Area size: ' + state.areaSize + '.',
+          'Existing hard landscaping: ' + state.hardLandscaping + '.',
+          'Name: ' + state.name,
+          'Phone: ' + state.phone,
+          'Email: ' + state.email
+        ];
+        if (state.postcode) msgParts.push('Postcode: ' + state.postcode);
+        if (state.photos.length > 0) msgParts.push('(I will send ' + state.photos.length + ' photo(s) in this chat.)');
+
+        var message = msgParts.join('\n');
+        var waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+        // Show success
+        document.getElementById('qw-wizard-card').style.display = 'none';
+        document.getElementById('qw-progress-wrap').style.display = 'none';
+        document.getElementById('qw-success').classList.add('visible');
+      };
+
+      /* ── Helpers ── */
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      /* ── Init progress ── */
+      updateProgress(1);
+
+    })();
+  </script>
+
+</section>
+
+</body>
+</html>

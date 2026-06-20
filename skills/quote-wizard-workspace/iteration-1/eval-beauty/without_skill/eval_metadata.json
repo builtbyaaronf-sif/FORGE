@@ -1,0 +1,6 @@
+{
+  "eval_id": 3,
+  "eval_name": "beauty-hubspot",
+  "prompt": "Build a quote wizard for Glow Beauty Studio. They offer: Haircut & blow-dry, Colour & highlights, Hair extensions, Lash extensions, Brow shaping & tinting. Brand colours: #1a0a2e (primary), #c9a96e (accent). Route to HubSpot, form ID 123456789, portal ID 987654.",
+  "config": "without_skill"
+}

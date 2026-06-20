@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get a Quote — Rapid Flow Plumbing</title>
+</head>
+<body>
+
+<section id="quote-wizard">
+<style>
+  /* ── Reset & scope ── */
+  #quote-wizard *, #quote-wizard *::before, #quote-wizard *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  #quote-wizard {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #1a1a1a;
+    background: #f9f9f9;
+    padding: 24px 16px 40px;
+  }
+
+  /* ── Container ── */
+  #qw-container {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 28px 20px 32px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  }
+
+  /* ── Header ── */
+  #qw-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  #qw-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 4px;
+  }
+  #qw-header p {
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  /* ── Progress bar ── */
+  #qw-progress-wrap {
+    margin-bottom: 24px;
+  }
+  #qw-progress-label {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  #qw-progress-bar-bg {
+    background: #e5e7eb;
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+  }
+  #qw-progress-bar-fill {
+    height: 100%;
+    background: #003366;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+    width: 20%;
+  }
+
+  /* ── Step heading ── */
+  .qw-step-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 6px;
+  }
+  .qw-step-subtext {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 20px;
+  }
+
+  /* ── Service cards ── */
+  #qw-service-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .qw-service-card {
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    padding: 14px 10px;
+    min-height: 44px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: #fff;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .qw-service-card:hover {
+    border-color: #ff6600;
+  }
+  .qw-service-card.selected {
+    border-color: #ff6600;
+    background: #fff3eb;
+    color: #cc4400;
+    font-weight: 600;
+  }
+  .qw-service-card:focus-visible {
+    outline: 3px solid #ff6600;
+    outline-offset: 2px;
+  }
+
+  /* ── Form fields ── */
+  .qw-field {
+    margin-bottom: 18px;
+  }
+  .qw-field label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  .qw-field .qw-optional {
+    font-weight: 400;
+    color: #888;
+    font-size: 0.82rem;
+    margin-left: 4px;
+  }
+  .qw-field input,
+  .qw-field select,
+  .qw-field textarea {
+    width: 100%;
+    font-size: 16px; /* prevents iOS zoom */
+    padding: 12px 14px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #1a1a1a;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  .qw-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  .qw-field input:focus,
+  .qw-field select:focus,
+  .qw-field textarea:focus {
+    outline: none;
+    border-color: #003366;
+  }
+  .qw-field textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  .qw-field input.qw-error,
+  .qw-field select.qw-error,
+  .qw-field textarea.qw-error {
+    border-color: #dc2626;
+  }
+  .qw-field-error {
+    color: #dc2626;
+    font-size: 0.82rem;
+    margin-top: 4px;
+    display: none;
+  }
+  .qw-field-error.visible {
+    display: block;
+  }
+
+  /* ── Photo upload ── */
+  #qw-photo-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    background: #fafafa;
+    min-height: 44px;
+  }
+  #qw-photo-zone:hover {
+    border-color: #ff6600;
+  }
+  #qw-photo-zone p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  #qw-photo-zone .qw-photo-hint {
+    font-size: 0.8rem;
+    color: #888;
+  }
+  #qw-photo-input {
+    display: none;
+  }
+  #qw-photo-btn {
+    display: inline-block;
+    background: #003366;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    min-height: 44px;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  #qw-photo-btn:hover {
+    background: #002244;
+  }
+  #qw-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .qw-thumb-wrap {
+    position: relative;
+    width: 72px;
+    height: 72px;
+  }
+  .qw-thumb-wrap img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #e5e7eb;
+  }
+  .qw-thumb-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    line-height: 1;
+    padding: 0;
+  }
+
+  /* ── Step 5 summary ── */
+  #qw-summary-services {
+    background: #f0f4ff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  #qw-summary-services p {
+    font-size: 0.9rem;
+    color: #003366;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  #qw-summary-services ul {
+    list-style: none;
+    padding: 0;
+  }
+  #qw-summary-services ul li {
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    padding: 3px 0;
+  }
+  #qw-summary-services ul li::before {
+    content: "✓ ";
+    color: #ff6600;
+    font-weight: 700;
+  }
+  #qw-confirm-note {
+    font-size: 0.88rem;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* ── Buttons ── */
+  #qw-nav {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .qw-btn {
+    flex: 1;
+    min-height: 48px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #qw-btn-back {
+    background: #e5e7eb;
+    color: #333;
+  }
+  #qw-btn-back:hover {
+    background: #d1d5db;
+  }
+  #qw-btn-next {
+    background: #ff6600;
+    color: #fff;
+  }
+  #qw-btn-next:hover {
+    background: #e05500;
+  }
+  #qw-btn-next:disabled,
+  #qw-btn-next[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* ── Error banner ── */
+  #qw-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: #dc2626;
+    margin-top: 12px;
+    display: none;
+  }
+  #qw-error-banner[aria-live] {}
+
+  /* ── Success state ── */
+  #qw-success {
+    text-align: center;
+    padding: 32px 16px;
+    display: none;
+  }
+  #qw-success .qw-success-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+  #qw-success h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 10px;
+  }
+  #qw-success p {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ── Step visibility ── */
+  .qw-step { display: none; }
+  .qw-step.active { display: block; }
+
+  /* ── Responsive: wider screens ── */
+  @media (min-width: 481px) {
+    #qw-service-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    #qw-nav {
+      flex-direction: row;
+    }
+    .qw-btn {
+      flex: 1;
+    }
+  }
+
+  /* ── Mobile: stack nav buttons full-width ── */
+  @media (max-width: 480px) {
+    #qw-nav {
+      flex-direction: column-reverse;
+    }
+    .qw-btn {
+      width: 100%;
+    }
+    #qw-service-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    #qw-container {
+      padding: 20px 14px 24px;
+    }
+  }
+</style>
+
+<div id="qw-container">
+
+  <!-- Header -->
+  <div id="qw-header">
+    <h2>Get a Free Quote</h2>
+    <p>Rapid Flow Plumbing — tell us what you need and we'll be in touch fast.</p>
+  </div>
+
+  <!-- Progress -->
+  <div id="qw-progress-wrap" aria-label="Form progress">
+    <div id="qw-progress-label">Step 1 of 5</div>
+    <div id="qw-progress-bar-bg" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5">
+      <div id="qw-progress-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- Success screen (hidden until submission) -->
+  <div id="qw-success" role="alert">
+    <div class="qw-success-icon">&#10003;</div>
+    <h3>Quote request sent!</h3>
+    <p>Thanks — we've received your request and will be in touch shortly. If your job is urgent, give us a call directly.</p>
+  </div>
+
+  <!-- The form -->
+  <form id="qw-form" method="POST" action="https://formspree.io/f/xkzgbpqw" enctype="multipart/form-data" novalidate>
+
+    <!-- Hidden fields for Formspree -->
+    <input type="hidden" name="_subject" value="New Quote Request — Rapid Flow Plumbing" />
+
+    <!-- Step 1: Service selection -->
+    <div class="qw-step active" id="qw-step-1">
+      <div class="qw-step-heading">What do you need?</div>
+      <p class="qw-step-subtext">Select all that apply.</p>
+      <div id="qw-service-grid" role="group" aria-label="Select services">
+        <button type="button" class="qw-service-card" data-service="Emergency call-out" aria-pressed="false">Emergency call-out</button>
+        <button type="button" class="qw-service-card" data-service="Boiler service &amp; repair" aria-pressed="false">Boiler service &amp; repair</button>
+        <button type="button" class="qw-service-card" data-service="Bathroom installation" aria-pressed="false">Bathroom installation</button>
+        <button type="button" class="qw-service-card" data-service="Leaking tap or pipe" aria-pressed="false">Leaking tap or pipe</button>
+        <button type="button" class="qw-service-card" data-service="Blocked drains" aria-pressed="false">Blocked drains</button>
+        <button type="button" class="qw-service-card" data-service="Other" aria-pressed="false">Other</button>
+      </div>
+      <div id="qw-error-banner" aria-live="polite">Please select at least one service to continue.</div>
+    </div>
+
+    <!-- Step 2: Tell us more -->
+    <div class="qw-step" id="qw-step-2">
+      <div class="qw-step-heading">Tell us more</div>
+      <p class="qw-step-subtext">A little detail helps us give you an accurate quote.</p>
+
+      <!-- Hidden: selected services passed to Formspree -->
+      <input type="hidden" name="services" id="qw-hidden-services" />
+
+      <div class="qw-field">
+        <label for="qw-description">Describe what you need in a few words&hellip; <span class="qw-optional">(required)</span></label>
+        <textarea id="qw-description" name="description" rows="4" placeholder="e.g. Boiler stopped working this morning, no hot water or heating…"></textarea>
+        <div class="qw-field-error" id="qw-err-description">Please describe your job.</div>
+      </div>
+
+      <!-- Smart follow-up: repair vs new install -->
+      <div class="qw-field">
+        <label for="qw-job-type">Is this a repair or a new installation?</label>
+        <select id="qw-job-type" name="job_type">
+          <option value="" disabled selected>Select an option</option>
+          <option value="Repair">Repair</option>
+          <option value="New installation">New installation</option>
+          <option value="Not sure">Not sure</option>
+        </select>
+      </div>
+
+      <!-- Smart follow-up: urgency -->
+      <div class="qw-field">
+        <label for="qw-urgency">Is this urgent? (e.g. active leak or no hot water)</label>
+        <select id="qw-urgency" name="urgency">
+          <option value="" disabled selected>Select an option</option>
+          <option value="Yes, urgent">Yes, urgent</option>
+          <option value="No, can wait">No, can wait</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 3: Photos -->
+    <div class="qw-step" id="qw-step-3">
+      <div class="qw-step-heading">Add photos <span style="font-weight:400;color:#888;font-size:0.9rem;">(optional)</span></div>
+      <p class="qw-step-subtext">Upload up to 4 photos — a picture helps us give you an accurate quote.</p>
+
+      <div id="qw-photo-zone" role="button" tabindex="0" aria-label="Click to upload photos">
+        <p>Tap to add photos of your job</p>
+        <p class="qw-photo-hint">JPG, PNG, WEBP, HEIC &mdash; max 5MB each &mdash; up to 4 photos</p>
+        <button type="button" id="qw-photo-btn">Choose Photos</button>
+      </div>
+      <input type="file" id="qw-photo-input" name="photos[]" accept=".jpg,.jpeg,.png,.webp,.heic" multiple />
+      <div id="qw-thumbs"></div>
+      <div id="qw-photo-error" style="color:#dc2626;font-size:0.82rem;margin-top:8px;display:none;"></div>
+    </div>
+
+    <!-- Step 4: Contact details -->
+    <div class="qw-step" id="qw-step-4">
+      <div class="qw-step-heading">Your details</div>
+      <p class="qw-step-subtext">We'll use these to send your quote.</p>
+
+      <div class="qw-field">
+        <label for="qw-name">Full name</label>
+        <input type="text" id="qw-name" name="name" autocomplete="name" placeholder="e.g. Sarah Johnson" />
+        <div class="qw-field-error" id="qw-err-name">Please enter your name.</div>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-phone">Phone number</label>
+        <input type="tel" id="qw-phone" name="phone" autocomplete="tel" placeholder="e.g. 07700 900000" />
+        <div class="qw-field-error" id="qw-err-phone">Please enter your phone number.</div>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-email">Email address</label>
+        <input type="email" id="qw-email" name="email" autocomplete="email" placeholder="e.g. sarah@example.com" />
+        <div class="qw-field-error" id="qw-err-email">Please enter a valid email address.</div>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-postcode">Postcode <span class="qw-optional">(recommended)</span></label>
+        <input type="text" id="qw-postcode" name="postcode" autocomplete="postal-code" placeholder="e.g. SW1A 1AA" style="text-transform:uppercase;" />
+      </div>
+    </div>
+
+    <!-- Step 5: Confirm & submit -->
+    <div class="qw-step" id="qw-step-5">
+      <div class="qw-step-heading">Confirm &amp; send</div>
+      <p class="qw-step-subtext">Almost done — check your details below then hit send.</p>
+
+      <div id="qw-summary-services">
+        <p>Selected services:</p>
+        <ul id="qw-summary-list"></ul>
+      </div>
+
+      <p id="qw-confirm-note">
+        By submitting, you agree to Rapid Flow Plumbing contacting you to discuss your quote. We'll get back to you as quickly as possible.
+      </p>
+
+      <div id="qw-submit-error" style="color:#dc2626;font-size:0.88rem;margin-bottom:12px;display:none;" aria-live="polite">
+        Something went wrong. Please try again or contact us directly.
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div id="qw-nav">
+      <button type="button" class="qw-btn" id="qw-btn-back" style="display:none;">Back</button>
+      <button type="button" class="qw-btn" id="qw-btn-next">Next</button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var TOTAL_STEPS = 5;
+  var currentStep = 1;
+  var selectedServices = [];
+  var uploadedFiles = []; // {file, dataUrl}
+
+  // ── Element refs ──
+  var form        = document.getElementById('qw-form');
+  var progressLbl = document.getElementById('qw-progress-label');
+  var progressBar = document.getElementById('qw-progress-bar-fill');
+  var progressRole= document.getElementById('qw-progress-bar-bg');
+  var btnBack     = document.getElementById('qw-btn-back');
+  var btnNext     = document.getElementById('qw-btn-next');
+  var successBox  = document.getElementById('qw-success');
+  var headerBox   = document.getElementById('qw-header');
+  var progressWrap= document.getElementById('qw-progress-wrap');
+  var navBox      = document.getElementById('qw-nav');
+  var errorBanner = document.getElementById('qw-error-banner');
+  var submitError = document.getElementById('qw-submit-error');
+  var photoZone   = document.getElementById('qw-photo-zone');
+  var photoInput  = document.getElementById('qw-photo-input');
+  var photoBtn    = document.getElementById('qw-photo-btn');
+  var thumbsWrap  = document.getElementById('qw-thumbs');
+  var photoError  = document.getElementById('qw-photo-error');
+
+  // ── Helpers ──
+  function showStep(n) {
+    for (var i = 1; i <= TOTAL_STEPS; i++) {
+      var el = document.getElementById('qw-step-' + i);
+      if (el) el.classList.toggle('active', i === n);
+    }
+    progressLbl.textContent = 'Step ' + n + ' of ' + TOTAL_STEPS;
+    var pct = (n / TOTAL_STEPS) * 100;
+    progressBar.style.width = pct + '%';
+    progressRole.setAttribute('aria-valuenow', n);
+
+    btnBack.style.display = n === 1 ? 'none' : 'flex';
+    btnNext.textContent   = n === TOTAL_STEPS ? 'Send My Quote Request' : 'Next';
+
+    // Hide global error banner when changing steps
+    errorBanner.style.display = 'none';
+    currentStep = n;
+  }
+
+  function setFieldError(inputId, errorId, show) {
+    var input = document.getElementById(inputId);
+    var error = document.getElementById(errorId);
+    if (input) input.classList.toggle('qw-error', show);
+    if (error) error.classList.toggle('visible', show);
+  }
+
+  // ── Step 1: Service card toggle ──
+  var cards = document.querySelectorAll('.qw-service-card');
+  cards.forEach(function (card) {
+    card.addEventListener('click', function () {
+      var svc = card.getAttribute('data-service');
+      var idx = selectedServices.indexOf(svc);
+      if (idx > -1) {
+        selectedServices.splice(idx, 1);
+        card.classList.remove('selected');
+        card.setAttribute('aria-pressed', 'false');
+      } else {
+        selectedServices.push(svc);
+        card.classList.add('selected');
+        card.setAttribute('aria-pressed', 'true');
+      }
+      // Hide error once selection made
+      if (selectedServices.length > 0) {
+        errorBanner.style.display = 'none';
+      }
+    });
+
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+
+  // ── Step 3: Photo upload ──
+  photoBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    photoInput.click();
+  });
+  photoZone.addEventListener('click', function () {
+    photoInput.click();
+  });
+  photoZone.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      photoInput.click();
+    }
+  });
+
+  photoInput.addEventListener('change', function (e) {
+    var files = Array.from(e.target.files || []);
+    photoError.style.display = 'none';
+
+    files.forEach(function (file) {
+      if (uploadedFiles.length >= 4) {
+        photoError.textContent = 'Maximum 4 photos allowed.';
+        photoError.style.display = 'block';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        photoError.textContent = '"' + file.name + '" is too large (max 5MB).';
+        photoError.style.display = 'block';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        uploadedFiles.push({ file: file, dataUrl: ev.target.result });
+        renderThumbs();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input so same file can be re-added if removed
+    photoInput.value = '';
+  });
+
+  function renderThumbs() {
+    thumbsWrap.innerHTML = '';
+    uploadedFiles.forEach(function (item, idx) {
+      var wrap = document.createElement('div');
+      wrap.className = 'qw-thumb-wrap';
+
+      var img = document.createElement('img');
+      img.src = item.dataUrl;
+      img.alt = 'Photo ' + (idx + 1);
+
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'qw-thumb-remove';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.setAttribute('aria-label', 'Remove photo ' + (idx + 1));
+      removeBtn.addEventListener('click', function () {
+        uploadedFiles.splice(idx, 1);
+        renderThumbs();
+        if (uploadedFiles.length < 4) {
+          photoError.style.display = 'none';
+        }
+      });
+
+      wrap.appendChild(img);
+      wrap.appendChild(removeBtn);
+      thumbsWrap.appendChild(wrap);
+    });
+  }
+
+  // ── Validation ──
+  function validateStep(n) {
+    if (n === 1) {
+      if (selectedServices.length === 0) {
+        errorBanner.style.display = 'block';
+        errorBanner.textContent = 'Please select at least one service to continue.';
+        return false;
+      }
+      // Pass selected services to hidden field
+      document.getElementById('qw-hidden-services').value = selectedServices.join(', ');
+      return true;
+    }
+
+    if (n === 2) {
+      var desc = document.getElementById('qw-description').value.trim();
+      var ok = true;
+      if (!desc) {
+        setFieldError('qw-description', 'qw-err-description', true);
+        ok = false;
+      } else {
+        setFieldError('qw-description', 'qw-err-description', false);
+      }
+      return ok;
+    }
+
+    if (n === 3) {
+      // Photos optional — always passes
+      return true;
+    }
+
+    if (n === 4) {
+      var name  = document.getElementById('qw-name').value.trim();
+      var phone = document.getElementById('qw-phone').value.trim();
+      var email = document.getElementById('qw-email').value.trim();
+      var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var ok = true;
+
+      if (!name)  { setFieldError('qw-name',  'qw-err-name',  true);  ok = false; }
+      else          setFieldError('qw-name',  'qw-err-name',  false);
+
+      if (!phone) { setFieldError('qw-phone', 'qw-err-phone', true);  ok = false; }
+      else          setFieldError('qw-phone', 'qw-err-phone', false);
+
+      if (!email || !emailRe.test(email)) {
+        setFieldError('qw-email', 'qw-err-email', true); ok = false;
+      } else {
+        setFieldError('qw-email', 'qw-err-email', false);
+      }
+
+      return ok;
+    }
+
+    return true;
+  }
+
+  // ── Step 5: Build summary ──
+  function buildSummary() {
+    var list = document.getElementById('qw-summary-list');
+    list.innerHTML = '';
+    selectedServices.forEach(function (svc) {
+      var li = document.createElement('li');
+      li.textContent = svc;
+      list.appendChild(li);
+    });
+  }
+
+  // ── Navigation ──
+  btnNext.addEventListener('click', function () {
+    if (!validateStep(currentStep)) return;
+
+    if (currentStep === TOTAL_STEPS) {
+      submitForm();
+      return;
+    }
+
+    if (currentStep === 4) {
+      buildSummary();
+    }
+
+    showStep(currentStep + 1);
+    window.scrollTo({ top: document.getElementById('qw-container').getBoundingClientRect().top + window.scrollY - 16, behavior: 'smooth' });
+  });
+
+  btnBack.addEventListener('click', function () {
+    if (currentStep > 1) {
+      showStep(currentStep - 1);
+      window.scrollTo({ top: document.getElementById('qw-container').getBoundingClientRect().top + window.scrollY - 16, behavior: 'smooth' });
+    }
+  });
+
+  // ── Submit via Formspree (fetch) with file attachments ──
+  function submitForm() {
+    btnNext.disabled = true;
+    btnNext.textContent = 'Sending…';
+    submitError.style.display = 'none';
+
+    var data = new FormData();
+    data.append('_subject', 'New Quote Request — Rapid Flow Plumbing');
+    data.append('services',    document.getElementById('qw-hidden-services').value);
+    data.append('description', document.getElementById('qw-description').value.trim());
+    data.append('job_type',    document.getElementById('qw-job-type').value);
+    data.append('urgency',     document.getElementById('qw-urgency').value);
+    data.append('name',        document.getElementById('qw-name').value.trim());
+    data.append('phone',       document.getElementById('qw-phone').value.trim());
+    data.append('email',       document.getElementById('qw-email').value.trim());
+    data.append('postcode',    document.getElementById('qw-postcode').value.trim());
+
+    // Attach photos
+    uploadedFiles.forEach(function (item, idx) {
+      data.append('photos[]', item.file, item.file.name);
+    });
+
+    fetch('https://formspree.io/f/xkzgbpqw', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) {
+      if (res.ok) {
+        showSuccess();
+      } else {
+        return res.json().then(function (json) {
+          throw new Error(json.error || 'Submission failed');
+        });
+      }
+    })
+    .catch(function (err) {
+      console.error('Quote wizard error:', err);
+      btnNext.disabled = false;
+      btnNext.textContent = 'Send My Quote Request';
+      submitError.style.display = 'block';
+    });
+  }
+
+  function showSuccess() {
+    form.style.display = 'none';
+    navBox.style.display = 'none';
+    progressWrap.style.display = 'none';
+    headerBox.querySelector('p').style.display = 'none';
+    successBox.style.display = 'block';
+  }
+
+  // ── Init ──
+  showStep(1);
+
+})();
+</script>
+
+</section>
+
+</body>
+</html>

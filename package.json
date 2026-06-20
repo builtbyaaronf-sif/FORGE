@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0",
+    "axios": "^1.18.0",
+    "cheerio": "^1.2.0",
+    "html-pdf-node": "^1.0.8",
+    "resend": "^6.14.0",
+    "sharp": "^0.33.5",
+    "@resvg/resvg-js": "^2.6.2",
+    "jszip": "^3.10.1"
+  }
+}

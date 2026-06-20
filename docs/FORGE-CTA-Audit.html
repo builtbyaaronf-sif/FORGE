@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE — CTA Audit Report</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0a;
+    color: #e8e8e8;
+    padding: 48px 32px;
+    max-width: 960px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  h1 { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  h1 span { color: #f97316; }
+  .meta { color: #555; font-size: 13px; margin-top: 6px; margin-bottom: 48px; }
+
+  /* Summary bar */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .sc {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .sc .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 6px; }
+  .sc .val { font-size: 26px; font-weight: 800; color: #f97316; }
+  .sc .sub { font-size: 11px; color: #444; margin-top: 3px; }
+
+  /* Boxes */
+  .alert-box {
+    background: #1a0800;
+    border: 1px solid #7c2d12;
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 32px;
+  }
+  .alert-box h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #f97316; margin-bottom: 12px; }
+  .alert-box p { font-size: 14px; color: #d1a57a; line-height: 1.7; }
+  .alert-box p + p { margin-top: 8px; }
+  .alert-box strong { color: #fff; }
+
+  .win-box {
+    background: #0a1a0a;
+    border: 1px solid #14532d;
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 40px;
+  }
+  .win-box h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #4ade80; margin-bottom: 16px; }
+  .win-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #0f2a0f;
+    font-size: 14px;
+  }
+  .win-item:last-child { border-bottom: none; }
+  .win-num { color: #4ade80; font-weight: 700; flex-shrink: 0; width: 20px; }
+  .win-text { color: #aaa; }
+  .win-text strong { color: #fff; }
+
+  /* Section titles */
+  .section-head {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #444;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1a1a1a;
+    margin-top: 48px;
+  }
+
+  /* CTA cards */
+  .cta-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .cta-card.high-friction { border-color: #7c2d12; }
+  .cta-card.medium { border-color: #713f12; }
+  .cta-card.good { border-color: #14532d; }
+
+  .cta-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .cta-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .depth-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .depth-1 { background: #14532d; color: #4ade80; }
+  .depth-2 { background: #1e3a5f; color: #60a5fa; }
+  .depth-3 { background: #713f12; color: #fbbf24; }
+  .depth-4 { background: #7c1d1d; color: #f87171; }
+
+  .cta-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .cta-meta-item { font-size: 12px; color: #555; }
+  .cta-meta-item span { display: block; color: #aaa; margin-top: 2px; font-size: 13px; }
+
+  .problem-block {
+    background: #1a0000;
+    border-left: 3px solid #f87171;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #f87171;
+  }
+
+  .fix-block {
+    background: #001a05;
+    border-left: 3px solid #4ade80;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #aaa;
+  }
+  .fix-block .fix-label { color: #4ade80; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .fix-block strong { color: #fff; }
+
+  .why-block {
+    font-size: 12px;
+    color: #555;
+    font-style: italic;
+    padding-top: 6px;
+  }
+
+  /* Path reduction */
+  .path-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .path-row { margin-bottom: 12px; }
+  .path-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 6px; }
+  .path-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .path-step {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #aaa;
+  }
+  .path-step.bad { border-color: #7c2d12; color: #f87171; }
+  .path-step.good { border-color: #14532d; color: #4ade80; }
+  .path-arrow { color: #444; font-size: 12px; }
+
+  .removed-badge {
+    display: inline-block;
+    background: #4ade80;
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+  }
+
+  .how-to {
+    background: #141414;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #888;
+    margin-top: 12px;
+  }
+  .how-to strong { color: #fff; }
+
+  /* Form audit */
+  .form-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .form-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .field-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 13px;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-status {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .keep { background: #14532d; color: #4ade80; }
+  .defer { background: #1e3a5f; color: #60a5fa; }
+  .remove { background: #7c1d1d; color: #f87171; }
+  .required { background: #3b1f00; color: #fb923c; }
+
+  .field-text strong { display: block; color: #e8e8e8; margin-bottom: 2px; }
+  .field-text span { color: #555; font-size: 12px; }
+
+  /* Implementation plan */
+  .impl-section { margin-bottom: 32px; }
+  .impl-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .today { background: #14532d; color: #4ade80; }
+  .this-week { background: #1e3a5f; color: #60a5fa; }
+  .next-sprint { background: #3b1f00; color: #fb923c; }
+
+  .impl-item {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #aaa;
+  }
+  .impl-item strong { color: #fff; display: block; margin-bottom: 3px; }
+
+  footer { margin-top: 64px; font-size: 11px; color: #333; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>FORGE <span>//</span> CTA Audit Report</h1>
+<div class="meta">Website: index.html (FORGE homepage) · Audited: June 2026 · Goal: Purchase via enquiry · CTAs audited: 7 · Forms audited: 1</div>
+
+<!-- Summary -->
+<div class="summary-bar">
+  <div class="sc">
+    <div class="label">CTAs Audited</div>
+    <div class="val">7</div>
+    <div class="sub">Across nav, hero, packages, footer</div>
+  </div>
+  <div class="sc">
+    <div class="label">Click Depth (avg)</div>
+    <div class="val">4+</div>
+    <div class="sub">Every CTA → mailto → email → wait</div>
+  </div>
+  <div class="sc">
+    <div class="label">Unique CTA Texts</div>
+    <div class="val">3</div>
+    <div class="sub">But only 2 destinations total</div>
+  </div>
+  <div class="sc">
+    <div class="label">Forms on site</div>
+    <div class="val">0</div>
+    <div class="sub">No form exists — critical gap</div>
+  </div>
+</div>
+
+<!-- Critical finding -->
+<div class="alert-box">
+  <h2>What I found in 30 seconds</h2>
+  <p><strong>The entire site converts to a mailto: link.</strong> Every single CTA on the page — from the nav, the hero, and all three package cards — points to an anchor (#contact) that triggers an email to builtbyaaronf@gmail.com. This means a visitor who wants to buy must: click the CTA → hope their email client opens → write an email → wait for a reply → receive a quote → pay an invoice. That is at minimum 5 steps and introduces a 24–72 hour gap before any money changes hands.</p>
+  <p>The conversion path is not just unoptimised — <strong>it does not exist yet as a flow</strong>. The biggest single thing you can do for FORGE's revenue is replace the mailto link with a Calendly booking form or a lightweight enquiry form with a 48-hour response guarantee. Every other fix in this report is secondary to that.</p>
+</div>
+
+<!-- Quick wins -->
+<div class="win-box">
+  <h2>Quick Wins — No developer needed, do these today</h2>
+  <div class="win-item">
+    <div class="win-num">1</div>
+    <div class="win-text"><strong>Replace all "Get started" package CTAs with package-specific copy.</strong> Quick Deploy: "Get my website today" · Standard Deploy: "Launch my full presence" · Full Deploy: "Build my sales machine". Zero code — find and replace in the HTML.</div>
+  </div>
+  <div class="win-item">
+    <div class="win-num">2</div>
+    <div class="win-text"><strong>Replace the nav CTA "Get started" with "Book a free call"</strong> and point it directly to your Calendly link instead of #contact. This immediately cuts click depth from 4+ to 2.</div>
+  </div>
+  <div class="win-item">
+    <div class="win-num">3</div>
+    <div class="win-text"><strong>Change the hero primary CTA from "Deploy my business" to "Get my free strategy call".</strong> "Deploy my business" is FORGE's language, not the customer's language. They don't know what "deploy" means yet — the CTA needs to reflect what they get, not what you do.</div>
+  </div>
+  <div class="win-item">
+    <div class="win-num">4</div>
+    <div class="win-text"><strong>Add a secondary CTA below the email link in the #contact section: "Or book a 15-minute call →"</strong> linked to Calendly. Some people won't email cold — give them a lower-commitment path.</div>
+  </div>
+</div>
+
+<!-- CTA Audit -->
+<div class="section-head">CTA Audit — All 7 CTAs</div>
+
+<div class="cta-card high-friction">
+  <div class="cta-header">
+    <div class="cta-title">CTA 1: "Get started" — Nav</div>
+    <div class="depth-badge depth-4">Click Depth 4+ · HIGH FRICTION</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>Sticky navigation bar (top right)</span></div>
+    <div class="cta-meta-item">Type <span>Anchor link styled as button</span></div>
+    <div class="cta-meta-item">Destination <span>#contact → mailto: link</span></div>
+  </div>
+  <div class="problem-block">
+    "Get started" is generic and tells the visitor nothing about what happens next. It scrolls to the bottom of the page, which then opens their email client. The nav CTA is the highest-visibility real estate on the page — it is in front of the user at all times — and it is wasting that position on a 4-step path to an email inbox.
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>"Book a free call"</strong>
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Destination</div>
+    <strong>Your Calendly link directly (e.g. calendly.com/yourname/15min) — skip the #contact anchor entirely</strong>
+  </div>
+  <div class="why-block">Opens the booking flow in one click. Calendly handles the form, the slot selection, and the confirmation. Click depth drops from 4+ to 2.</div>
+</div>
+
+<div class="cta-card high-friction">
+  <div class="cta-header">
+    <div class="cta-title">CTA 2: "Deploy my business" — Hero Primary</div>
+    <div class="depth-badge depth-4">Click Depth 4+ · HIGH FRICTION</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>Hero section, above the fold</span></div>
+    <div class="cta-meta-item">Type <span>Anchor link → #contact</span></div>
+    <div class="cta-meta-item">Destination <span>#contact → mailto: link</span></div>
+  </div>
+  <div class="problem-block">
+    The copy uses FORGE's internal language. A small business owner landing on this page has never used the word "deploy" in the context of their marketing. It creates a micro-confusion: what exactly am I deploying? The destination (an email link) is also a massive letdown after bold hero copy — the visitor expects a form or a booking flow, not to be handed a mailto: prompt.
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>"Get my free strategy call"</strong>
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Destination</div>
+    <strong>Direct Calendly link — or a lightweight enquiry form (Tally.so recommended, free, embeds in one line)</strong>
+  </div>
+  <div class="why-block">"Get my free strategy call" speaks to the visitor's outcome, not your internal process. Adding "free" lowers commitment. Linking directly to booking removes 3 steps from the path.</div>
+</div>
+
+<div class="cta-card good">
+  <div class="cta-header">
+    <div class="cta-title">CTA 3: "See how it works" — Hero Secondary</div>
+    <div class="depth-badge depth-1">Click Depth 1 · GOOD</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>Hero section, beside primary CTA</span></div>
+    <div class="cta-meta-item">Type <span>Anchor link → #how</span></div>
+    <div class="cta-meta-item">Destination <span>#how section (same page)</span></div>
+  </div>
+  <div class="problem-block" style="background:#0a1a0a; border-left-color:#4ade80; color:#4ade80;">
+    This is correct. It is a lower-commitment secondary CTA that keeps the user on the page and moves them into the funnel. The copy is clear and specific. No changes needed here beyond ensuring it has lower visual weight than the primary (which it does — good).
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>Keep as is: "See how it works" → #how</strong>
+  </div>
+  <div class="why-block">Follows the correct primary/secondary CTA pattern. No change needed.</div>
+</div>
+
+<div class="cta-card high-friction">
+  <div class="cta-header">
+    <div class="cta-title">CTA 4: "Get started" — Quick Deploy Package</div>
+    <div class="depth-badge depth-4">Click Depth 4+ · HIGH FRICTION</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>Packages section, first card</span></div>
+    <div class="cta-meta-item">Type <span>Anchor link → #contact</span></div>
+    <div class="cta-meta-item">Destination <span>#contact → mailto: link</span></div>
+  </div>
+  <div class="problem-block">
+    A visitor who has read through the Quick Deploy package and is ready to buy hits "Get started" — which scrolls them back up to an email link. The CTA copy is identical to every other CTA on the page, so there is no sense of package selection or commitment. The visitor has no idea that clicking this has anything to do with the £150–£300 package they just read about.
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>"Get my website today — from £150"</strong>
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Destination</div>
+    <strong>Tally/Typeform with package pre-selected as "Quick Deploy" — or Calendly with package name in the URL parameters so you know which they chose before the call</strong>
+  </div>
+  <div class="why-block">Reinforces the price (sets expectation, pre-qualifies), names the outcome (website, not "getting started"), and carries package context into the enquiry so you don't have to ask again.</div>
+</div>
+
+<div class="cta-card high-friction">
+  <div class="cta-header">
+    <div class="cta-title">CTA 5: "Get started" — Standard Deploy Package (Featured)</div>
+    <div class="depth-badge depth-4">Click Depth 4+ · HIGH FRICTION</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>Packages section, featured/middle card</span></div>
+    <div class="cta-meta-item">Type <span>Anchor link → #contact</span></div>
+    <div class="cta-meta-item">Destination <span>#contact → mailto: link</span></div>
+  </div>
+  <div class="problem-block">
+    Same mailto problem. The featured card — your highest-converting package — has the weakest CTA. "Get started" does not reflect the scope or the excitement of "full digital presence in 14 minutes." This is where FORGE makes the most revenue per client and it deserves the most compelling CTA copy.
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>"Launch my full presence — from £750"</strong>
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Destination</div>
+    <strong>Enquiry form or Calendly with Standard Deploy pre-selected</strong>
+  </div>
+  <div class="why-block">The featured package CTA should be the most assertive on the page. "Launch my full presence" mirrors the headline language ("full digital presence") and makes the visitor feel like they are making a real decision — because they are.</div>
+</div>
+
+<div class="cta-card high-friction">
+  <div class="cta-header">
+    <div class="cta-title">CTA 6: "Get started" — Full Deploy Package</div>
+    <div class="depth-badge depth-4">Click Depth 4+ · HIGH FRICTION</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>Packages section, third card</span></div>
+    <div class="cta-meta-item">Type <span>Anchor link → #contact</span></div>
+    <div class="cta-meta-item">Destination <span>#contact → mailto: link</span></div>
+  </div>
+  <div class="problem-block">
+    Full Deploy is your highest-ticket package (up to £2,500). The CTA copy is identical to the £150 Quick Deploy. There is no sense of difference in commitment, value, or next step. A visitor considering a £2,500 package wants to feel like they are beginning a proper engagement — not just clicking the same button as everyone else.
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>"Build my sales machine — from £1,200"</strong>
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Destination</div>
+    <strong>Calendly — a discovery call is appropriate at this price point. Pre-populate with "Full Deploy" in the notes.</strong>
+  </div>
+  <div class="why-block">Higher-ticket sales benefit from a call rather than a form. "Build my sales machine" uses the exact language from the package itself ("30-day sales cadence", "HubSpot pipeline") and signals this is a serious investment — which it is.</div>
+</div>
+
+<div class="cta-card high-friction">
+  <div class="cta-header">
+    <div class="cta-title">CTA 7: "Email us to get started" — Bottom CTA Section</div>
+    <div class="depth-badge depth-4">Click Depth 4+ · HIGH FRICTION</div>
+  </div>
+  <div class="cta-meta">
+    <div class="cta-meta-item">Location <span>#contact section (bottom of page)</span></div>
+    <div class="cta-meta-item">Type <span>mailto: link</span></div>
+    <div class="cta-meta-item">Destination <span>mailto:builtbyaaronf@gmail.com (pre-filled)</span></div>
+  </div>
+  <div class="problem-block">
+    The conversion endpoint of the entire page is a mailto: link. On many devices — especially mobile — this opens the default mail app (if one is configured). On desktop, many users have no default mail client set up, so clicking this does nothing visible. The pre-filled email body asks for "Business name, Business location, Package, Anything else" — which is good content — but forced into the wrong channel. Email is also asynchronous: the visitor sends their enquiry and then waits with no confirmation, no SLA, and no next step communicated.
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Text</div>
+    <strong>"Book my free strategy call" (primary) + "Or send a message →" (secondary, linking to a Tally form)</strong>
+  </div>
+  <div class="fix-block">
+    <div class="fix-label">Optimised Destination</div>
+    <strong>Primary: Calendly 15-min call. Secondary: Tally.so embedded form (free, no-code, collects exactly the fields you need).</strong>
+  </div>
+  <div class="why-block">Two conversion paths at the bottom captures both visitor types — the one ready to talk now (Calendly) and the one who wants to enquire first (form). Both are faster and more reliable than email.</div>
+</div>
+
+
+<!-- Form Audit -->
+<div class="section-head">Form Audit</div>
+
+<div class="form-card">
+  <div class="form-title">The Contact "Form" — #contact section</div>
+  <p style="font-size:13px; color:#f87171; margin-bottom:20px;">⚠ There is no form on the site. The conversion endpoint is a mailto: link with a pre-filled email body. The fields below are what the email body asks for — but they are not enforced, collected, or stored anywhere.</p>
+
+  <div class="field-row">
+    <div class="field-status required">Required</div>
+    <div class="field-text"><strong>Business name</strong><span>Needed to begin research (SCOUT phase). Keep this as field 1 in any form.</span></div>
+  </div>
+  <div class="field-row">
+    <div class="field-status required">Required</div>
+    <div class="field-text"><strong>Email address</strong><span>Not currently asked in the email template — needs to be added. You have no way to follow up if the visitor doesn't include it.</span></div>
+  </div>
+  <div class="field-row">
+    <div class="field-status required">Required</div>
+    <div class="field-text"><strong>Business location</strong><span>Used for local SEO targeting and competitor research. Keep it.</span></div>
+  </div>
+  <div class="field-row">
+    <div class="field-status required">Required</div>
+    <div class="field-text"><strong>Package choice (Quick / Standard / Full)</strong><span>Currently asked but freeform. Make this a dropdown in a proper form so it can't be skipped or misread.</span></div>
+  </div>
+  <div class="field-row">
+    <div class="field-status defer">Defer</div>
+    <div class="field-text"><strong>Phone number</strong><span>Not currently asked. Don't add it to the form — it increases abandonment. Collect it on the confirmation page or in the follow-up email.</span></div>
+  </div>
+  <div class="field-row">
+    <div class="field-status defer">Defer</div>
+    <div class="field-text"><strong>"Anything else"</strong><span>Currently in the email template. Optional in a form — makes the form feel longer without adding required value. Move to optional field or remove entirely.</span></div>
+  </div>
+
+  <div style="margin-top: 20px; background:#001a05; border-radius:8px; padding:16px;">
+    <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#4ade80; margin-bottom:10px; font-weight:700;">Optimised Form (in order)</div>
+    <div style="font-size:13px; color:#aaa; line-height:2;">
+      1. Business name (text, required)<br>
+      2. Your email (email, required)<br>
+      3. Business location / area (text, required)<br>
+      4. Which package? (dropdown: Quick / Standard / Full, required)<br>
+      5. Anything else? (textarea, optional — label it "optional")<br>
+      <br>
+      <strong style="color:#fff;">Fields: 4 required + 1 optional. Estimated completion time: under 60 seconds.</strong>
+    </div>
+  </div>
+</div>
+
+
+<!-- Click Path Reduction -->
+<div class="section-head">Click Path Reduction</div>
+
+<div class="path-card">
+  <div style="font-size:15px; font-weight:700; color:#fff; margin-bottom:18px;">
+    Main conversion path — All CTAs <span class="removed-badge">Remove 3 steps</span>
+  </div>
+
+  <div class="path-row">
+    <div class="path-label">Current path (Click Depth 5+)</div>
+    <div class="path-steps">
+      <div class="path-step bad">Click CTA</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step bad">Scroll to #contact</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step bad">Click mailto link</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step bad">Email client opens</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step bad">Write / review email</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step bad">Send → wait 24–72hrs</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step bad">Invoice → pay</div>
+    </div>
+  </div>
+
+  <div class="path-row" style="margin-top:16px;">
+    <div class="path-label">Optimised path — Calendly (Click Depth 2)</div>
+    <div class="path-steps">
+      <div class="path-step good">Click CTA</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step good">Calendly opens (book slot)</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step good">Confirmed → call → invoice</div>
+    </div>
+  </div>
+
+  <div class="path-row" style="margin-top:16px;">
+    <div class="path-label">Optimised path — Tally form (Click Depth 2)</div>
+    <div class="path-steps">
+      <div class="path-step good">Click CTA</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step good">Fill 4-field form (60 secs)</div>
+      <div class="path-arrow">→</div>
+      <div class="path-step good">Confirmation + response SLA shown</div>
+    </div>
+  </div>
+
+  <div class="how-to">
+    <strong>How to do it:</strong> Create a free account at tally.so. Build the 4-field form (business name, email, location, package dropdown). Copy the embed code and replace the mailto: anchor in the #contact section. Takes 20 minutes. Alternatively, point all CTAs directly to your Calendly link — requires no new tools and cuts setup to under 5 minutes.
+  </div>
+</div>
+
+
+<!-- Implementation order -->
+<div class="section-head">Implementation Order</div>
+
+<div class="impl-section">
+  <div class="impl-title today">Today — Copy changes, no code required</div>
+  <div class="impl-item">
+    <strong>Nav CTA: "Get started" → "Book a free call"</strong>
+    Open index.html, find <code>class="nav-cta"</code>, change the text. Also change the href from "#contact" to your Calendly URL.
+  </div>
+  <div class="impl-item">
+    <strong>Hero primary CTA: "Deploy my business" → "Get my free strategy call"</strong>
+    Find <code>class="btn-primary"</code> in the hero section. Change text. Update href to Calendly URL.
+  </div>
+  <div class="impl-item">
+    <strong>Quick Deploy CTA: "Get started" → "Get my website today — from £150"</strong>
+    Find the first <code>class="package-cta"</code>. Replace text only for now.
+  </div>
+  <div class="impl-item">
+    <strong>Standard Deploy CTA: "Get started" → "Launch my full presence — from £750"</strong>
+    Find the second <code>class="package-cta"</code> (inside the .featured div). Replace text.
+  </div>
+  <div class="impl-item">
+    <strong>Full Deploy CTA: "Get started" → "Build my sales machine — from £1,200"</strong>
+    Find the third <code>class="package-cta"</code>. Replace text.
+  </div>
+</div>
+
+<div class="impl-section">
+  <div class="impl-title this-week">This week — Requires Tally or Calendly setup (no developer)</div>
+  <div class="impl-item">
+    <strong>Replace #contact section mailto: with a proper conversion path</strong>
+    Option A: Sign up at tally.so, build the 4-field form, embed it in the #contact section. Option B: Point all CTAs directly to Calendly — zero build required.
+  </div>
+  <div class="impl-item">
+    <strong>Add a "Or send a message →" secondary CTA below the main button in #contact</strong>
+    Give visitors two options: book a call (high intent) or fill a form (lower commitment). Both should convert.
+  </div>
+  <div class="impl-item">
+    <strong>Add a response SLA statement below the form/booking</strong>
+    "We respond to every enquiry within 4 hours during business hours." This removes the uncertainty of emailing into a void and increases form completion.
+  </div>
+  <div class="impl-item">
+    <strong>Add email address field to any form</strong>
+    The current mailto template does not explicitly ask for the sender's email — the reply-to is auto-populated, but a form needs to explicitly capture it as field 2.
+  </div>
+</div>
+
+<div class="impl-section">
+  <div class="impl-title next-sprint">Next sprint — Higher impact structural changes</div>
+  <div class="impl-item">
+    <strong>Add a sticky "Book a free call" button on mobile</strong>
+    On mobile, no nav links are shown. A sticky CTA button fixed to the bottom of the screen (thumb zone) gives mobile visitors a constant conversion path. Implement as a fixed-position div with your Calendly link.
+  </div>
+  <div class="impl-item">
+    <strong>Pass package selection into Calendly / Tally via URL parameters</strong>
+    When a visitor clicks "Get my website today — from £150", pre-fill the Tally form with "Quick Deploy" already selected so they don't have to choose again. Tally supports prefill via URL parameters.
+  </div>
+  <div class="impl-item">
+    <strong>Add a footer CTA</strong>
+    The current footer has no CTA — just the logo, a tagline, and an email address. Add a single line: "Ready to launch? → Book your free call" with a Calendly link. Users who scroll to the footer are often the most motivated visitors.
+  </div>
+  <div class="impl-item">
+    <strong>Add a post-form confirmation page with next steps</strong>
+    After form submission, redirect to a simple thank-you page that says what happens next ("We'll email you within 4 hours with a personalised proposal. In the meantime, here's what we'll build for you →"). This closes the loop and reduces buyer's remorse abandonment.
+  </div>
+</div>
+
+<footer>FORGE Internal · CTA Audit · June 2026 · builtbyaaronf@gmail.com</footer>
+
+</body>
+</html>

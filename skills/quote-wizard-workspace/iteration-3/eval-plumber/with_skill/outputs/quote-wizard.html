@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get a Quote — Rapid Flow Plumbing</title>
+</head>
+<body style="margin:0;padding:20px;background:#f9f9f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+
+<section id="quote-wizard">
+<style>
+  /* ── Reset & base ── */
+  #quote-wizard *,
+  #quote-wizard *::before,
+  #quote-wizard *::after {
+    box-sizing: border-box;
+  }
+
+  #quote-wizard {
+    max-width: 640px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-size: 16px;
+    color: #111;
+    background: #f9f9f9;
+  }
+
+  /* ── Card wrapper ── */
+  #quote-wizard .qw-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  #quote-wizard .qw-header {
+    background: #003366;
+    padding: 24px 24px 20px;
+    color: #fff;
+  }
+
+  #quote-wizard .qw-header h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  #quote-wizard .qw-header p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+  }
+
+  /* ── Progress bar ── */
+  #quote-wizard .qw-progress-wrap {
+    padding: 20px 24px 0;
+  }
+
+  #quote-wizard .qw-step-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+  }
+
+  #quote-wizard .qw-step-label .qw-step-name {
+    font-weight: 600;
+    color: #003366;
+  }
+
+  #quote-wizard .qw-bar-track {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  #quote-wizard .qw-bar-fill {
+    height: 100%;
+    background: #003366;
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  /* ── Step body ── */
+  #quote-wizard .qw-body {
+    padding: 24px;
+  }
+
+  #quote-wizard .qw-step {
+    display: none;
+  }
+
+  #quote-wizard .qw-step.qw-active {
+    display: block;
+  }
+
+  #quote-wizard .qw-step-title {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #003366;
+    line-height: 1.3;
+  }
+
+  #quote-wizard .qw-step-sub {
+    margin: 0 0 20px;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  /* ── Service cards ── */
+  #quote-wizard .qw-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (min-width: 480px) {
+    #quote-wizard .qw-cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  #quote-wizard .qw-service-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 10px;
+    min-height: 60px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.3;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #quote-wizard .qw-service-card:hover {
+    border-color: #ff6600;
+  }
+
+  #quote-wizard .qw-service-card.qw-selected {
+    border-color: #ff6600;
+    background: #fff4ec;
+    color: #cc4400;
+  }
+
+  /* ── Labels & inputs ── */
+  #quote-wizard .qw-field {
+    margin-bottom: 18px;
+  }
+
+  #quote-wizard .qw-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  #quote-wizard .qw-field label .qw-optional {
+    font-weight: 400;
+    color: #999;
+    font-size: 13px;
+    margin-left: 4px;
+  }
+
+  #quote-wizard .qw-field textarea,
+  #quote-wizard .qw-field input[type="text"],
+  #quote-wizard .qw-field input[type="email"],
+  #quote-wizard .qw-field input[type="tel"],
+  #quote-wizard .qw-field select {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    font-family: inherit;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #111;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+
+  #quote-wizard .qw-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 38px;
+  }
+
+  #quote-wizard .qw-field textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  #quote-wizard .qw-field textarea:focus,
+  #quote-wizard .qw-field input:focus,
+  #quote-wizard .qw-field select:focus {
+    border-color: #003366;
+    box-shadow: 0 0 0 3px rgba(0,51,102,0.12);
+  }
+
+  #quote-wizard .qw-field textarea.qw-error,
+  #quote-wizard .qw-field input.qw-error,
+  #quote-wizard .qw-field select.qw-error {
+    border-color: #dc2626;
+  }
+
+  /* ── Error messages ── */
+  #quote-wizard .qw-error-msg {
+    margin-top: 5px;
+    font-size: 13px;
+    color: #dc2626;
+    display: none;
+  }
+
+  #quote-wizard .qw-error-msg.qw-visible {
+    display: block;
+  }
+
+  #quote-wizard .qw-cards-error {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #dc2626;
+    display: none;
+  }
+
+  #quote-wizard .qw-cards-error.qw-visible {
+    display: block;
+  }
+
+  /* ── Photo upload ── */
+  #quote-wizard .qw-upload-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  #quote-wizard .qw-upload-zone:hover {
+    border-color: #ff6600;
+    background: #fff9f5;
+  }
+
+  #quote-wizard .qw-upload-zone input[type="file"] {
+    display: none;
+  }
+
+  #quote-wizard .qw-upload-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 10px;
+    opacity: 0.4;
+  }
+
+  #quote-wizard .qw-upload-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 4px;
+  }
+
+  #quote-wizard .qw-upload-hint {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+  }
+
+  #quote-wizard .qw-upload-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 22px;
+    background: #003366;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  #quote-wizard .qw-upload-btn:hover {
+    background: #002244;
+  }
+
+  #quote-wizard .qw-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  #quote-wizard .qw-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f3f4f6;
+  }
+
+  #quote-wizard .qw-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #quote-wizard .qw-thumb-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    font-family: inherit;
+  }
+
+  #quote-wizard .qw-upload-count {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ── Summary (Step 5) ── */
+  #quote-wizard .qw-summary {
+    background: #f3f6fb;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+
+  #quote-wizard .qw-summary-row {
+    margin-bottom: 12px;
+  }
+
+  #quote-wizard .qw-summary-row:last-child {
+    margin-bottom: 0;
+  }
+
+  #quote-wizard .qw-summary-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  #quote-wizard .qw-summary-value {
+    font-size: 15px;
+    color: #111;
+    line-height: 1.5;
+  }
+
+  #quote-wizard .qw-summary-value ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  #quote-wizard .qw-summary-value ul li {
+    margin-bottom: 2px;
+  }
+
+  /* ── Navigation buttons ── */
+  #quote-wizard .qw-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  @media (min-width: 480px) {
+    #quote-wizard .qw-nav {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    #quote-wizard .qw-nav .qw-btn-back {
+      order: 0;
+    }
+
+    #quote-wizard .qw-nav .qw-btn-next {
+      order: 1;
+      margin-left: auto;
+    }
+  }
+
+  #quote-wizard .qw-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    min-height: 48px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, transform 0.1s;
+    line-height: 1.2;
+  }
+
+  @media (min-width: 480px) {
+    #quote-wizard .qw-btn {
+      width: auto;
+      min-width: 140px;
+    }
+  }
+
+  #quote-wizard .qw-btn:active {
+    transform: scale(0.98);
+  }
+
+  #quote-wizard .qw-btn-next {
+    background: #ff6600;
+    color: #fff;
+  }
+
+  #quote-wizard .qw-btn-next:hover {
+    background: #e55a00;
+  }
+
+  #quote-wizard .qw-btn-next:disabled {
+    background: #ffc299;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  #quote-wizard .qw-btn-back {
+    background: transparent;
+    color: #555;
+    border: 1.5px solid #d1d5db;
+  }
+
+  #quote-wizard .qw-btn-back:hover {
+    background: #f3f4f6;
+  }
+
+  /* ── Success state ── */
+  #quote-wizard .qw-success {
+    display: none;
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  #quote-wizard .qw-success.qw-active {
+    display: block;
+  }
+
+  #quote-wizard .qw-success-icon {
+    width: 64px;
+    height: 64px;
+    background: #003366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  #quote-wizard .qw-success-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #quote-wizard .qw-success h3 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #003366;
+  }
+
+  #quote-wizard .qw-success p {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ── Submitting spinner ── */
+  #quote-wizard .qw-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: qw-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  @keyframes qw-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── Live error region ── */
+  #quote-wizard .qw-live-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #991b1b;
+    display: none;
+  }
+
+  #quote-wizard .qw-live-error.qw-visible {
+    display: block;
+  }
+</style>
+
+<div class="qw-card">
+
+  <!-- Header -->
+  <div class="qw-header">
+    <h2>Get a Free Quote</h2>
+    <p>Rapid Flow Plumbing — quick, no-obligation estimates</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="qw-progress-wrap">
+    <div class="qw-step-label">
+      <span class="qw-step-name" id="qw-step-name">What do you need?</span>
+      <span id="qw-step-counter">Step 1 of 5</span>
+    </div>
+    <div class="qw-bar-track">
+      <div class="qw-bar-fill" id="qw-bar" style="width:20%"></div>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="qw-body">
+
+    <!-- Aria live region for errors -->
+    <div aria-live="polite" id="qw-aria-live" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+    <!-- ── Step 1: Services ── -->
+    <div class="qw-step qw-active" id="qw-step-1" role="group" aria-labelledby="qw-s1-title">
+      <h3 class="qw-step-title" id="qw-s1-title">What do you need?</h3>
+      <p class="qw-step-sub">Select all that apply — you can choose more than one.</p>
+
+      <div class="qw-cards" id="qw-service-cards">
+        <div class="qw-service-card" data-service="Emergency call-out" tabindex="0" role="checkbox" aria-checked="false">Emergency call-out</div>
+        <div class="qw-service-card" data-service="Boiler service &amp; repair" tabindex="0" role="checkbox" aria-checked="false">Boiler service &amp; repair</div>
+        <div class="qw-service-card" data-service="Bathroom installation" tabindex="0" role="checkbox" aria-checked="false">Bathroom installation</div>
+        <div class="qw-service-card" data-service="Leaking tap or pipe" tabindex="0" role="checkbox" aria-checked="false">Leaking tap or pipe</div>
+        <div class="qw-service-card" data-service="Blocked drains" tabindex="0" role="checkbox" aria-checked="false">Blocked drains</div>
+        <div class="qw-service-card" data-service="Other" tabindex="0" role="checkbox" aria-checked="false">Other</div>
+      </div>
+      <p class="qw-cards-error" id="qw-services-error" role="alert">Please select at least one service to continue.</p>
+
+      <div class="qw-nav">
+        <button class="qw-btn qw-btn-next" id="qw-next-1" type="button">Next</button>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Details + follow-ups ── -->
+    <div class="qw-step" id="qw-step-2" role="group" aria-labelledby="qw-s2-title">
+      <h3 class="qw-step-title" id="qw-s2-title">Tell us more</h3>
+      <p class="qw-step-sub">A few quick details help us give you an accurate quote.</p>
+
+      <div class="qw-field">
+        <label for="qw-description">Describe what you need
+          <span class="qw-optional">(optional)</span>
+        </label>
+        <textarea id="qw-description" name="description" placeholder="Describe what you need in a few words…" rows="4"></textarea>
+      </div>
+
+      <!-- Plumber follow-up: Is this a repair or new installation? -->
+      <div class="qw-field">
+        <label for="qw-fq-1">Is this a repair or a new installation?</label>
+        <select id="qw-fq-1" name="followup_1">
+          <option value="">Select an option</option>
+          <option value="Repair">Repair</option>
+          <option value="New installation">New installation</option>
+          <option value="Not sure">Not sure</option>
+        </select>
+        <p class="qw-error-msg" id="qw-fq-1-error">Please select an option.</p>
+      </div>
+
+      <!-- Plumber follow-up: What area is affected? -->
+      <div class="qw-field">
+        <label for="qw-fq-2">What area is affected?</label>
+        <select id="qw-fq-2" name="followup_2">
+          <option value="">Select an option</option>
+          <option value="Bathroom">Bathroom</option>
+          <option value="Kitchen">Kitchen</option>
+          <option value="Boiler/heating">Boiler/heating</option>
+          <option value="Outside">Outside</option>
+          <option value="Multiple areas">Multiple areas</option>
+        </select>
+        <p class="qw-error-msg" id="qw-fq-2-error">Please select an option.</p>
+      </div>
+
+      <!-- Plumber follow-up: Is this urgent? -->
+      <div class="qw-field">
+        <label for="qw-fq-3">Is this urgent? (e.g. active leak or no hot water)</label>
+        <select id="qw-fq-3" name="followup_3">
+          <option value="">Select an option</option>
+          <option value="Yes, urgent">Yes, urgent</option>
+          <option value="No, can wait">No, can wait</option>
+        </select>
+        <p class="qw-error-msg" id="qw-fq-3-error">Please select an option.</p>
+      </div>
+
+      <div class="qw-nav">
+        <button class="qw-btn qw-btn-back" id="qw-back-2" type="button">Back</button>
+        <button class="qw-btn qw-btn-next" id="qw-next-2" type="button">Next</button>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Photos ── -->
+    <div class="qw-step" id="qw-step-3" role="group" aria-labelledby="qw-s3-title">
+      <h3 class="qw-step-title" id="qw-s3-title">Add photos <span style="font-weight:400;color:#999;font-size:15px;">— optional</span></h3>
+      <p class="qw-step-sub">Upload up to 4 photos — a picture helps us give you an accurate quote.</p>
+
+      <div class="qw-upload-zone" id="qw-upload-zone">
+        <input type="file" id="qw-file-input" accept=".jpg,.jpeg,.png,.webp,.heic" multiple>
+        <svg class="qw-upload-icon" viewBox="0 0 24 24" fill="none" stroke="#003366" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <p class="qw-upload-label">Tap to add photos</p>
+        <p class="qw-upload-hint">JPG, PNG, WEBP or HEIC &nbsp;·&nbsp; Max 5MB each</p>
+        <button class="qw-upload-btn" type="button" id="qw-upload-trigger">Choose photos</button>
+      </div>
+
+      <div class="qw-thumbs" id="qw-thumbs" style="display:none;"></div>
+      <p class="qw-upload-count" id="qw-upload-count" style="display:none;"></p>
+
+      <div class="qw-nav">
+        <button class="qw-btn qw-btn-back" id="qw-back-3" type="button">Back</button>
+        <button class="qw-btn qw-btn-next" id="qw-next-3" type="button">Next</button>
+      </div>
+    </div>
+
+    <!-- ── Step 4: Contact details ── -->
+    <div class="qw-step" id="qw-step-4" role="group" aria-labelledby="qw-s4-title">
+      <h3 class="qw-step-title" id="qw-s4-title">Your details</h3>
+      <p class="qw-step-sub">We'll use these to send you your quote — no spam, ever.</p>
+
+      <div class="qw-field">
+        <label for="qw-name">Full name</label>
+        <input type="text" id="qw-name" name="name" placeholder="e.g. Sarah Johnson" autocomplete="name">
+        <p class="qw-error-msg" id="qw-name-error">Please enter your name.</p>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-phone">Phone number</label>
+        <input type="tel" id="qw-phone" name="phone" placeholder="e.g. 07700 900000" autocomplete="tel">
+        <p class="qw-error-msg" id="qw-phone-error">Please enter a phone number.</p>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-email">Email address</label>
+        <input type="text" id="qw-email" name="email" placeholder="e.g. sarah@example.com" autocomplete="email">
+        <p class="qw-error-msg" id="qw-email-error">Please enter a valid email address.</p>
+      </div>
+
+      <div class="qw-field">
+        <label for="qw-postcode">Postcode <span class="qw-optional">(recommended)</span></label>
+        <input type="text" id="qw-postcode" name="postcode" placeholder="e.g. SW1A 1AA" autocomplete="postal-code" style="max-width:180px;">
+      </div>
+
+      <div class="qw-nav">
+        <button class="qw-btn qw-btn-back" id="qw-back-4" type="button">Back</button>
+        <button class="qw-btn qw-btn-next" id="qw-next-4" type="button">Review quote request</button>
+      </div>
+    </div>
+
+    <!-- ── Step 5: Confirm & submit ── -->
+    <div class="qw-step" id="qw-step-5" role="group" aria-labelledby="qw-s5-title">
+      <h3 class="qw-step-title" id="qw-s5-title">Review &amp; submit</h3>
+      <p class="qw-step-sub">Everything look right? Hit send and we'll be in touch shortly.</p>
+
+      <div class="qw-live-error" id="qw-submit-error" aria-live="assertive"></div>
+
+      <div class="qw-summary" id="qw-summary">
+        <div class="qw-summary-row">
+          <div class="qw-summary-label">Services</div>
+          <div class="qw-summary-value" id="qw-sum-services"></div>
+        </div>
+        <div class="qw-summary-row" id="qw-sum-desc-row">
+          <div class="qw-summary-label">Description</div>
+          <div class="qw-summary-value" id="qw-sum-desc"></div>
+        </div>
+        <div class="qw-summary-row">
+          <div class="qw-summary-label">Additional details</div>
+          <div class="qw-summary-value" id="qw-sum-followups"></div>
+        </div>
+        <div class="qw-summary-row">
+          <div class="qw-summary-label">Your details</div>
+          <div class="qw-summary-value" id="qw-sum-contact"></div>
+        </div>
+        <div class="qw-summary-row" id="qw-sum-photos-row" style="display:none;">
+          <div class="qw-summary-label">Photos</div>
+          <div class="qw-summary-value" id="qw-sum-photos"></div>
+        </div>
+      </div>
+
+      <div class="qw-nav">
+        <button class="qw-btn qw-btn-back" id="qw-back-5" type="button">Back</button>
+        <button class="qw-btn qw-btn-next" id="qw-submit" type="button">Send My Quote Request</button>
+      </div>
+    </div>
+
+    <!-- ── Success state ── -->
+    <div class="qw-success" id="qw-success" role="status">
+      <div class="qw-success-icon">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h3>Quote request sent!</h3>
+      <p>Thanks — we'll review your details and get back to you as soon as possible.</p>
+      <p style="font-size:14px;color:#888;">Rapid Flow Plumbing typically responds within a few hours.</p>
+    </div>
+
+  </div><!-- /.qw-body -->
+</div><!-- /.qw-card -->
+
+<script>
+(function () {
+  'use strict';
+
+  // ── State ──
+  var currentStep = 1;
+  var totalSteps  = 5;
+  var selectedServices = [];
+  var photoFiles = [];
+
+  var stepNames = [
+    'What do you need?',
+    'Tell us more',
+    'Add photos',
+    'Your details',
+    'Review & submit'
+  ];
+
+  // ── Helper: show/hide step ──
+  function goToStep(n) {
+    document.getElementById('qw-step-' + currentStep).classList.remove('qw-active');
+    currentStep = n;
+    document.getElementById('qw-step-' + currentStep).classList.add('qw-active');
+
+    var pct = Math.round((currentStep / totalSteps) * 100);
+    document.getElementById('qw-bar').style.width = pct + '%';
+    document.getElementById('qw-step-counter').textContent = 'Step ' + currentStep + ' of ' + totalSteps;
+    document.getElementById('qw-step-name').textContent = stepNames[currentStep - 1];
+
+    // Scroll to top of wizard
+    document.getElementById('quote-wizard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Step 1: Service cards ──
+  var cards = document.querySelectorAll('#qw-service-cards .qw-service-card');
+  cards.forEach(function (card) {
+    card.addEventListener('click', function () {
+      toggleCard(card);
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleCard(card);
+      }
+    });
+  });
+
+  function toggleCard(card) {
+    var svc = card.getAttribute('data-service');
+    var idx = selectedServices.indexOf(svc);
+    if (idx === -1) {
+      selectedServices.push(svc);
+      card.classList.add('qw-selected');
+      card.setAttribute('aria-checked', 'true');
+    } else {
+      selectedServices.splice(idx, 1);
+      card.classList.remove('qw-selected');
+      card.setAttribute('aria-checked', 'false');
+    }
+    // Hide error if at least one selected
+    if (selectedServices.length > 0) {
+      document.getElementById('qw-services-error').classList.remove('qw-visible');
+    }
+  }
+
+  document.getElementById('qw-next-1').addEventListener('click', function () {
+    if (selectedServices.length === 0) {
+      var err = document.getElementById('qw-services-error');
+      err.classList.add('qw-visible');
+      document.getElementById('qw-aria-live').textContent = 'Please select at least one service to continue.';
+      return;
+    }
+    goToStep(2);
+  });
+
+  // ── Step 2: Details ──
+  document.getElementById('qw-back-2').addEventListener('click', function () { goToStep(1); });
+  document.getElementById('qw-next-2').addEventListener('click', function () {
+    var valid = true;
+
+    // Follow-up 1
+    var fq1 = document.getElementById('qw-fq-1');
+    if (!fq1.value) {
+      fq1.classList.add('qw-error');
+      document.getElementById('qw-fq-1-error').classList.add('qw-visible');
+      valid = false;
+    } else {
+      fq1.classList.remove('qw-error');
+      document.getElementById('qw-fq-1-error').classList.remove('qw-visible');
+    }
+
+    // Follow-up 2
+    var fq2 = document.getElementById('qw-fq-2');
+    if (!fq2.value) {
+      fq2.classList.add('qw-error');
+      document.getElementById('qw-fq-2-error').classList.add('qw-visible');
+      valid = false;
+    } else {
+      fq2.classList.remove('qw-error');
+      document.getElementById('qw-fq-2-error').classList.remove('qw-visible');
+    }
+
+    // Follow-up 3
+    var fq3 = document.getElementById('qw-fq-3');
+    if (!fq3.value) {
+      fq3.classList.add('qw-error');
+      document.getElementById('qw-fq-3-error').classList.add('qw-visible');
+      valid = false;
+    } else {
+      fq3.classList.remove('qw-error');
+      document.getElementById('qw-fq-3-error').classList.remove('qw-visible');
+    }
+
+    if (!valid) {
+      document.getElementById('qw-aria-live').textContent = 'Please answer all required questions before continuing.';
+      return;
+    }
+    goToStep(3);
+  });
+
+  // ── Step 3: Photos ──
+  var fileInput    = document.getElementById('qw-file-input');
+  var uploadZone   = document.getElementById('qw-upload-zone');
+  var uploadTrigger = document.getElementById('qw-upload-trigger');
+  var thumbsWrap   = document.getElementById('qw-thumbs');
+  var uploadCount  = document.getElementById('qw-upload-count');
+
+  uploadZone.addEventListener('click', function (e) {
+    if (e.target !== uploadTrigger) fileInput.click();
+  });
+  uploadTrigger.addEventListener('click', function (e) {
+    e.stopPropagation();
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', function () {
+    var incoming = Array.from(fileInput.files);
+    incoming.forEach(function (f) {
+      if (photoFiles.length >= 4) return;
+      if (f.size > 5 * 1024 * 1024) return; // skip > 5MB
+      if (photoFiles.find(function (x) { return x.name === f.name && x.size === f.size; })) return;
+      photoFiles.push(f);
+    });
+    fileInput.value = '';
+    renderThumbs();
+  });
+
+  function renderThumbs() {
+    thumbsWrap.innerHTML = '';
+    if (photoFiles.length === 0) {
+      thumbsWrap.style.display = 'none';
+      uploadCount.style.display = 'none';
+      return;
+    }
+    thumbsWrap.style.display = 'grid';
+    uploadCount.style.display = 'block';
+    uploadCount.textContent = photoFiles.length + ' of 4 photo' + (photoFiles.length !== 1 ? 's' : '') + ' selected';
+
+    photoFiles.forEach(function (f, i) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var div = document.createElement('div');
+        div.className = 'qw-thumb';
+
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.alt = 'Photo ' + (i + 1);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'qw-thumb-remove';
+        btn.setAttribute('aria-label', 'Remove photo ' + (i + 1));
+        btn.innerHTML = '&times;';
+        btn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          photoFiles.splice(i, 1);
+          renderThumbs();
+        });
+
+        div.appendChild(img);
+        div.appendChild(btn);
+        thumbsWrap.appendChild(div);
+      };
+      reader.readAsDataURL(f);
+    });
+
+    // Hide upload zone if at max
+    if (photoFiles.length >= 4) {
+      uploadZone.style.display = 'none';
+    } else {
+      uploadZone.style.display = '';
+    }
+  }
+
+  document.getElementById('qw-back-3').addEventListener('click', function () { goToStep(2); });
+  document.getElementById('qw-next-3').addEventListener('click', function () { goToStep(4); });
+
+  // ── Step 4: Contact ──
+  document.getElementById('qw-back-4').addEventListener('click', function () { goToStep(3); });
+  document.getElementById('qw-next-4').addEventListener('click', function () {
+    var valid = true;
+
+    var name  = document.getElementById('qw-name');
+    var phone = document.getElementById('qw-phone');
+    var email = document.getElementById('qw-email');
+
+    if (!name.value.trim()) {
+      name.classList.add('qw-error');
+      document.getElementById('qw-name-error').classList.add('qw-visible');
+      valid = false;
+    } else {
+      name.classList.remove('qw-error');
+      document.getElementById('qw-name-error').classList.remove('qw-visible');
+    }
+
+    if (!phone.value.trim()) {
+      phone.classList.add('qw-error');
+      document.getElementById('qw-phone-error').classList.add('qw-visible');
+      valid = false;
+    } else {
+      phone.classList.remove('qw-error');
+      document.getElementById('qw-phone-error').classList.remove('qw-visible');
+    }
+
+    var emailVal = email.value.trim();
+    var emailOk  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+    if (!emailOk) {
+      email.classList.add('qw-error');
+      document.getElementById('qw-email-error').classList.add('qw-visible');
+      valid = false;
+    } else {
+      email.classList.remove('qw-error');
+      document.getElementById('qw-email-error').classList.remove('qw-visible');
+    }
+
+    if (!valid) {
+      document.getElementById('qw-aria-live').textContent = 'Please fill in all required fields.';
+      return;
+    }
+
+    buildSummary();
+    goToStep(5);
+  });
+
+  // ── Step 5: Summary ──
+  function buildSummary() {
+    // Services
+    var svcsEl = document.getElementById('qw-sum-services');
+    var ul = document.createElement('ul');
+    selectedServices.forEach(function (s) {
+      var li = document.createElement('li');
+      li.textContent = s;
+      ul.appendChild(li);
+    });
+    svcsEl.innerHTML = '';
+    svcsEl.appendChild(ul);
+
+    // Description
+    var desc = document.getElementById('qw-description').value.trim();
+    var descRow = document.getElementById('qw-sum-desc-row');
+    if (desc) {
+      document.getElementById('qw-sum-desc').textContent = desc;
+      descRow.style.display = '';
+    } else {
+      descRow.style.display = 'none';
+    }
+
+    // Follow-ups
+    var fups = [];
+    var fq1v = document.getElementById('qw-fq-1').value;
+    var fq2v = document.getElementById('qw-fq-2').value;
+    var fq3v = document.getElementById('qw-fq-3').value;
+    if (fq1v) fups.push('Repair or new installation: ' + fq1v);
+    if (fq2v) fups.push('Area affected: ' + fq2v);
+    if (fq3v) fups.push('Urgent: ' + fq3v);
+    document.getElementById('qw-sum-followups').textContent = fups.join(' · ');
+
+    // Contact
+    var cName     = document.getElementById('qw-name').value.trim();
+    var cPhone    = document.getElementById('qw-phone').value.trim();
+    var cEmail    = document.getElementById('qw-email').value.trim();
+    var cPostcode = document.getElementById('qw-postcode').value.trim();
+    var contactParts = [cName, cPhone, cEmail];
+    if (cPostcode) contactParts.push(cPostcode);
+    document.getElementById('qw-sum-contact').textContent = contactParts.join(' · ');
+
+    // Photos
+    var photosRow = document.getElementById('qw-sum-photos-row');
+    if (photoFiles.length > 0) {
+      document.getElementById('qw-sum-photos').textContent = photoFiles.length + ' photo' + (photoFiles.length !== 1 ? 's' : '') + ' attached';
+      photosRow.style.display = '';
+    } else {
+      photosRow.style.display = 'none';
+    }
+  }
+
+  document.getElementById('qw-back-5').addEventListener('click', function () { goToStep(4); });
+
+  // ── Submit ──
+  document.getElementById('qw-submit').addEventListener('click', function () {
+    var submitBtn = document.getElementById('qw-submit');
+    var errorBox  = document.getElementById('qw-submit-error');
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="qw-spinner"></span>Sending…';
+    errorBox.classList.remove('qw-visible');
+
+    var followups = [];
+    var fq1v = document.getElementById('qw-fq-1').value;
+    var fq2v = document.getElementById('qw-fq-2').value;
+    var fq3v = document.getElementById('qw-fq-3').value;
+    if (fq1v) followups.push({ question: 'Is this a repair or a new installation?', answer: fq1v });
+    if (fq2v) followups.push({ question: 'What area is affected?',                  answer: fq2v });
+    if (fq3v) followups.push({ question: 'Is this urgent?',                          answer: fq3v });
+
+    var payload = {
+      customerName:     document.getElementById('qw-name').value.trim(),
+      customerPhone:    document.getElementById('qw-phone').value.trim(),
+      customerEmail:    document.getElementById('qw-email').value.trim(),
+      customerPostcode: document.getElementById('qw-postcode').value.trim(),
+      services:         selectedServices,
+      description:      document.getElementById('qw-description').value.trim(),
+      followups:        followups
+    };
+
+    fetch('/api/quote', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    })
+    .then(function (res) {
+      if (!res.ok) {
+        return res.json().then(function (d) { throw new Error(d.error || 'Server error'); });
+      }
+      return res.json();
+    })
+    .then(function () {
+      // Show success
+      document.getElementById('qw-step-5').classList.remove('qw-active');
+      document.getElementById('qw-progress-wrap') && (document.querySelector('.qw-progress-wrap').style.display = 'none');
+      document.getElementById('qw-success').classList.add('qw-active');
+      document.querySelector('.qw-progress-wrap').style.display = 'none';
+    })
+    .catch(function (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send My Quote Request';
+      errorBox.textContent = 'Something went wrong — please try again or call us directly.';
+      errorBox.classList.add('qw-visible');
+      document.getElementById('qw-aria-live').textContent = 'Submission failed. Please try again.';
+      console.error('Quote submit error:', err);
+    });
+  });
+
+})();
+</script>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "plumber-email-formspree",
+  "prompt": "Build a quote wizard for a plumbing company called Rapid Flow Plumbing. Services: Emergency call-out, Boiler service & repair, Bathroom installation, Leaking tap or pipe, Blocked drains. Brand colours: #003366 (primary), #ff6600 (accent). Contact: email via Formspree, formspree_id is xkzgbpqw.",
+  "config": "with_skill"
+}

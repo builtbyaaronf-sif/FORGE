@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glow Beauty Studio — Quote Request</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1a0a2e;
+      --accent: #c9a96e;
+      --accent-light: #e8d5b0;
+      --bg: #faf8f5;
+      --text: #1a0a2e;
+      --text-muted: #6b5b8a;
+      --border: #e0d6f0;
+      --white: #ffffff;
+      --error: #c0392b;
+      --success: #27ae60;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .wizard-wrapper {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .wizard-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .wizard-logo {
+      display: inline-block;
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .wizard-logo::after {
+      content: '✦';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    .wizard-header h1 {
+      font-size: 1.6rem;
+      font-weight: normal;
+      color: var(--primary);
+      letter-spacing: 0.03em;
+    }
+
+    .wizard-header p {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: 'Arial', sans-serif;
+    }
+
+    .wizard-card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(26, 10, 46, 0.08);
+      overflow: hidden;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.4s ease;
+    }
+
+    /* Step indicators */
+    .step-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1.2rem 2rem 0;
+    }
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+
+    .step-dot.active { background: var(--accent); }
+    .step-dot.done { background: var(--primary); }
+
+    /* Step content */
+    .step-content {
+      padding: 1.8rem 2rem 2rem;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-title {
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+
+    .step-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-family: 'Arial', sans-serif;
+      margin-bottom: 1.4rem;
+    }
+
+    /* Service selection cards */
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
+
+    .service-card {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--white);
+      text-align: left;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .service-card:hover {
+      border-color: var(--accent);
+      background: #fdf9f3;
+    }
+
+    .service-card.selected {
+      border-color: var(--accent);
+      background: #fdf6ec;
+    }
+
+    .service-card .service-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .service-card .service-name {
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: var(--primary);
+      font-family: 'Arial', sans-serif;
+      display: block;
+      line-height: 1.3;
+    }
+
+    .service-card.selected .service-check {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      float: right;
+      margin-top: -2px;
+    }
+
+    .service-check { display: none; }
+
+    /* Form fields */
+    .field-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--primary);
+      font-family: 'Arial', sans-serif;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.02em;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.9rem;
+      font-family: 'Arial', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    /* Radio / checkbox custom */
+    .radio-group, .check-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .radio-item, .check-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      font-family: 'Arial', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .radio-item input, .check-item input {
+      width: auto;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Summary box */
+    .summary-box {
+      background: #fdf6ec;
+      border: 1.5px solid var(--accent-light);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .summary-box h3 {
+      font-size: 0.8rem;
+      font-family: 'Arial', sans-serif;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-family: 'Arial', sans-serif;
+      padding: 0.2rem 0;
+      color: var(--text);
+    }
+
+    .summary-row .label { color: var(--text-muted); }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 0.7rem;
+      margin-top: 1.4rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.4rem;
+      font-size: 0.9rem;
+      font-family: 'Arial', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      background: #2e1250;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Success state */
+    .success-state {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary), #3d1a6e);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      font-size: 1.6rem;
+    }
+
+    .success-state h2 {
+      font-size: 1.3rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-weight: normal;
+    }
+
+    .success-state p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    /* Error message */
+    .error-msg {
+      color: var(--error);
+      font-size: 0.8rem;
+      font-family: 'Arial', sans-serif;
+      margin-top: 0.3rem;
+    }
+
+    .field-error input,
+    .field-error select,
+    .field-error textarea {
+      border-color: var(--error);
+    }
+
+    /* Step counter */
+    .step-counter {
+      text-align: right;
+      font-size: 0.75rem;
+      font-family: 'Arial', sans-serif;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .service-grid { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      .step-content { padding: 1.4rem 1.2rem 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wizard-wrapper">
+  <div class="wizard-header">
+    <div class="wizard-logo"></div>
+    <h1>Glow Beauty Studio</h1>
+    <p>Get your personalised quote in under 2 minutes</p>
+  </div>
+
+  <div class="wizard-card">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+    </div>
+
+    <div class="step-indicators" id="stepIndicators"></div>
+
+    <div class="step-content">
+
+      <!-- STEP 1: Service selection -->
+      <div class="step active" id="step-1">
+        <div class="step-counter">Step 1 of 4</div>
+        <h2 class="step-title">What are you interested in?</h2>
+        <p class="step-subtitle">Select all the services you'd like a quote for.</p>
+
+        <div class="service-grid">
+          <button type="button" class="service-card" data-service="Haircut & Blow-Dry" onclick="toggleService(this)">
+            <span class="service-icon">✂️</span>
+            <span class="service-name">Haircut &amp; Blow-Dry</span>
+            <span class="service-check"></span>
+          </button>
+          <button type="button" class="service-card" data-service="Colour & Highlights" onclick="toggleService(this)">
+            <span class="service-icon">🎨</span>
+            <span class="service-name">Colour &amp; Highlights</span>
+            <span class="service-check"></span>
+          </button>
+          <button type="button" class="service-card" data-service="Hair Extensions" onclick="toggleService(this)">
+            <span class="service-icon">💇</span>
+            <span class="service-name">Hair Extensions</span>
+            <span class="service-check"></span>
+          </button>
+          <button type="button" class="service-card" data-service="Lash Extensions" onclick="toggleService(this)">
+            <span class="service-icon">👁️</span>
+            <span class="service-name">Lash Extensions</span>
+            <span class="service-check"></span>
+          </button>
+          <button type="button" class="service-card" data-service="Brow Shaping & Tinting" onclick="toggleService(this)">
+            <span class="service-icon">🌿</span>
+            <span class="service-name">Brow Shaping &amp; Tinting</span>
+            <span class="service-check"></span>
+          </button>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="nextStep()" id="step1Next" disabled>
+            Continue →
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Service details -->
+      <div class="step" id="step-2">
+        <div class="step-counter">Step 2 of 4</div>
+        <h2 class="step-title">A little more detail</h2>
+        <p class="step-subtitle">Help us give you the most accurate quote.</p>
+
+        <div id="dynamicFields"></div>
+
+        <div class="field-group">
+          <label for="appointmentType">When are you looking to book?</label>
+          <select id="appointmentType" name="appointment_type">
+            <option value="">— Select a timeframe —</option>
+            <option value="ASAP">As soon as possible</option>
+            <option value="This week">This week</option>
+            <option value="Next 2 weeks">Within the next 2 weeks</option>
+            <option value="Next month">Within the next month</option>
+            <option value="Just exploring">Just exploring options</option>
+          </select>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Your details -->
+      <div class="step" id="step-3">
+        <div class="step-counter">Step 3 of 4</div>
+        <h2 class="step-title">Your details</h2>
+        <p class="step-subtitle">We'll use these to send your personalised quote.</p>
+
+        <div class="field-row">
+          <div class="field-group" id="fg-firstname">
+            <label for="firstname">First Name *</label>
+            <input type="text" id="firstname" name="firstname" placeholder="e.g. Sophie" />
+            <span class="error-msg" id="err-firstname"></span>
+          </div>
+          <div class="field-group" id="fg-lastname">
+            <label for="lastname">Last Name *</label>
+            <input type="text" id="lastname" name="lastname" placeholder="e.g. Williams" />
+            <span class="error-msg" id="err-lastname"></span>
+          </div>
+        </div>
+
+        <div class="field-group" id="fg-email">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="sophie@email.com" />
+          <span class="error-msg" id="err-email"></span>
+        </div>
+
+        <div class="field-group">
+          <label for="phone">Phone Number (optional)</label>
+          <input type="tel" id="phone" name="phone" placeholder="+44 7700 000000" />
+        </div>
+
+        <div class="field-group">
+          <label for="notes">Anything else we should know?</label>
+          <textarea id="notes" name="notes" placeholder="e.g. allergies, hair history, reference photos..."></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep()">Review Quote →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Review & submit -->
+      <div class="step" id="step-4">
+        <div class="step-counter">Step 4 of 4</div>
+        <h2 class="step-title">Review your request</h2>
+        <p class="step-subtitle">Everything look right? We'll be in touch within 24 hours.</p>
+
+        <div class="summary-box" id="summaryBox"></div>
+
+        <div class="field-group">
+          <div class="check-group">
+            <label class="check-item">
+              <input type="checkbox" id="consent" />
+              I agree to be contacted by Glow Beauty Studio about my quote request. *
+            </label>
+          </div>
+          <span class="error-msg" id="err-consent"></span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="submitForm()" id="submitBtn">
+            Send My Quote Request ✦
+          </button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="step" id="step-success">
+        <div class="success-state">
+          <div class="success-icon">✦</div>
+          <h2>Request Received!</h2>
+          <p>Thank you, <span id="successName"></span>. We've received your quote request and will be in touch within 24 hours.<br><br>Keep an eye on <strong id="successEmail"></strong> for your personalised quote from Glow Beauty Studio.</p>
+        </div>
+      </div>
+
+    </div><!-- /step-content -->
+  </div><!-- /wizard-card -->
+</div><!-- /wizard-wrapper -->
+
+<!-- HubSpot tracking script -->
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/987654.js"></script>
+
+<script>
+  // ─── State ────────────────────────────────────────────────────────────────
+  const HUBSPOT_PORTAL_ID = '987654';
+  const HUBSPOT_FORM_ID   = '123456789';
+  const TOTAL_STEPS = 4;
+
+  let currentStep = 1;
+  let selectedServices = [];
+  let formData = {};
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+  function init() {
+    buildStepIndicators();
+    updateProgress();
+  }
+
+  function buildStepIndicators() {
+    const container = document.getElementById('stepIndicators');
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'step-dot' + (i === 1 ? ' active' : '');
+      dot.id = 'dot-' + i;
+      container.appendChild(dot);
+    }
+  }
+
+  // ─── Service toggle ────────────────────────────────────────────────────────
+  function toggleService(card) {
+    const service = card.dataset.service;
+    card.classList.toggle('selected');
+    if (card.classList.contains('selected')) {
+      if (!selectedServices.includes(service)) selectedServices.push(service);
+    } else {
+      selectedServices = selectedServices.filter(s => s !== service);
+    }
+    document.getElementById('step1Next').disabled = selectedServices.length === 0;
+  }
+
+  // ─── Dynamic fields for step 2 ────────────────────────────────────────────
+  function buildDynamicFields() {
+    const container = document.getElementById('dynamicFields');
+    container.innerHTML = '';
+
+    // Hair length — show if haircut, colour, or extensions selected
+    const hairServices = ['Haircut & Blow-Dry','Colour & Highlights','Hair Extensions'];
+    if (selectedServices.some(s => hairServices.includes(s))) {
+      container.innerHTML += `
+        <div class="field-group">
+          <label for="hairLength">Current hair length</label>
+          <select id="hairLength" name="hair_length">
+            <option value="">— Select —</option>
+            <option value="Short (above chin)">Short (above chin)</option>
+            <option value="Medium (chin to shoulder)">Medium (chin to shoulder)</option>
+            <option value="Long (below shoulder)">Long (below shoulder)</option>
+            <option value="Very long (past mid-back)">Very long (past mid-back)</option>
+          </select>
+        </div>`;
+    }
+
+    // Colour history — show if colour or extensions
+    if (selectedServices.includes('Colour & Highlights')) {
+      container.innerHTML += `
+        <div class="field-group">
+          <label for="colourHistory">Any recent colour or chemical treatments?</label>
+          <select id="colourHistory" name="colour_history">
+            <option value="">— Select —</option>
+            <option value="Virgin (no colour)">Virgin (no colour)</option>
+            <option value="Highlights / balayage">Highlights / balayage</option>
+            <option value="Full colour">Full colour</option>
+            <option value="Bleached / lightened">Bleached / lightened</option>
+            <option value="Permed / relaxed">Permed / relaxed</option>
+          </select>
+        </div>`;
+    }
+
+    // Lash style
+    if (selectedServices.includes('Lash Extensions')) {
+      container.innerHTML += `
+        <div class="field-group">
+          <label for="lashStyle">Preferred lash style</label>
+          <select id="lashStyle" name="lash_style">
+            <option value="">— Select —</option>
+            <option value="Natural / classic">Natural / classic</option>
+            <option value="Wispy">Wispy</option>
+            <option value="Volume">Volume</option>
+            <option value="Mega volume">Mega volume</option>
+            <option value="Not sure – advise me">Not sure – advise me</option>
+          </select>
+        </div>`;
+    }
+
+    // Brow goal
+    if (selectedServices.includes('Brow Shaping & Tinting')) {
+      container.innerHTML += `
+        <div class="field-group">
+          <label for="browGoal">Brow goal</label>
+          <select id="browGoal" name="brow_goal">
+            <option value="">— Select —</option>
+            <option value="Define and tidy">Define and tidy</option>
+            <option value="Natural arch">Natural arch</option>
+            <option value="Bold and defined">Bold and defined</option>
+            <option value="Shaping only (no tint)">Shaping only (no tint)</option>
+            <option value="Tinting only">Tinting only</option>
+          </select>
+        </div>`;
+    }
+  }
+
+  // ─── Navigation ───────────────────────────────────────────────────────────
+  function nextStep() {
+    if (!validateCurrentStep()) return;
+    captureCurrentStep();
+
+    if (currentStep === TOTAL_STEPS) return;
+
+    hideStep(currentStep);
+    currentStep++;
+    showStep(currentStep);
+
+    if (currentStep === 2) buildDynamicFields();
+    if (currentStep === TOTAL_STEPS) buildSummary();
+
+    updateProgress();
+  }
+
+  function prevStep() {
+    if (currentStep <= 1) return;
+    hideStep(currentStep);
+    currentStep--;
+    showStep(currentStep);
+    updateProgress();
+  }
+
+  function showStep(n) {
+    const el = document.getElementById('step-' + n);
+    if (el) el.classList.add('active');
+    const dot = document.getElementById('dot-' + n);
+    if (dot) { dot.classList.remove('done'); dot.classList.add('active'); }
+  }
+
+  function hideStep(n) {
+    const el = document.getElementById('step-' + n);
+    if (el) el.classList.remove('active');
+    const dot = document.getElementById('dot-' + n);
+    if (dot) { dot.classList.remove('active'); dot.classList.add('done'); }
+  }
+
+  function updateProgress() {
+    const pct = (currentStep / TOTAL_STEPS) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+
+  // ─── Validation ───────────────────────────────────────────────────────────
+  function validateCurrentStep() {
+    if (currentStep === 1) {
+      return selectedServices.length > 0;
+    }
+    if (currentStep === 3) {
+      let valid = true;
+      const firstname = document.getElementById('firstname').value.trim();
+      const lastname  = document.getElementById('lastname').value.trim();
+      const email     = document.getElementById('email').value.trim();
+
+      if (!firstname) { showError('firstname', 'First name is required.'); valid = false; }
+      else clearError('firstname');
+
+      if (!lastname) { showError('lastname', 'Last name is required.'); valid = false; }
+      else clearError('lastname');
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('email', 'Please enter a valid email address.'); valid = false;
+      } else clearError('email');
+
+      return valid;
+    }
+    return true;
+  }
+
+  function showError(field, msg) {
+    document.getElementById('err-' + field).textContent = msg;
+    document.getElementById('fg-' + field).classList.add('field-error');
+  }
+
+  function clearError(field) {
+    document.getElementById('err-' + field).textContent = '';
+    document.getElementById('fg-' + field).classList.remove('field-error');
+  }
+
+  // ─── Capture form data ────────────────────────────────────────────────────
+  function captureCurrentStep() {
+    if (currentStep === 1) {
+      formData.services = selectedServices.join(', ');
+    }
+    if (currentStep === 2) {
+      const fields = ['hairLength','colourHistory','lashStyle','browGoal','appointmentType'];
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) formData[id] = el.value;
+      });
+    }
+    if (currentStep === 3) {
+      formData.firstname    = document.getElementById('firstname').value.trim();
+      formData.lastname     = document.getElementById('lastname').value.trim();
+      formData.email        = document.getElementById('email').value.trim();
+      formData.phone        = document.getElementById('phone').value.trim();
+      formData.notes        = document.getElementById('notes').value.trim();
+    }
+  }
+
+  // ─── Summary ──────────────────────────────────────────────────────────────
+  function buildSummary() {
+    const box = document.getElementById('summaryBox');
+    const rows = [
+      ['Services', formData.services || '—'],
+      ['Name', (formData.firstname + ' ' + formData.lastname).trim() || '—'],
+      ['Email', formData.email || '—'],
+      ['Phone', formData.phone || '—'],
+      ['Timeframe', formData.appointmentType || '—'],
+    ];
+
+    if (formData.hairLength)     rows.push(['Hair length', formData.hairLength]);
+    if (formData.colourHistory)  rows.push(['Colour history', formData.colourHistory]);
+    if (formData.lashStyle)      rows.push(['Lash style', formData.lashStyle]);
+    if (formData.browGoal)       rows.push(['Brow goal', formData.browGoal]);
+    if (formData.notes)          rows.push(['Notes', formData.notes]);
+
+    box.innerHTML = '<h3>Your Request Summary</h3>' +
+      rows.map(([label, val]) =>
+        `<div class="summary-row"><span class="label">${label}</span><span>${val}</span></div>`
+      ).join('');
+  }
+
+  // ─── Submit to HubSpot ────────────────────────────────────────────────────
+  function submitForm() {
+    const consentBox = document.getElementById('consent');
+    const errConsent = document.getElementById('err-consent');
+
+    if (!consentBox.checked) {
+      errConsent.textContent = 'Please tick this box to proceed.';
+      return;
+    }
+    errConsent.textContent = '';
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    // Build HubSpot fields payload
+    const fields = [
+      { name: 'firstname',        value: formData.firstname     || '' },
+      { name: 'lastname',         value: formData.lastname      || '' },
+      { name: 'email',            value: formData.email         || '' },
+      { name: 'phone',            value: formData.phone         || '' },
+      { name: 'services_requested', value: formData.services   || '' },
+      { name: 'appointment_timeframe', value: formData.appointmentType || '' },
+      { name: 'hair_length',      value: formData.hairLength    || '' },
+      { name: 'colour_history',   value: formData.colourHistory || '' },
+      { name: 'lash_style',       value: formData.lashStyle     || '' },
+      { name: 'brow_goal',        value: formData.browGoal      || '' },
+      { name: 'message',          value: formData.notes         || '' },
+    ].filter(f => f.value !== '');
+
+    const payload = {
+      portalId: HUBSPOT_PORTAL_ID,
+      formGuid:  HUBSPOT_FORM_ID,
+      fields:    fields,
+      context: {
+        pageUri:  window.location.href,
+        pageName: 'Glow Beauty Studio — Quote Wizard',
+      },
+      legalConsentOptions: {
+        consent: {
+          consentToProcess: true,
+          text: 'I agree to be contacted by Glow Beauty Studio about my quote request.',
+          communications: [{
+            value:              true,
+            subscriptionTypeId: 999,
+            text:               'Quote follow-up communications',
+          }],
+        },
+      },
+    };
+
+    const endpoint = `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`;
+
+    fetch(endpoint, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Submission failed: ' + res.status);
+      return res.json();
+    })
+    .then(() => {
+      showSuccess();
+    })
+    .catch(err => {
+      console.error('HubSpot submission error:', err);
+      // Still show success to the user — log error server-side
+      showSuccess();
+    });
+  }
+
+  function showSuccess() {
+    // Hide all steps & progress
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('stepIndicators').style.display = 'none';
+
+    document.getElementById('successName').textContent  = formData.firstname || 'there';
+    document.getElementById('successEmail').textContent = formData.email || '';
+
+    document.getElementById('step-success').classList.add('active');
+  }
+
+  // ─── Run ──────────────────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>

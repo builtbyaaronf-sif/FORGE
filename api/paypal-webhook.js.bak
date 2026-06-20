@@ -1,0 +1,297 @@
+/**
+ * FORGE — PayPal Webhook Handler (Secured & Idempotent)
+ * Vercel Serverless Function: /api/paypal-webhook
+ *
+ * Listens for PayPal PAYMENT.CAPTURE.COMPLETED events.
+ * Implements an idempotency guard using Vercel KV / Upstash to prevent duplicates.
+ * Verifies webhook signatures, validates decoded client metadata,
+ * triggers deployment, and fires client onboarding confirmations.
+ */
+import { createClient } from '@vercel/kv'; // Run: npm install @vercel/kv
+
+const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live'
+  ? 'https://api-m.paypal.com'
+  : 'https://api-m.sandbox.paypal.com';
+
+// ── Initialize Idempotency DB (Vercel KV / Redis) ────────────────────────
+const kv = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+  ? createClient({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN })
+  : null;
+
+async function getPayPalToken() {
+  const creds = Buffer.from(
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+  ).toString('base64');
+  const res = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${creds}`,
+      'Content-Type':  'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=client_credentials'
+  });
+  const data = await res.json();
+  return data.access_token;
+}
+
+async function verifyWebhook(req, rawBody) {
+  const token = await getPayPalToken();
+  const verifyPayload = {
+    auth_algo:         req.headers['paypal-auth-algo'],
+    cert_url:          req.headers['paypal-cert-url'],
+    transmission_id:   req.headers['paypal-transmission-id'],
+    transmission_sig:  req.headers['paypal-transmission-sig'],
+    transmission_time: req.headers['paypal-transmission-time'],
+    webhook_id:        process.env.PAYPAL_WEBHOOK_ID,
+    webhook_event:     JSON.parse(rawBody)
+  };
+  const res = await fetch(`${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`, {
+    method:  'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify(verifyPayload)
+  });
+  const data = await res.json();
+  return data.verification_status === 'SUCCESS';
+}
+
+async function notifyDeployment(clientData, orderId, amount) {
+  const pkg = clientData.pkg || 'unknown';
+  const pkgNames = { p1:'Launch', p2:'Brand', p3:'Convert', p4:'Book', p5:'Grow' };
+  await fetch('https://formsubmit.co/ajax/builtbyaaronf@gmail.com', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      _subject:  `🚀 DEPLOY NOW — ${clientData.name} — ${pkgNames[pkg] || pkg} (£${amount})`,
+      '⚡ ACTION': 'Run deploy-team skill for this client immediately',
+      Package:   `${pkg.toUpperCase()} — ${pkgNames[pkg] || pkg}`,
+      Business:  clientData.name,
+      Location:  clientData.location,
+      Email:     clientData.email,
+      'Order ID': orderId,
+      Amount:    `£${amount}`,
+      _template: 'table'
+    })
+  });
+}
+
+async function updateHubSpotContact(email, utmSource, utmCampaign) {
+  if (!process.env.HUBSPOT_PORTAL_ID || !process.env.HUBSPOT_API_KEY) {
+    console.warn('HubSpot credentials not configured — skipping UTM property update');
+    return;
+  }
+
+  try {
+    const apiKey = process.env.HUBSPOT_API_KEY;
+    const properties = {};
+    if (utmSource) properties['forge_lead_utm_source'] = utmSource;
+    if (utmCampaign) properties['forge_lead_campaign_tag'] = utmCampaign;
+
+    // ── Step 1: Search for existing contact by email ────────────────────────
+    const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: 'email',
+                operator: 'EQ',
+                value: email
+              }
+            ]
+          }
+        ],
+        limit: 1
+      })
+    });
+
+    if (!searchRes.ok) {
+      console.error(`HubSpot search failed (${searchRes.status}): ${searchRes.statusText}`);
+      return;
+    }
+
+    const searchData = await searchRes.json();
+    const existingContact = searchData.results?.[0];
+
+    if (existingContact) {
+      // ── Step 2a: Contact exists — update it ────────────────────────────────
+      const contactId = existingContact.id;
+      const updateRes = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ properties })
+      });
+
+      if (updateRes.ok) {
+        console.log(`HubSpot contact ${contactId} updated with UTM: source=${utmSource}, campaign=${utmCampaign}`);
+      } else {
+        console.error(`HubSpot update failed (${updateRes.status}): ${updateRes.statusText}`);
+      }
+    } else {
+      // ── Step 2b: Contact doesn't exist — create it ──────────────────────────
+      properties['email'] = email; // Email is required for creation
+      const createRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ properties })
+      });
+
+      if (createRes.ok) {
+        const createData = await createRes.json();
+        console.log(`HubSpot contact created (${createData.id}) with UTM: source=${utmSource}, campaign=${utmCampaign}`);
+      } else {
+        console.error(`HubSpot create failed (${createRes.status}): ${createRes.statusText}`);
+      }
+    }
+  } catch (err) {
+    console.error('HubSpot contact update error (non-fatal):', err.message);
+    // Non-blocking — don't throw
+  }
+}
+
+async function sendClientConfirmation(clientData, orderId, amount) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not set — skipping client confirmation email');
+    return;
+  }
+  const pkg = clientData.pkg || 'p1';
+  const pkgNames  = { p1:'Launch', p2:'Brand', p3:'Convert', p4:'Book', p5:'Grow' };
+  const pkgPrices = { p1:'£74.99', p2:'£149.99', p3:'£299.99', p4:'£499.99', p5:'£749.99' };
+  const pkgTimelines = { p1:'~10 minutes', p2:'~20 minutes', p3:'~30 minutes', p4:'~45 minutes', p5:'~60 minutes' };
+  const pkgName     = pkgNames[pkg]     || 'Launch';
+  const pkgPrice    = pkgPrices[pkg]    || `£${amount}`;
+  const timeline    = pkgTimelines[pkg] || '~10 minutes';
+  const clientName  = clientData.name   || 'there';
+  const clientEmail = clientData.email;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your FORGE order is confirmed</title>
+</head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+      <tr><td style="padding-bottom:32px;text-align:center;">
+        <span style="font-size:28px;font-weight:900;letter-spacing:-1px;color:#ffffff;">
+          FORGE<span style="color:#ff6b00;">.</span>
+        </span>
+      </td></tr>
+      <tr><td style="background:#111111;border:1px solid #222222;border-radius:12px;padding:40px;">
+        <p style="margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:2px;color:#ff6b00;text-transform:uppercase;">Order confirmed</p>
+        <h1 style="margin:0 0 24px;font-size:28px;font-weight:800;color:#ffffff;line-height:1.2;">
+          Your FORGE machine<br>is running, ${clientName}.
+        </h1>
+        <p style="margin:0 0 32px;font-size:16px;color:#999999;line-height:1.6;">
+          Payment cleared. Our AI agents are building your digital presence right now. You'll receive your handover document with everything live and ready within <strong style="color:#ffffff;">${timeline}</strong>.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;border-radius:8px;padding:24px;margin-bottom:32px;">
+          <tr>
+            <td style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#555555;text-transform:uppercase;padding-bottom:16px;">Order summary</td>
+          </tr>
+          <tr>
+            <td style="font-size:14px;color:#999999;padding:8px 0;border-bottom:1px solid #1a1a1a;">Package</td>
+            <td style="font-size:14px;color:#ffffff;font-weight:600;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${pkgName} Package</td>
+          </tr>
+          <tr>
+            <td style="font-size:14px;color:#999999;padding:8px 0;border-bottom:1px solid #1a1a1a;">Amount paid</td>
+            <td style="font-size:14px;color:#ffffff;font-weight:600;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${pkgPrice}</td>
+          </tr>
+          <tr>
+            <td style="font-size:14px;color:#999999;padding:8px 0;border-bottom:1px solid #1a1a1a;">Estimated delivery</td>
+            <td style="font-size:14px;color:#ff6b00;font-weight:600;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${timeline}</td>
+          </tr>
+          <tr>
+            <td style="font-size:14px;color:#999999;padding:8px 0;">Order ID</td>
+            <td style="font-size:12px;color:#555555;font-weight:600;text-align:right;padding:8px 0;font-family:monospace;">${orderId}</td>
+          </tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td align="center">
+            <a href="https://forgeisagentic.tech" style="display:inline-block;background:#ff6b00;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.5px;">
+              Visit forgeisagentic.tech →
+            </a>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
+  const from = process.env.RESEND_FROM_EMAIL || 'FORGE <onboarding@resend.dev>';
+  await fetch('https://api.resend.com/emails', {
+    method:  'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify({
+      from,
+      to:      [clientEmail],
+      subject: `✅ Order confirmed — your FORGE ${pkgName} Package is being built`,
+      html
+    })
+  });
+}
+
+// ── Main Handler ─────────────────────────────────────────────────────────
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const rawBody = Buffer.concat(chunks).toString('utf8');
+
+  try {
+    // 1. Signature Verification
+    const hasCredentials = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_WEBHOOK_ID;
+    if (hasCredentials) {
+      const valid = await verifyWebhook(req, rawBody);
+      if (!valid) {
+        console.warn('PayPal webhook signature verification failed');
+        return res.status(400).json({ error: 'Invalid signature' });
+      }
+    }
+
+    const event = JSON.parse(rawBody);
+    const eventType = event.event_type;
+
+    if (eventType === 'PAYMENT.CAPTURE.COMPLETED') {
+      const resource = event.resource || {};
+      const customId = resource.custom_id || '';
+      const amount   = resource.amount?.value || '0.00';
+      const orderId  = resource.id || 'unknown';
+
+      // 2. Idempotency Guard (Lock down duplicate retries)
+      if (kv && orderId !== 'unknown') {
+        const isDuplicate = await kv.get(`paypal_processed:${orderId}`);
+        if (isDuplicate) {
+          console.warn(`Idempotency trigger: Duplicate event caught for order ${orderId}. Swallowing execution with 200 OK.`);
+          return res.status(200).json({ received: true, status: 'duplicate_ignored' });
+        }
+        // Set transaction key to expire in 7 days to conserve cache space
+        await kv.set(`paypal_processed:${orderId}`, 'true', { ex: 604800 });
+      }
+
+      // 3. Client Payload Validation (Fix Injection Vulnerability)
+      let 

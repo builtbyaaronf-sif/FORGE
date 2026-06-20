@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Garden Landscaping — Quote Request</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #2d5a1b;
+      --primary-dark: #1e3d12;
+      --primary-light: #3d7a25;
+      --accent: #f4a623;
+      --accent-dark: #d48a0f;
+      --white: #ffffff;
+      --grey-50: #f9fafb;
+      --grey-100: #f3f4f6;
+      --grey-200: #e5e7eb;
+      --grey-400: #9ca3af;
+      --grey-600: #4b5563;
+      --grey-800: #1f2937;
+      --error: #dc2626;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--grey-100);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: var(--grey-800);
+    }
+
+    .wizard-wrapper {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* Header */
+    .wizard-header {
+      background: var(--primary);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 28px 32px 24px;
+      color: var(--white);
+      text-align: center;
+    }
+
+    .wizard-header .logo-leaf {
+      font-size: 2.4rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .wizard-header h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .wizard-header p {
+      margin-top: 4px;
+      font-size: 0.92rem;
+      opacity: 0.82;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      background: var(--primary-dark);
+      padding: 14px 32px;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .progress-labels span {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.6);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .progress-labels span.active {
+      color: var(--accent);
+    }
+
+    .progress-track {
+      height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* Form card */
+    .wizard-card {
+      background: var(--white);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 32px 28px;
+    }
+
+    /* Steps */
+    .step { display: none; }
+    .step.active { display: block; animation: fadeIn 0.25s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-heading {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .step-sub {
+      font-size: 0.88rem;
+      color: var(--grey-600);
+      margin-bottom: 22px;
+    }
+
+    /* Service grid */
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .service-card {
+      border: 2px solid var(--grey-200);
+      border-radius: 10px;
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .service-card:hover {
+      border-color: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .service-card.selected {
+      border-color: var(--primary);
+      background: #f0f7ec;
+    }
+
+    .service-card input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .service-icon {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .service-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--grey-800);
+      line-height: 1.3;
+    }
+
+    .service-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--grey-300);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .service-card.selected .service-check {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .service-check::after {
+      content: '✓';
+      color: var(--white);
+      font-size: 0.65rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .service-card.selected .service-check::after { opacity: 1; }
+
+    /* Form fields */
+    .field-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--grey-600);
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--grey-200);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--grey-800);
+      background: var(--grey-50);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(45,90,27,0.12);
+      background: var(--white);
+    }
+
+    input.error, select.error, textarea.error {
+      border-color: var(--error);
+    }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 0.78rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .error-msg.visible { display: block; }
+
+    textarea { resize: vertical; min-height: 90px; }
+
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 13px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-back {
+      background: var(--grey-100);
+      color: var(--grey-600);
+      border: 1.5px solid var(--grey-200);
+      flex: 0 0 auto;
+      padding: 13px 18px;
+    }
+
+    .btn-back:hover { background: var(--grey-200); }
+
+    .btn-next {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(45,90,27,0.22);
+    }
+
+    .btn-next:hover {
+      background: var(--primary-light);
+      box-shadow: 0 4px 14px rgba(45,90,27,0.3);
+    }
+
+    .btn-submit {
+      background: var(--accent);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(244,166,35,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-dark);
+      box-shadow: 0 4px 14px rgba(244,166,35,0.4);
+    }
+
+    /* Summary box */
+    .summary-box {
+      background: var(--grey-50);
+      border: 1.5px solid var(--grey-200);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+
+    .summary-box h3 {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--grey-400);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .summary-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+      align-items: flex-start;
+    }
+
+    .summary-row:last-child { margin-bottom: 0; }
+
+    .summary-label {
+      font-size: 0.82rem;
+      color: var(--grey-600);
+      font-weight: 600;
+      min-width: 80px;
+    }
+
+    .summary-value {
+      font-size: 0.85rem;
+      color: var(--grey-800);
+    }
+
+    .wa-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f0f7ec;
+      border: 1.5px solid #c3e0b0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--primary-dark);
+      margin-bottom: 0;
+    }
+
+    .wa-note strong { font-weight: 700; }
+
+    /* Success state */
+    .success-view {
+      display: none;
+      text-align: center;
+      padding: 24px 0 8px;
+    }
+
+    .success-view.active { display: block; animation: fadeIn 0.3s ease; }
+
+    .success-icon {
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+    }
+
+    .success-view h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .success-view p {
+      font-size: 0.9rem;
+      color: var(--grey-600);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 480px) {
+      .wizard-card { padding: 24px 18px 20px; }
+      .wizard-header { padding: 22px 18px 18px; }
+      .progress-bar-wrap { padding: 12px 18px; }
+      .service-grid { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wizard-wrapper">
+  <!-- Header -->
+  <div class="wizard-header">
+    <span class="logo-leaf">🌿</span>
+    <h1>Green Garden Landscaping</h1>
+    <p>Get a free, no-obligation quote in under 2 minutes</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap">
+    <div class="progress-labels">
+      <span id="lbl-1" class="active">Services</span>
+      <span id="lbl-2">Details</span>
+      <span id="lbl-3">Contact</span>
+      <span id="lbl-4">Review</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="wizard-card">
+
+    <!-- STEP 1 — Services -->
+    <div class="step active" id="step-1">
+      <p class="step-heading">Which services do you need?</p>
+      <p class="step-sub">Select one or more — you can choose as many as you like.</p>
+
+      <div class="service-grid">
+        <label class="service-card" id="card-design" onclick="toggleService(this,'Garden design & consultation')">
+          <input type="checkbox" value="Garden design & consultation" />
+          <span class="service-icon">🎨</span>
+          <span class="service-name">Garden Design &amp; Consultation</span>
+          <span class="service-check"></span>
+        </label>
+
+        <label class="service-card" id="card-lawn" onclick="toggleService(this,'Lawn care & maintenance')">
+          <input type="checkbox" value="Lawn care & maintenance" />
+          <span class="service-icon">🌱</span>
+          <span class="service-name">Lawn Care &amp; Maintenance</span>
+          <span class="service-check"></span>
+        </label>
+
+        <label class="service-card" id="card-decking" onclick="toggleService(this,'Decking & patio installation')">
+          <input type="checkbox" value="Decking & patio installation" />
+          <span class="service-icon">🪵</span>
+          <span class="service-name">Decking &amp; Patio Installation</span>
+          <span class="service-check"></span>
+        </label>
+
+        <label class="service-card" id="card-tree" onclick="toggleService(this,'Tree surgery')">
+          <input type="checkbox" value="Tree surgery" />
+          <span class="service-icon">🌳</span>
+          <span class="service-name">Tree Surgery</span>
+          <span class="service-check"></span>
+        </label>
+
+        <label class="service-card" id="card-hedge" onclick="toggleService(this,'Hedge trimming & shaping')">
+          <input type="checkbox" value="Hedge trimming & shaping" />
+          <span class="service-icon">✂️</span>
+          <span class="service-name">Hedge Trimming &amp; Shaping</span>
+          <span class="service-check"></span>
+        </label>
+      </div>
+
+      <p id="service-error" class="error-msg">Please select at least one service.</p>
+
+      <div class="btn-row">
+        <button class="btn btn-next" onclick="goToStep(2)">Next: Project Details →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 — Project Details -->
+    <div class="step" id="step-2">
+      <p class="step-heading">Tell us about your project</p>
+      <p class="step-sub">Help us understand the scope so we can give you an accurate quote.</p>
+
+      <div class="field-group">
+        <label for="gardenSize">Garden / area size</label>
+        <select id="gardenSize">
+          <option value="">— Select size —</option>
+          <option>Small (under 50 m²)</option>
+          <option>Medium (50–150 m²)</option>
+          <option>Large (150–400 m²)</option>
+          <option>Very large (400 m²+)</option>
+          <option>Not sure</option>
+        </select>
+        <p class="error-msg" id="err-size">Please select a garden size.</p>
+      </div>
+
+      <div class="field-group">
+        <label for="timeline">Preferred start date / timeline</label>
+        <select id="timeline">
+          <option value="">— When do you need the work? —</option>
+          <option>As soon as possible</option>
+          <option>Within 1 month</option>
+          <option>1–3 months</option>
+          <option>3–6 months</option>
+          <option>Flexible / planning ahead</option>
+        </select>
+        <p class="error-msg" id="err-timeline">Please select a timeline.</p>
+      </div>
+
+      <div class="field-group">
+        <label for="budget">Approximate budget (optional)</label>
+        <select id="budget">
+          <option value="">— Select a range (optional) —</option>
+          <option>Under £500</option>
+          <option>£500 – £1,500</option>
+          <option>£1,500 – £5,000</option>
+          <option>£5,000 – £15,000</option>
+          <option>£15,000+</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="notes">Any additional details or special requirements?</label>
+        <textarea id="notes" placeholder="e.g. narrow access, specific plants, existing structures to keep…"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-next" onclick="goToStep(3)">Next: Your Contact Info →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — Contact Details -->
+    <div class="step" id="step-3">
+      <p class="step-heading">Your contact details</p>
+      <p class="step-sub">We'll only use these to follow up on your quote.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="firstName">First name *</label>
+          <input type="text" id="firstName" placeholder="Jane" />
+          <p class="error-msg" id="err-fname">Required.</p>
+        </div>
+        <div class="field-group">
+          <label for="lastName">Last name *</label>
+          <input type="text" id="lastName" placeholder="Smith" />
+          <p class="error-msg" id="err-lname">Required.</p>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="phone">Phone number *</label>
+        <input type="tel" id="phone" placeholder="07700 900000" />
+        <p class="error-msg" id="err-phone">Please enter a valid phone number.</p>
+      </div>
+
+      <div class="field-group">
+        <label for="email">Email address *</label>
+        <input type="email" id="email" placeholder="jane@example.com" />
+        <p class="error-msg" id="err-email">Please enter a valid email address.</p>
+      </div>
+
+      <div class="field-group">
+        <label for="postcode">Postcode *</label>
+        <input type="text" id="postcode" placeholder="AB12 3CD" />
+        <p class="error-msg" id="err-postcode">Please enter your postcode.</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToStep(2)">← Back</button>
+        <button class="btn btn-next" onclick="goToStep(4)">Review My Quote →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 — Review & Submit -->
+    <div class="step" id="step-4">
+      <p class="step-heading">Review your request</p>
+      <p class="step-sub">Everything look right? Hit Send and we'll be in touch shortly.</p>
+
+      <div class="summary-box">
+        <h3>Your Summary</h3>
+        <div class="summary-row">
+          <span class="summary-label">Services</span>
+          <span class="summary-value" id="sum-services">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Size</span>
+          <span class="summary-value" id="sum-size">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Timeline</span>
+          <span class="summary-value" id="sum-timeline">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Budget</span>
+          <span class="summary-value" id="sum-budget">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Notes</span>
+          <span class="summary-value" id="sum-notes">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Name</span>
+          <span class="summary-value" id="sum-name">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Phone</span>
+          <span class="summary-value" id="sum-phone">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Email</span>
+          <span class="summary-value" id="sum-email">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Postcode</span>
+          <span class="summary-value" id="sum-postcode">—</span>
+        </div>
+      </div>
+
+      <div class="wa-note">
+        <span style="font-size:1.2rem">💬</span>
+        <span>Tapping <strong>Send via WhatsApp</strong> will open WhatsApp with your details pre-filled — just press send.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToStep(3)">← Back</button>
+        <button class="btn btn-submit" onclick="submitToWhatsApp()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Send via WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-view" id="success-view">
+      <div class="success-icon">🌿</div>
+      <h2>Quote request sent!</h2>
+      <p>Thanks! Your request has been sent to Green Garden Landscaping via WhatsApp. We aim to respond within 24 hours.</p>
+    </div>
+
+  </div><!-- /wizard-card -->
+</div><!-- /wizard-wrapper -->
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+  const selectedServices = new Set();
+
+  // --- Toggle service cards ---
+  function toggleService(card, value) {
+    card.classList.toggle('selected');
+    const cb = card.querySelector('input[type="checkbox"]');
+    cb.checked = card.classList.contains('selected');
+    if (card.classList.contains('selected')) {
+      selectedServices.add(value);
+    } else {
+      selectedServices.delete(value);
+    }
+  }
+
+  // --- Step navigation ---
+  function goToStep(target) {
+    if (target > currentStep && !validateStep(currentStep)) return;
+
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep = target;
+
+    if (currentStep <= totalSteps) {
+      document.getElementById('step-' + currentStep).classList.add('active');
+    }
+
+    // Update progress
+    const pct = (currentStep / totalSteps) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+
+    // Update labels
+    ['1','2','3','4'].forEach(n => {
+      const el = document.getElementById('lbl-' + n);
+      el.classList.toggle('active', n === String(currentStep));
+    });
+
+    // Populate summary on step 4
+    if (currentStep === 4) populateSummary();
+  }
+
+  // --- Validation ---
+  function show(id, visible) {
+    document.getElementById(id).classList.toggle('visible', visible);
+  }
+
+  function setErr(inputId, errId, hasErr) {
+    const el = document.getElementById(inputId);
+    if (el) el.classList.toggle('error', hasErr);
+    show(errId, hasErr);
+  }
+
+  function validateStep(step) {
+    let valid = true;
+
+    if (step === 1) {
+      if (selectedServices.size === 0) {
+        show('service-error', true);
+        valid = false;
+      } else {
+        show('service-error', false);
+      }
+    }
+
+    if (step === 2) {
+      const size = document.getElementById('gardenSize').value;
+      const tl = document.getElementById('timeline').value;
+      if (!size) { setErr('gardenSize','err-size',true); valid = false; } else { setErr('gardenSize','err-size',false); }
+      if (!tl)   { setErr('timeline','err-timeline',true); valid = false; } else { setErr('timeline','err-timeline',false); }
+    }
+
+    if (step === 3) {
+      const fn = document.getElementById('firstName').value.trim();
+      const ln = document.getElementById('lastName').value.trim();
+      const ph = document.getElementById('phone').value.trim();
+      const em = document.getElementById('email').value.trim();
+      const pc = document.getElementById('postcode').value.trim();
+
+      if (!fn) { setErr('firstName','err-fname',true); valid = false; } else { setErr('firstName','err-fname',false); }
+      if (!ln) { setErr('lastName','err-lname',true); valid = false; } else { setErr('lastName','err-lname',false); }
+      if (!ph || ph.replace(/\s/g,'').length < 7) { setErr('phone','err-phone',true); valid = false; } else { setErr('phone','err-phone',false); }
+
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);
+      if (!emailOk) { setErr('email','err-email',true); valid = false; } else { setErr('email','err-email',false); }
+
+      if (!pc) { setErr('postcode','err-postcode',true); valid = false; } else { setErr('postcode','err-postcode',false); }
+    }
+
+    return valid;
+  }
+
+  // --- Populate review summary ---
+  function populateSummary() {
+    const v = id => document.getElementById(id).value || '—';
+    document.getElementById('sum-services').textContent = [...selectedServices].join(', ') || '—';
+    document.getElementById('sum-size').textContent     = v('gardenSize');
+    document.getElementById('sum-timeline').textContent = v('timeline');
+    document.getElementById('sum-budget').textContent   = v('budget') || 'Not specified';
+    document.getElementById('sum-notes').textContent    = v('notes') || 'None';
+    document.getElementById('sum-name').textContent     = (document.getElementById('firstName').value.trim() + ' ' + document.getElementById('lastName').value.trim()).trim();
+    document.getElementById('sum-phone').textContent    = v('phone');
+    document.getElementById('sum-email').textContent    = v('email');
+    document.getElementById('sum-postcode').textContent = v('postcode');
+  }
+
+  // --- WhatsApp submit ---
+  function submitToWhatsApp() {
+    const name     = (document.getElementById('firstName').value.trim() + ' ' + document.getElementById('lastName').value.trim()).trim();
+    const phone    = document.getElementById('phone').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const postcode = document.getElementById('postcode').value.trim();
+    const size     = document.getElementById('gardenSize').value || 'Not specified';
+    const timeline = document.getElementById('timeline').value || 'Not specified';
+    const budget   = document.getElementById('budget').value || 'Not specified';
+    const notes    = document.getElementById('notes').value.trim() || 'None';
+    const services = [...selectedServices].join(', ');
+
+    const msg =
+`Hello Green Garden Landscaping! 🌿 I'd like to request a free quote.
+
+*Name:* ${name}
+*Phone:* ${phone}
+*Email:* ${email}
+*Postcode:* ${postcode}
+
+*Services required:* ${services}
+*Garden size:* ${size}
+*Timeline:* ${timeline}
+*Budget:* ${budget}
+*Additional notes:* ${notes}
+
+Please let me know your availability. Thank you!`;
+
+    const waNumber = '447891234567';
+    const encoded  = encodeURIComponent(msg);
+    const waUrl    = `https://wa.me/${waNumber}?text=${encoded}`;
+
+    window.open(waUrl, '_blank');
+
+    // Show success state
+    document.getElementById('step-4').classList.remove('active');
+    document.getElementById('success-view').classList.add('active');
+    document.getElementById('progressFill').style.width = '100%';
+    ['1','2','3','4'].forEach(n => document.getElementById('lbl-' + n).classList.remove('active'));
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!-- LIGHTWEIGHT LEGAL GATE - Drop into index.html -->
+<!-- This adds a consent modal that stores consent in localStorage -->
+<!-- No backend required. Works on static sites. -->
+
+<style>
+/* ─── LEGAL GATE MODAL ───────────────────────────────────── */
+.legal-gate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.legal-gate-overlay.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.legal-gate-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--rL);
+  padding: 40px;
+  max-width: 520px;
+  width: calc(100vw - 32px);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.legal-gate-modal h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+  color: var(--ink);
+}
+
+.legal-gate-modal p {
+  font-size: 0.95rem;
+  color: var(--ink2);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.legal-gate-modal ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.legal-gate-modal li {
+  font-size: 0.9rem;
+  color: var(--ink2);
+  padding-left: 20px;
+  position: relative;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.legal-gate-modal li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.legal-gate-checkbox-group {
+  margin: 24px 0;
+  padding: 16px;
+  background: var(--surface2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.legal-gate-checkbox-group label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.legal-gate-checkbox-group input[type="checkbox"] {
+  margin-top: 4px;
+  cursor: pointer;
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.legal-gate-checkbox-group span {
+  font-size: 0.9rem;
+  color: var(--ink2);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.legal-gate-checkbox-group a {
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.legal-gate-checkbox-group a:hover {
+  opacity: 0.8;
+}
+
+.legal-gate-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.legal-gate-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.legal-gate-btn--accept {
+  background: var(--accent);
+  color: #fff;
+}
+
+.legal-gate-btn--accept:hover:not(:disabled) {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 153, 255, 0.35);
+}
+
+.legal-gate-btn--accept:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.legal-gate-btn--decline {
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--border);
+}
+
+.legal-gate-btn--decline:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.legal-gate-error {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #ef4444;
+  text-align: center;
+}
+
+.legal-gate-error.show {
+  display: block;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .legal-gate-modal {
+    padding: 28px 20px;
+  }
+
+  .legal-gate-modal h2 {
+    font-size: 1.25rem;
+  }
+
+  .legal-gate-actions {
+    flex-direction: column;
+  }
+}
+</style>
+
+<!-- LEGAL GATE MODAL HTML -->
+<div class="legal-gate-overlay" id="legalGateOverlay">
+  <div class="legal-gate-modal" id="legalGateModal">
+    <h2>Legal Terms & Conditions</h2>
+
+    <p>Before you continue, please review and agree to our terms:</p>
+
+    <ul>
+      <li>You agree to our <a href="/terms" onclick="event.preventDefault(); window.open('/terms', '_blank')">Terms of Service</a></li>
+      <li>You understand our <a href="/privacy" onclick="event.preventDefault(); window.open('/privacy', '_blank')">Privacy Policy</a></li>
+      <li>You consent to the processing of your data as outlined</li>
+      <li>You confirm you are of legal age to use this service</li>
+    </ul>
+
+    <div class="legal-gate-checkbox-group">
+      <label>
+        <input type="checkbox" id="legalGateConsent" />
+        <span>I agree to the <a href="/terms" onclick="event.preventDefault(); window.open('/terms', '_blank')">Terms of Service</a> and <a href="/privacy" onclick="event.preventDefault(); window.open('/privacy', '_blank')">Privacy Policy</a></span>
+      </label>
+    </div>
+
+    <div class="legal-gate-error" id="legalGateError">
+      Please check the box to continue
+    </div>
+
+    <div class="legal-gate-actions">
+      <button class="legal-gate-btn legal-gate-btn--decline" id="legalGateDecline">
+        Decline & Leave
+      </button>
+      <button class="legal-gate-btn legal-gate-btn--accept" id="legalGateAccept" disabled>
+        Accept & Continue
+      </button>
+    </div>
+
+    <p style="font-size: 0.8rem; color: var(--ink2); text-align: center; margin-top: 20px;">
+      Your consent is stored securely and never expires.
+    </p>
+  </div>
+</div>
+
+<!-- LEGAL GATE SCRIPT -->
+<script>
+(function initLegalGate() {
+  const CONSENT_KEY = 'forge_legal_consent';
+  const CONSENT_VERSION = '1.0'; // Update this when terms change
+
+  const overlay = document.getElementById('legalGateOverlay');
+  const modal = document.getElementById('legalGateModal');
+  const checkbox = document.getElementById('legalGateConsent');
+  const acceptBtn = document.getElementById('legalGateAccept');
+  const declineBtn = document.getElementById('legalGateDecline');
+  const error = document.getElementById('legalGateError');
+
+  // Check if user has already consented
+  function hasUserConsented() {
+    try {
+      const consent = localStorage.getItem(CONSENT_KEY);
+      if (!consent) return false;
+      const data = JSON.parse(consent);
+      return data.version === CONSENT_VERSION && data.timestamp > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Show the gate
+  function showGate() {
+    overlay.classList.add('active');
+  }
+
+  // Hide the gate
+  function hideGate() {
+    overlay.classList.remove('active');
+  }
+
+  // Record consent
+  function recordConsent() {
+    try {
+      const consentData = {
+        version: CONSENT_VERSION,
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent,
+        accepted: true
+      };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+      hideGate();
+    } catch (e) {
+      console.error('Failed to save consent:', e);
+    }
+  }
+
+  // Handle decline
+  function handleDecline() {
+    try {
+      const consentData = {
+        version: CONSENT_VERSION,
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent,
+        accepted: false
+      };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+      // Redirect to a declining page or homepage
+      window.location.href = '/';
+    } catch (e) {
+      console.error('Failed to save decline:', e);
+    }
+  }
+
+  // Checkbox toggle
+  checkbox.addEventListener('change', () => {
+    acceptBtn.disabled = !checkbox.checked;
+    error.classList.remove('show');
+  });
+
+  // Accept button
+  acceptBtn.addEventListener('click', () => {
+    if (checkbox.checked) {
+      recordConsent();
+    }
+  });
+
+  // Decline button
+  declineBtn.addEventListener('click', handleDecline);
+
+  // Prevent closing by clicking overlay
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      e.preventDefault();
+    }
+  });
+
+  // Prevent ESC key from closing
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      e.preventDefault();
+    }
+  });
+
+  // Initialize
+  if (!hasUserConsented()) {
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', showGate);
+    } else {
+      showGate();
+    }
+  }
+
+  // Export for manual control if needed
+  window.LegalGate = {
+    show: showGate,
+    hide: hideGate,
+    reset: () => {
+      localStorage.removeItem(CONSENT_KEY);
+      showGate();
+    },
+    hasConsented: hasUserConsented,
+    getConsent: () => {
+      try {
+        return JSON.parse(localStorage.getItem(CONSENT_KEY));
+      } catch (e) {
+        return null;
+      }
+    }
+  };
+})();
+</script>

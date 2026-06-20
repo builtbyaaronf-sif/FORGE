@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Started — FORGE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://www.paypal.com/sdk/js?client-id=AdT5Zs-k6QuhdIbdV-nDBqmzRaeMKIjWVaSESFmA67h74udOf3nxWVHGtHfDmfoYJavy1qCEDD6SBwlT&currency=GBP&intent=capture" data-namespace="paypal_sdk"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0A0A0A;
+      --bg2:        #111111;
+      --bg3:        #1A1A1A;
+      --border:     #2A2A2A;
+      --accent:     #0099FF;
+      --accent-dim: rgba(0,153,255,0.10);
+      --white:      #FFFFFF;
+      --grey:       #9CA3AF;
+      --grey2:      #6B7280;
+      --font:       'Inter', system-ui, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--white);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 3px;
+      background: var(--border);
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      position: fixed;
+      top: 3px; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent); }
+    .step-counter {
+      font-size: 13px;
+      color: var(--grey2);
+      font-weight: 500;
+    }
+    .step-counter strong { color: var(--white); }
+
+    /* ── VIEWPORT ── */
+    .viewport {
+      position: fixed;
+      inset: 63px 0 0 0;
+      overflow: hidden;
+    }
+
+    /* ── SLIDES ── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(40px);
+      transition: opacity 0.38s ease, transform 0.38s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+    .slide.exit-up {
+      opacity: 0;
+      transform: translateY(-40px);
+      pointer-events: none;
+      transition: opacity 0.26s ease, transform 0.26s ease;
+    }
+
+    /* ── SLIDE CONTENT ── */
+    .slide-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .slide-title {
+      font-size: clamp(24px, 4.5vw, 44px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      text-align: center;
+      max-width: 680px;
+      margin-bottom: 10px;
+    }
+    .slide-title em { font-style: normal; color: var(--accent); }
+    .slide-sub {
+      font-size: 15px;
+      color: var(--grey);
+      text-align: center;
+      max-width: 500px;
+      line-height: 1.75;
+      margin-bottom: 36px;
+    }
+
+    /* ── PACKAGE CARDS ── */
+    .packages {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 1060px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .packages { grid-template-columns: repeat(2, 1fr); max-width: 560px; }
+    }
+    @media (max-width: 500px) {
+      .packages { grid-template-columns: 1fr; max-width: 380px; }
+    }
+    .pkg-card {
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 22px;
+      cursor: pointer;
+      transition: border-color 0.18s, transform 0.15s, background 0.18s;
+      position: relative;
+      text-align: left;
+    }
+    .pkg-card:hover { border-color: var(--grey2); transform: translateY(-2px); }
+    .pkg-card.selected {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(0,153,255,0.08), var(--bg2));
+    }
+    .pkg-badge {
+      position: absolute;
+      top: -11px; left: 18px;
+      background: var(--accent);
+      color: var(--white);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .pkg-name {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--grey2); margin-bottom: 6px;
+    }
+    .pkg-price { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .pkg-time { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+    .pkg-features { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .pkg-features li {
+      font-size: 12px; color: var(--grey);
+      padding-left: 16px; position: relative; line-height: 1.4;
+    }
+    .pkg-features li::before {
+      content: ''; position: absolute; left: 0; top: 5px;
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    }
+    .pkg-select-indicator {
+      position: absolute; top: 14px; right: 14px;
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .pkg-card.selected .pkg-select-indicator { background: var(--accent); border-color: var(--accent); }
+    .pkg-select-indicator::after {
+      content: '✓'; font-size: 11px; color: white; font-weight: 700;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .pkg-card.selected .pkg-select-indicator::after { opacity: 1; }
+
+    /* ── TEXT INPUTS ── */
+    .input-wrap { width: 100%; max-width: 540px; margin-bottom: 28px; }
+    .field-label {
+      display: block; font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--grey2); margin-bottom: 10px;
+    }
+    .field-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 20px;
+      font-weight: 600;
+      padding: 18px 20px;
+      outline: none;
+      transition: border-color 0.18s;
+    }
+    .field-input::placeholder { color: var(--grey2); font-weight: 400; font-size: 17px; }
+    .field-input:focus { border-color: var(--accent); }
+    textarea.field-input {
+      resize: none; min-height: 120px;
+      font-size: 15px; font-weight: 400; line-height: 1.7;
+    }
+    .field-hint {
+      font-size: 12px; color: var(--grey2); margin-top: 8px; line-height: 1.6;
+    }
+
+    /* ── PROMPT CHIPS ── */
+    .prompt-chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 14px; max-width: 540px;
+    }
+    .chip {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--grey);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--accent); color: var(--accent); }
+    .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+    /* ── NO PRESENCE TOGGLE ── */
+    .no-presence-wrap {
+      max-width: 540px; width: 100%; margin-bottom: 16px;
+    }
+    .no-presence-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 14px 18px;
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.15s;
+      user-select: none;
+    }
+    .no-presence-label:hover { border-color: var(--grey2); }
+    .no-presence-label.checked { border-color: var(--accent); background: var(--accent-dim); }
+    .no-presence-label input { display: none; }
+    .no-presence-box {
+      width: 20px; height: 20px; border-radius: 5px;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.15s;
+    }
+    .no-presence-label.checked .no-presence-box {
+      background: var(--accent); border-color: var(--accent);
+    }
+    .no-presence-box::after {
+      content: '✓'; font-size: 12px; color: white; font-weight: 700;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .no-presence-label.checked .no-presence-box::after { opacity: 1; }
+    .no-presence-text { font-size: 14px; color: var(--grey); font-weight: 500; }
+    .no-presence-label.checked .no-presence-text { color: var(--white); }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex; align-items: center; gap: 16px; margin-top: 8px;
+    }
+    .btn-next {
+      background: var(--accent); color: var(--white);
+      border: none; border-radius: 10px;
+      font-family: var(--font); font-size: 15px; font-weight: 700;
+      padding: 15px 36px; cursor: pointer;
+      transition: opacity 0.18s, transform 0.12s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-next:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-next:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    .btn-back {
+      background: transparent; color: var(--grey2); border: none;
+      font-family: var(--font); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: color 0.15s; padding: 8px 0;
+    }
+    .btn-back:hover { color: var(--white); }
+    .key-hint {
+      font-size: 12px; color: var(--grey2); margin-top: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .key-hint kbd {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 4px; padding: 2px 6px;
+      font-size: 11px; color: var(--grey); font-family: var(--font);
+    }
+
+    /* ── WELCOME FEATURES ── */
+    .welcome-features {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 44px;
+    }
+    .wf-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--grey);
+    }
+    .wf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* ── SUMMARY ── */
+    .summary-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px 28px;
+      width: 100%; max-width: 520px; margin-bottom: 24px; text-align: left;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+      font-size: 14px; gap: 16px;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: var(--grey2); font-weight: 500; flex-shrink: 0; }
+    .summary-val { color: var(--white); font-weight: 600; text-align: right; }
+    .summary-val.price { color: var(--accent); font-size: 17px; }
+
+    .pay-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: #0070ba; color: white; border: none; border-radius: 10px;
+      font-family: var(--font); font-size: 16px; font-weight: 700;
+      padding: 16px 40px; cursor: pointer; text-decoration: none;
+      transition: opacity 0.18s, transform 0.12s;
+      width: 100%; max-width: 520px; margin-bottom: 12px;
+    }
+    .pay-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .pay-note { font-size: 12px; color: var(--grey2); text-align: center; max-width: 400px; }
+    .pay-note a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- PROGRESS -->
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="index.html" class="logo">FORGE<span>.</span></a>
+  <div class="step-counter" id="stepCounter"></div>
+</div>
+
+<!-- VIEWPORT -->
+<div class="viewport">
+
+  <!-- ── SLIDE 0: Welcome ── -->
+  <div class="slide active" data-step="0">
+    <div class="slide-label">Let's build your business</div>
+    <h1 class="slide-title">A few quick questions.<br /><em>Then we get to work.</em></h1>
+    <p class="slide-sub">This takes under 2 minutes. We'll confirm your package, send your invoice, and start deploying the moment you pay.</p>
+    <div class="welcome-features">
+      <div class="wf-item"><div class="wf-dot"></div>Invoice sent within 2 hours</div>
+      <div class="wf-item"><div class="wf-dot"></div>Work starts same day</div>
+      <div class="wf-item"><div class="wf-dot"></div>No commitment until you pay</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" onclick="next()">Let's go <span>→</span></button>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 1: Package ── -->
+  <div class="slide" data-step="1">
+    <div class="slide-label">Question 1 of 6</div>
+    <h2 class="slide-title">Which package<br /><em>is right for you?</em></h2>
+    <p class="slide-sub">Not sure? The Standard Deploy is our most popular — it gives you everything you need to look established and start generating leads from day one.</p>
+    <div class="packages">
+
+      <!-- P1 Launch -->
+      <div class="pkg-card" id="pkg-p1" onclick="selectPackage('p1')">
+        <div class="pkg-select-indicator"></div>
+        <div class="pkg-name">Launch</div>
+        <div class="pkg-price">£74.99</div>
+        <div class="pkg-time">~5 minutes</div>
+        <ul class="pkg-features">
+          <li>Live website + CTAs</li>
+          <li>SEO meta + Analytics</li>
+          <li>WhatsApp button</li>
+          <li>Cookie banner + Privacy Policy</li>
+        </ul>
+      </div>
+
+      <!-- P2 Brand -->
+      <div class="pkg-card" id="pkg-p2" onclick="selectPackage('p2')">
+        <div class="pkg-select-indicator"></div>
+        <div class="pkg-name">Brand</div>
+        <div class="pkg-price">£149.99</div>
+        <div class="pkg-time">~8 minutes</div>
+        <ul class="pkg-features">
+          <li>Everything in Launch</li>
+          <li>AI imagery</li>
+          <li>Canva brand kit</li>
+          <li>Testimonials section</li>
+        </ul>
+      </div>
+
+      <!-- P3 Convert — Featured -->
+      <div class="pkg-card" id="pkg-p3" onclick="selectPackage('p3')">
+        <div class="pkg-badge">Most popular</div>
+        <div class="pkg-select-indicator"></div>
+        <div class="pkg-name">Convert</div>
+        <div class="pkg-price">£299.99</div>
+        <div class="pkg-time">~12 minutes</div>
+        <ul class="pkg-features">
+          <li>Everything in Brand</li>
+          <li>Quote wizard + photos</li>
+          <li>HubSpot CRM setup</li>
+          <li>Leads auto-flow to CRM</li>
+        </ul>
+      </div>
+
+      <!-- P4 Book -->
+      <div class="pkg-card" id="pkg-p4" onclick="selectPackage('p4')">
+        <div class="pkg-select-indicator"></div>
+        <div class="pkg-name">Book</div>
+        <div class="pkg-price">£499.99</div>
+        <div class="pkg-time">~15 minutes</div>
+        <ul class="pkg-features">
+          <li>Everything in Convert</li>
+          <li>Calendly setup</li>
+          <li>Booking widget on site</li>
+          <li>Google Calendar sync</li>
+        </ul>
+      </div>
+
+      <!-- P5 Grow -->
+      <div class="pkg-card" id="pkg-p5" onclick="selectPackage('p5')">
+        <div class="pkg-select-indicator"></div>
+        <div class="pkg-name">Grow</div>
+        <div class="pkg-price">£624.99</div>
+        <div class="pkg-time">~18 minutes</div>
+        <ul class="pkg-features">
+          <li>Everything in Book</li>
+          <li>Full month of social content</li>
+          <li>Canva social templates</li>
+          <li>Brand across all channels</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="pkgNextBtn" onclick="next()" disabled>Continue <span>→</span></button>
+      <button class="btn-back" onclick="back()">← Back</button>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 2: Business name ── -->
+  <div class="slide" data-step="2">
+    <div class="slide-label">Question 2 of 6</div>
+    <h2 class="slide-title">What's your<br /><em>business called?</em></h2>
+    <p class="slide-sub">This is the name we'll use across your website, brand kit, and content. Use the name your customers already know you by.</p>
+    <div class="input-wrap">
+      <label class="field-label" for="bizName">Business name</label>
+      <input
+        class="field-input" type="text" id="bizName"
+        placeholder="e.g. Mike's Electrical"
+        autocomplete="off"
+        oninput="validateField('bizName','s2next',2)"
+        onkeydown="if(event.key==='Enter'&&!document.getElementById('s2next').disabled)next()"
+      />
+      <div class="field-hint">Use your trading name, not your Ltd company name — this is what goes on your website.</div>
+    </div>
+
+    <!-- Business type toggle -->
+    <div class="input-wrap" style="margin-top:20px;">
+      <label class="field-label">Are you a...</label>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button type="button" id="biz-type-sole" onclick="setBizType('sole_trader')" style="
+          flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid var(--accent);
+          background:var(--accent-dim);color:#fff;font-size:15px;font-weight:600;
+          font-family:inherit;cursor:pointer;transition:all 0.15s;
+        ">Sole Trader / Self-Employed</button>
+        <button type="button" id="biz-type-ltd" onclick="setBizType('limited_company')" style="
+          flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid var(--bg3);
+          background:var(--bg2);color:var(--grey);font-size:15px;font-weight:600;
+          font-family:inherit;cursor:pointer;transition:all 0.15s;
+        ">Limited Company</button>
+      </div>
+      <div class="field-hint" id="biz-type-hint" style="margin-top:8px;">Self-employed or trading under your own name.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-next" id="s2next" onclick="next()" disabled>Continue <span>→</span></button>
+      <button class="btn-back" onclick="back()">← Back</button>
+    </div>
+    <div class="key-hint"><kbd>Enter</kbd> to continue</div>
+  </div>
+
+  <!-- ── SLIDE 3: Location ── -->
+  <div class="slide" data-step="3">
+    <div class="slide-label">Question 3 of 6</div>
+    <h2 class="slide-title">Where are<br /><em>you based?</em></h2>
+    <p class="slide-sub">We use this to research your local market, find out who your competitors are, and position you as the obvious choice in your area.</p>
+    <div class="input-wrap">
+      <label class="field-label" for="bizLocation">Town, city, or region</label>
+      <input
+        class="field-input" type="text" id="bizLocation"
+        placeholder="e.g. Manchester, UK"
+        autocomplete="off"
+        oninput="validateField('bizLocation','s3next',2)"
+        onkeydown="if(event.key==='Enter'&&!document.getElementById('s3next').disabled)next()"
+      />
+      <div class="field-hint">If you cover multiple areas, list the main one — we'll capture the rest on your website.</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="s3next" onclick="next()" disabled>Continue <span>→</span></button>
+      <button class="btn-back" onclick="back()">← Back</button>
+    </div>
+    <div class="key-hint"><kbd>Enter</kbd> to continue</div>
+  </div>
+
+  <!-- ── SLIDE 4: Email ── -->
+  <div class="slide" data-step="4">
+    <div class="slide-label">Question 4 of 6</div>
+    <h2 class="slide-title">Where do we<br /><em>send your invoice?</em></h2>
+    <p class="slide-sub">We'll send your invoice here. Once payment clears, work begins immediately — you'll also get a confirmation with your expected delivery time.</p>
+    <div class="input-wrap">
+      <label class="field-label" for="bizEmail">Your email address</label>
+      <input
+        class="field-input" type="email" id="bizEmail"
+        placeholder="you@yourbusiness.com"
+        autocomplete="email"
+        oninput="validateEmail()"
+        onkeydown="if(event.key==='Enter'&&!document.getElementById('s4next').disabled)next()"
+      />
+      <div class="field-hint">We only use this for your invoice and project updates. No marketing emails, ever.</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="s4next" onclick="next()" disabled>Continue <span>→</span></button>
+      <button class="btn-back" onclick="back()">← Back</button>
+    </div>
+    <div class="key-hint"><kbd>Enter</kbd> to continue</div>
+  </div>
+
+  <!-- ── SLIDE 5: Internet presence ── -->
+  <div class="slide" data-step="5">
+    <div class="slide-label">Question 5 of 6</div>
+    <h2 class="slide-title">Do you have any<br /><em>online presence already?</em></h2>
+    <p class="slide-sub">Take a moment to think — you might have more than you realise. We use everything we find to make your new site stronger.</p>
+
+    <div class="prompt-chips" id="presenceChips">
+      <div class="chip" onclick="insertChip(this, 'Google Maps listing')">📍 Google Maps listing</div>
+      <div class="chip" onclick="insertChip(this, 'Facebook page')">📘 Facebook page</div>
+      <div class="chip" onclick="insertChip(this, 'Instagram account')">📸 Instagram account</div>
+      <div class="chip" onclick="insertChip(this, 'LinkedIn page')">💼 LinkedIn page</div>
+      <div class="chip" onclick="insertChip(this, 'TikTok account')">🎵 TikTok</div>
+      <div class="chip" onclick="insertChip(this, 'Checkatrade listing')">🔧 Checkatrade</div>
+      <div class="chip" onclick="insertChip(this, 'Yell.com listing')">📒 Yell.com</div>
+      <div class="chip" onclick="insertChip(this, 'Trustpilot page')">⭐ Trustpilot</div>
+      <div class="chip" onclick="insertChip(this, 'Old website')">🌐 Old website</div>
+      <div class="chip" onclick="insertChip(this, 'Tripadvisor listing')">🧭 Tripadvisor</div>
+    </div>
+
+    <div class="input-wrap" id="presenceInputWrap">
+      <label class="field-label" for="bizPresence">Links or platform names <span style="color:var(--grey2);font-weight:400;text-transform:none;letter-spacing:0;">(paste anything you have)</span></label>
+      <textarea
+        class="field-input" id="bizPresence"
+        placeholder="e.g. facebook.com/mikeelectrical&#10;google.com/maps/...&#10;instagram.com/mikeelectrical"
+        onkeydown="if(event.key==='Enter'&&event.metaKey)next()"
+        oninput="syncPresenceState()"
+      ></textarea>
+      <div class="field-hint">Paste links, handles, or just the platform name — we'll find the rest. Every profile we can link to helps your new site rank better and look more established.</div>
+    </div>
+
+    <div class="no-presence-wrap">
+      <label class="no-presence-label" id="noPresenceLabel" onclick="toggleNoPresence()">
+        <div class="no-presence-box"></div>
+        <span class="no-presence-text">I don't have any online presence yet — and that's fine</span>
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-next" id="s5next" onclick="next()">Continue <span>→</span></button>
+      <button class="btn-back" onclick="back()">← Back</button>
+    </div>
+    <div class="key-hint"><kbd>⌘</kbd> + <kbd>Enter</kbd> to continue</div>
+  </div>
+
+  <!-- ── SLIDE 6: Anything else ── -->
+  <div class="slide" data-step="6">
+    <div class="slide-label">Question 6 of 6</div>
+    <h2 class="slide-title">Is there anything<br /><em>else we should know?</em></h2>
+    <p class="slide-sub">This is your chance to tell us anything that will make the end result feel like <em>you</em>. Don't hold back — the more detail, the better the output.</p>
+
+    <div class="prompt-chips" style="max-width:540px; margin-bottom:14px;">
+      <div class="chip" onclick="insertChipTo('bizNotes', this, 'Dark colour scheme')">🌑 Dark colour scheme</div>
+      <div class="chip" onclick="insertChipTo('bizNotes', this, 'Light colour scheme')">☀️ Light colour scheme</div>
+      <div class="chip" onclick="insertChipTo('bizNotes', this, 'Bold and high-contrast')">⚡ Bold &amp; high-contrast</div>
+      <div class="chip" onclick="insertChipTo('bizNotes', this, 'Clean and minimal')">✨ Clean &amp; minimal</div>
+      <div class="chip" onclick="insertChipTo('bizNotes', this, 'Friendly and approachable')">😊 Friendly &amp; approachable</div>
+      <div class="chip" onclick="insertChipTo('bizNotes', this, 'Professional and corporate')">🏢 Professional &amp; corporate</div>
+    </div>
+
+    <div class="input-wrap">
+      <label class="field-label" for="bizNotes">Tell us anything <span style="color:var(--grey2);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <textarea
+        class="field-input" id="bizNotes"
+        style="min-height:140px;"
+        placeholder="e.g. I want a dark colour scheme, maybe navy and gold. I'd love photos of my team on the site. My main service is emergency callouts so that needs to be front and centre. I've seen a competitor site I really like — it's called AquaFix.co.uk..."
+        onkeydown="if(event.key==='Enter'&&event.metaKey)next()"
+      ></textarea>
+      <div class="field-hint">
+        Things worth mentioning: <strong>colour preferences</strong> (dark/light, specific colours or brand colours) · <strong>imagery</strong> (team photos, product shots, lifestyle images, illustrations) · <strong>must-have content</strong> (accreditations, awards, pricing, a specific call to action) · <strong>sites you admire</strong> (even if they're in a completely different industry) · <strong>anything your competitors are missing</strong> that you want to own.
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" onclick="next()">Review my order <span>→</span></button>
+      <button class="btn-back" onclick="back()">← Back</button>
+    </div>
+    <div class="key-hint"><kbd>⌘</kbd> + <kbd>Enter</kbd> to continue</div>
+  </div>
+
+  <!-- ── SLIDE 7: Summary + Payment ── -->
+  <div class="slide" data-step="7">
+    <div class="slide-label">You're all set</div>
+    <h2 class="slide-title">Looking good.<br /><em>Ready to launch?</em></h2>
+    <div class="summary-box" id="summaryBox"></div>
+    <div id="paypal-button-container" style="max-width:440px;margin:0 auto 12px;"></div>
+    <div id="paypal-loading" style="text-align:center;padding:18px;color:var(--grey);font-size:14px;display:none;">Initialising secure checkout…</div>
+    <div id="paypal-error" style="text-align:center;padding:12px;color:#f87171;font-size:13px;display:none;"></div>
+    <!-- LEGACY fallback (hidden by default, shown if SDK fails) -->
+    <a class="pay-btn" id="payBtn" href="#" target="_blank" rel="noopener" style="display:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72A.775.775 0 0 1 5.71 3h7.332c2.636 0 4.446 1.15 4.934 3.218.13.552.157 1.13.08 1.73-.022.16-.048.32-.08.48h.002c.82 2.87-.77 5.18-4.34 5.18H11.3l-.74 4.73a.641.641 0 0 1-.634.54H7.076zm9.374-11.8c-.34 2.26-2.05 3.14-4.07 3.14H10.6l.84-5.39h1.79c1.6 0 2.75.41 3.22 2.25z"/></svg>
+      Pay with PayPal
+    </a>
+    <div class="pay-note">
+      Taken to PayPal to pay securely. Invoice also sent to your email.<br />
+      Questions? <a href="mailto:builtbyaaronf@gmail.com">builtbyaaronf@gmail.com</a>
+    </div>
+    <button class="btn-back" onclick="back()" style="margin-top:20px;">← Edit answers</button>
+  </div>
+
+</div><!-- /viewport -->
+
+<script>
+  // ── PACKAGE CONFIG ────────────────────────────────────────────────────────
+  const PACKAGES = {
+    p1: { name: 'Launch',  price: '74.99',  label: 'Package 1 — Launch — £74.99',  eta: '~5 minutes' },
+    p2: { name: 'Brand',   price: '149.99', label: 'Package 2 — Brand — £149.99',  eta: '~8 minutes' },
+    p3: { name: 'Convert', price: '299.99', label: 'Package 3 — Convert — £299.99', eta: '~12 minutes' },
+    p4: { name: 'Book',    price: '499.99', label: 'Package 4 — Book — £499.99',   eta: '~15 minutes' },
+    p5: { name: 'Grow',    price: '624.99', label: 'Package 5 — Grow — £624.99',   eta: '~18 minutes' },
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const TOTAL_STEPS = 7; // 0 = welcome, 7 = summary
+
+  let currentStep = 0;
+  let selectedPackage = null;
+  let noPresence = false;
+  let selectedBusinessType = 'sole_trader';
+  let paypalButtonsRendered = false;
+
+  const slides = document.querySelectorAll('.slide');
+
+  // Pre-select package from URL param (?package=p1..p5 or legacy quick/standard/full)
+  const params = new URLSearchParams(window.location.search);
+  const pkgParam = (params.get('package') || '').toLowerCase();
+  const legacyMap = { quick: 'p1', standard: 'p3', full: 'p5' };
+  const normalised = legacyMap[pkgParam] || (['p1','p2','p3','p4','p5'].includes(pkgParam) ? pkgParam : null);
+  if (normalised) window._preselect = normalised;
+
+  // ── NAVIGATION ────────────────────────────────────────────────────────────
+  function goTo(n) {
+    slides[currentStep].classList.remove('active');
+    slides[currentStep].classList.add('exit-up');
+    setTimeout(() => slides[currentStep].classList.remove('exit-up'), 350);
+    currentStep = n;
+    slides[currentStep].classList.add('active');
+    updateMeta();
+    if (currentStep === 1 && window._preselect) {
+      selectPackage(window._preselect);
+      window._preselect = null;
+    }
+    const inp = slides[currentStep].querySelector('.field-input');
+    if (inp) setTimeout(() => inp.focus(), 360);
+    if (currentStep === TOTAL_STEPS) buildSummary();
+  }
+
+  function getClientData() {
+    return {
+      pkg:           selectedPackage,
+      name:          document.getElementById('bizName').value.trim(),
+      location:      document.getElementById('bizLocation').value.trim(),
+      email:         document.getElementById('bizEmail').value.trim(),
+      business_type: selectedBusinessType,
+      presence:      noPresence ? 'None yet' : (document.getElementById('bizPresence').value.trim() || 'Not provided'),
+      notes:         document.getElementById('bizNotes').value.trim()
+    };
+  }
+
+  function next() { if (currentStep < TOTAL_STEPS) goTo(currentStep + 1); }
+  function back() { if (currentStep > 0) goTo(currentStep - 1); }
+
+  function updateMeta() {
+    const fill = document.getElementById('progressFill');
+    const counter = document.getElementById('stepCounter');
+    if (currentStep === 0 || currentStep === TOTAL_STEPS) {
+      fill.style.width = (currentStep === TOTAL_STEPS ? '100' : '2') + '%';
+      counter.innerHTML = '';
+    } else {
+      fill.style.width = ((currentStep / (TOTAL_STEPS - 1)) * 100) + '%';
+      counter.innerHTML = `Question <strong>${currentStep}</strong> of ${TOTAL_STEPS - 1}`;
+    }
+  }
+
+  // ── PACKAGE ───────────────────────────────────────────────────────────────
+  function selectPackage(pkg) {
+    document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById('pkg-' + pkg);
+    if (card) {
+      card.classList.add('selected');
+      selectedPackage = pkg;
+      document.getElementById('pkgNextBtn').disabled = false;
+    }
+  }
+
+  // ── FIELD VALIDATION ──────────────────────────────────────────────────────
+  function validateField(fieldId, btnId, minLen) {
+    const val = document.getElementById(fieldId).value.trim();
+    document.getElementById(btnId).disabled = val.length < minLen;
+  }
+  function validateEmail() {
+    const val = document.getElementById('bizEmail').value.trim();
+    document.getElementById('s4next').disabled = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  }
+
+  // ── INTERNET PRESENCE ─────────────────────────────────────────────────────
+  // ── BUSINESS TYPE ─────────────────────────────────────────────────────────
+  function setBizType(type) {
+    selectedBusinessType = type;
+    const sole = document.getElementById('biz-type-sole');
+    const ltd  = document.getElementById('biz-type-ltd');
+    const hint = document.getElementById('biz-type-hint');
+    if (type === 'sole_trader') {
+      sole.style.borderColor   = 'var(--accent)';
+      sole.style.background    = 'var(--accent-dim)';
+      sole.style.color         = '#fff';
+      ltd.style.borderColor    = 'var(--bg3)';
+      ltd.style.background     = 'var(--bg2)';
+      ltd.style.color          = 'var(--grey)';
+      hint.textContent         = 'Self-employed or trading under your own name.';
+    } else {
+      ltd.style.borderColor    = 'var(--accent)';
+      ltd.style.background     = 'var(--accent-dim)';
+      ltd.style.color          = '#fff';
+      sole.style.borderColor   = 'var(--bg3)';
+      sole.style.background    = 'var(--bg2)';
+      sole.style.color         = 'var(--grey)';
+      hint.textContent         = 'Registered company with a Ltd, PLC, or LLP suffix.';
+    }
+  }
+
+  function toggleNoPresence() {
+    noPresence = !noPresence;
+    const label = document.getElementById('noPresenceLabel');
+    const wrap  = document.getElementById('presenceInputWrap');
+    const area  = document.getElementById('bizPresence');
+    label.classList.toggle('checked', noPresence);
+    if (noPresence) {
+      area.value = '';
+      area.disabled = true;
+      area.style.opacity = '0.35';
+      document.querySelectorAll('#presenceChips .chip').forEach(c => {
+        c.style.opacity = '0.35';
+        c.style.pointerEvents = 'none';
+      });
+    } else {
+      area.disabled = false;
+      area.style.opacity = '1';
+      document.querySelectorAll('#presenceChips .chip').forEach(c => {
+        c.style.opacity = '1';
+        c.style.pointerEvents = 'auto';
+      });
+    }
+  }
+
+  function syncPresenceState() {
+    if (noPresence && document.getElementById('bizPresence').value.trim()) {
+      noPresence = false;
+      document.getElementById('noPresenceLabel').classList.remove('checked');
+    }
+  }
+
+  // ── PROMPT CHIPS ──────────────────────────────────────────────────────────
+  function insertChip(chip, text) {
+    const area = document.getElementById('bizPresence');
+    if (area.disabled) return;
+    const current = area.value.trim();
+    area.value = current ? current + '\n' + text : text;
+    chip.classList.add('active');
+    syncPresenceState();
+  }
+
+  function insertChipTo(areaId, chip, text) {
+    const area = document.getElementById(areaId);
+    const current = area.value.trim();
+    if (!current.includes(text)) {
+      area.value = current ? current + '\n' + text : text;
+    }
+    chip.classList.toggle('active');
+  }
+
+  // ── SUMMARY + PAYMENT ─────────────────────────────────────────────────────
+  function buildSummary() {
+    const d = getClientData();
+    const pkg = PACKAGES[d.pkg] || {};
+
+    document.getElementById('summaryBox').innerHTML = `
+      <div class="summary-row">
+        <span class="summary-key">Package</span>
+        <span class="summary-val price">${pkg.label || d.pkg}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Business</span>
+        <span class="summary-val">${d.name}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Business type</span>
+        <span class="summary-val">${d.business_type === 'limited_company' ? 'Limited Company' : 'Sole Trader'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Location</span>
+        <span class="summary-val">${d.location}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Delivery to</span>
+        <span class="summary-val">${d.email}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Estimated delivery</span>
+        <span class="summary-val" style="color:var(--accent)">${pkg.eta || '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Online presence</span>
+        <span class="summary-val" style="font-size:13px;font-weight:400;color:var(--grey);">${d.presence.replace(/\n/g,'<br>')}</span>
+      </div>
+      ${d.notes ? `<div class="summary-row">
+        <span class="summary-key">Notes</span>
+        <span class="summary-val" style="font-size:13px;font-weight:400;color:var(--grey);">${d.notes.replace(/\n/g,'<br>')}</span>
+      </div>` : ''}
+    `;
+
+    // Silent notification via FormSubmit (fires immediately on summary view)
+    fetch('https://formsubmit.co/ajax/builtbyaaronf@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `⚡ New FORGE brief — ${d.name} — ${pkg.label}`,
+        Package: pkg.label,
+        Business: d.name,
+        'Business type': d.business_type === 'limited_company' ? 'Limited Company' : 'Sole Trader',
+        Location: d.location,
+        Email: d.email,
+        'Online presence': d.presence,
+        Notes: d.notes || 'None',
+        _template: 'table'
+      })
+    }).catch(() => {});
+
+    // Render PayPal Smart Buttons
+    initPayPalButtons(d, pkg);
+  }
+
+  // ── PAYPAL SDK INTEGRATION ────────────────────────────────────────────────
+  function initPayPalButtons(clientData, pkgConfig) {
+    if (paypalButtonsRendered) return;
+    paypalButtonsRendered = true;
+
+    const container = document.getElementById('paypal-button-container');
+    const errEl     = document.getElementById('paypal-error');
+
+    // If SDK not loaded (placeholder client-id), show legacy fallback
+    if (typeof paypal_sdk === 'undefined') {
+      errEl.textContent = 'PayPal SDK not configured — add your Client ID to enable live payments.';
+      errEl.style.display = 'block';
+      document.getElementById('payBtn').style.display = 'flex';
+      return;
+    }
+
+    // Encode client data in custom_id (max 256 chars)
+    const customId = btoa(JSON.stringify({
+      pkg:           clientData.pkg,
+      name:          clientData.name,
+      location:      clientData.location,
+      email:         clientData.email,
+      business_type: clientData.business_type || 'sole_trader'
+    })).slice(0, 256);
+
+    paypal_sdk.Buttons({
+      style: {
+        layout:  'vertical',
+        color:   'blue',
+        shape:   'rect',
+        label:   'pay',
+        height:  48
+      },
+
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value:         pkgConfig.price,
+              currency_code: 'GBP'
+            },
+            description: pkgConfig.label,
+            custom_id:  

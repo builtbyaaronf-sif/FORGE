@@ -1,0 +1,105 @@
+{
+  "skill_name": "quote-wizard",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a quote wizard for a plumbing company called Rapid Flow Plumbing. Services: Emergency call-out, Boiler service & repair, Bathroom installation, Leaking tap or pipe, Blocked drains. Brand colours: #003366 (primary), #ff6600 (accent). Contact: email via Formspree, formspree_id is xkzgbpqw.",
+      "expected_output": "A self-contained HTML section block with a 5-step quote wizard. Step 1 shows service cards for all 5 services plus an 'Other' option. Step 2 includes trade-specific plumber follow-up questions (repair vs install, area affected, urgency). Step 3 allows up to 4 photo uploads. Step 4 collects name/phone/email/postcode. Step 5 is a confirmation screen. The form posts to https://formspree.io/f/xkzgbpqw. Brand colours #003366 and #ff6600 are applied throughout. Zero external dependencies.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "includes_all_services",
+          "description": "All 5 services appear as selectable options, plus an Other option"
+        },
+        {
+          "name": "formspree_action_correct",
+          "description": "Form action points to https://formspree.io/f/xkzgbpqw"
+        },
+        {
+          "name": "photo_upload_max_4",
+          "description": "Photo input limits to 4 files (multiple attribute + JS validation)"
+        },
+        {
+          "name": "plumber_followup_questions",
+          "description": "Step 2 includes plumber-specific questions (repair vs install, area, urgency)"
+        },
+        {
+          "name": "five_steps_present",
+          "description": "5 distinct wizard steps are present in the HTML"
+        },
+        {
+          "name": "brand_colours_applied",
+          "description": "Both #003366 and #ff6600 appear in the CSS"
+        },
+        {
+          "name": "no_external_dependencies",
+          "description": "No CDN links or external script/style imports in the output"
+        },
+        {
+          "name": "mobile_responsive",
+          "description": "CSS includes media queries or responsive layout for small screens"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a quote request form for Green Garden Landscaping. Services they offer: Garden design & consultation, Lawn care & maintenance, Decking & patio installation, Tree surgery, Hedge trimming & shaping. Route to WhatsApp number +447891234567. Brand colours: #2d5a1b (primary), #f4a623 (accent).",
+      "expected_output": "A self-contained HTML section quote wizard for a landscaping business. WhatsApp routing: on submit, opens wa.me/447891234567 with a pre-filled URL-encoded message including selected services, description, and contact details. Note shown to user about sending photos via WhatsApp. Landscaper-specific follow-up questions in Step 2 (area size, existing hard landscaping). Brand colours #2d5a1b and #f4a623 applied.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "whatsapp_routing",
+          "description": "Submit opens a wa.me/447891234567 URL (not a form POST)"
+        },
+        {
+          "name": "whatsapp_message_prefilled",
+          "description": "The wa.me URL includes a pre-filled text parameter with service/contact info"
+        },
+        {
+          "name": "photo_note_shown",
+          "description": "User is told they can send photos in the WhatsApp conversation"
+        },
+        {
+          "name": "landscaper_followup_questions",
+          "description": "Step 2 includes landscaper-specific questions (area size, existing landscaping)"
+        },
+        {
+          "name": "all_services_present",
+          "description": "All 5 landscaping services appear plus an Other option"
+        },
+        {
+          "name": "brand_colours_applied",
+          "description": "Both #2d5a1b and #f4a623 appear in the CSS"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Build a quote wizard for Glow Beauty Studio. They offer: Haircut & blow-dry, Colour & highlights, Hair extensions, Lash extensions, Brow shaping & tinting. Brand colours: #1a0a2e (primary), #c9a96e (accent). Route to HubSpot, form ID 123456789, portal ID 987654.",
+      "expected_output": "A self-contained HTML section quote wizard for a beauty business. HubSpot embedded form JS API used for submission routing. Beauty-specific follow-up questions in Step 2 (first appointment, allergies/sensitivities). Photo upload still available (beauty clients may want to share inspiration images). Brand colours #1a0a2e and #c9a96e applied throughout.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "hubspot_routing",
+          "description": "HubSpot JS embed or API call used, not a standard form POST"
+        },
+        {
+          "name": "beauty_followup_questions",
+          "description": "Step 2 includes beauty-specific questions (first appointment, allergies)"
+        },
+        {
+          "name": "all_services_present",
+          "description": "All 5 beauty services appear plus an Other option"
+        },
+        {
+          "name": "brand_colours_applied",
+          "description": "Both #1a0a2e and #c9a96e appear in the CSS"
+        },
+        {
+          "name": "photo_upload_present",
+          "description": "Photo upload step is present (inspiration photos are relevant for beauty)"
+        }
+      ]
+    }
+  ]
+}

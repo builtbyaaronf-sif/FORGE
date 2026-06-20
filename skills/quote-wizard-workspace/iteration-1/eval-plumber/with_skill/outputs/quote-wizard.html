@@ -1,0 +1,1119 @@
+<section id="quote-wizard">
+<style>
+  /* ===== QUOTE WIZARD — Rapid Flow Plumbing ===== */
+  #quote-wizard {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f9f9f9;
+    padding: 60px 20px;
+    box-sizing: border-box;
+  }
+
+  #quote-wizard *,
+  #quote-wizard *::before,
+  #quote-wizard *::after {
+    box-sizing: border-box;
+  }
+
+  #qw-container {
+    max-width: 680px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    overflow: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  #qw-header {
+    background: #003366;
+    color: #ffffff;
+    padding: 28px 32px 20px;
+  }
+
+  #qw-header h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  #qw-header p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  #qw-progress-wrap {
+    padding: 16px 32px 0;
+    background: #003366;
+  }
+
+  #qw-step-label {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  #qw-progress-track {
+    height: 6px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 99px;
+    margin-bottom: 20px;
+  }
+
+  #qw-progress-fill {
+    height: 100%;
+    background: #ff6600;
+    border-radius: 99px;
+    transition: width 0.35s ease;
+  }
+
+  /* ===== BODY ===== */
+  #qw-body {
+    padding: 32px;
+  }
+
+  /* ===== STEPS ===== */
+  .qw-step {
+    display: none;
+    animation: qwFadeIn 0.25s ease;
+  }
+
+  .qw-step.active {
+    display: block;
+  }
+
+  @keyframes qwFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .qw-step-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #003366;
+    margin: 0 0 6px;
+  }
+
+  .qw-step-sub {
+    font-size: 0.88rem;
+    color: #555;
+    margin: 0 0 22px;
+  }
+
+  /* ===== SERVICE CARDS ===== */
+  #qw-service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .qw-service-card {
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    background: #fff;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+    text-align: center;
+    user-select: none;
+    line-height: 1.3;
+  }
+
+  .qw-service-card:hover {
+    border-color: #ff6600;
+    background: #fff5ee;
+  }
+
+  .qw-service-card.selected {
+    border-color: #ff6600;
+    background: #ff6600;
+    color: #ffffff;
+  }
+
+  .qw-service-card:focus {
+    outline: 3px solid #ff6600;
+    outline-offset: 2px;
+  }
+
+  /* ===== FORM FIELDS ===== */
+  .qw-field {
+    margin-bottom: 18px;
+  }
+
+  .qw-field label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #003366;
+    margin-bottom: 6px;
+  }
+
+  .qw-field label .qw-optional {
+    font-weight: 400;
+    color: #888;
+    font-size: 0.82rem;
+    margin-left: 4px;
+  }
+
+  .qw-field input[type="text"],
+  .qw-field input[type="email"],
+  .qw-field input[type="tel"],
+  .qw-field select,
+  .qw-field textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 7px;
+    font-size: 0.93rem;
+    color: #222;
+    background: #fff;
+    transition: border-color 0.18s;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .qw-field input[type="text"]:focus,
+  .qw-field input[type="email"]:focus,
+  .qw-field input[type="tel"]:focus,
+  .qw-field select:focus,
+  .qw-field textarea:focus {
+    outline: none;
+    border-color: #ff6600;
+    box-shadow: 0 0 0 3px rgba(255,102,0,0.15);
+  }
+
+  .qw-field textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  .qw-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23555' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* Error state */
+  .qw-field.has-error input,
+  .qw-field.has-error select,
+  .qw-field.has-error textarea {
+    border-color: #dc2626;
+  }
+
+  .qw-error-msg {
+    display: none;
+    font-size: 0.8rem;
+    color: #dc2626;
+    margin-top: 4px;
+  }
+
+  .qw-field.has-error .qw-error-msg {
+    display: block;
+  }
+
+  /* ===== PHOTO UPLOAD ===== */
+  #qw-photo-label-text {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #003366;
+    margin-bottom: 6px;
+  }
+
+  #qw-photo-drop {
+    border: 2px dashed #c0c0c0;
+    border-radius: 8px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+    position: relative;
+  }
+
+  #qw-photo-drop:hover,
+  #qw-photo-drop.drag-over {
+    border-color: #ff6600;
+    background: #fff5ee;
+  }
+
+  #qw-photo-drop p {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  #qw-photo-drop span {
+    font-size: 0.78rem;
+    color: #999;
+  }
+
+  #qw-choose-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 18px;
+    background: #003366;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: background 0.18s;
+  }
+
+  #qw-choose-btn:hover {
+    background: #004a99;
+  }
+
+  #qw-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #qw-photo-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .qw-thumb-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid #e0e0e0;
+  }
+
+  .qw-thumb-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .qw-thumb-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+  }
+
+  #qw-photo-count {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 8px;
+    display: block;
+  }
+
+  /* ===== TWO-COL LAYOUT ===== */
+  .qw-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .qw-two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ===== SUMMARY ===== */
+  #qw-summary-box {
+    background: #f0f5ff;
+    border: 1.5px solid #b8cce8;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+
+  #qw-summary-box h4 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #003366;
+  }
+
+  #qw-summary-services {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0;
+  }
+
+  #qw-summary-services li {
+    padding: 4px 0;
+    font-size: 0.88rem;
+    color: #333;
+    border-bottom: 1px solid #d0dce8;
+  }
+
+  #qw-summary-services li:last-child {
+    border-bottom: none;
+  }
+
+  #qw-summary-services li::before {
+    content: "✓ ";
+    color: #ff6600;
+    font-weight: 700;
+  }
+
+  #qw-summary-note {
+    font-size: 0.82rem;
+    color: #555;
+    margin: 0;
+  }
+
+  /* ===== SUCCESS STATE ===== */
+  #qw-success {
+    display: none;
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  #qw-success .qw-tick {
+    width: 64px;
+    height: 64px;
+    background: #ff6600;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  #qw-success .qw-tick svg {
+    width: 32px;
+    height: 32px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #qw-success h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #003366;
+    margin: 0 0 10px;
+  }
+
+  #qw-success p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ===== NAVIGATION BUTTONS ===== */
+  #qw-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px 28px;
+    border-top: 1px solid #eee;
+    gap: 12px;
+  }
+
+  #qw-btn-back {
+    padding: 11px 22px;
+    border: 2px solid #d0d0d0;
+    background: transparent;
+    color: #555;
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.18s, color 0.18s;
+    display: none;
+  }
+
+  #qw-btn-back:hover {
+    border-color: #003366;
+    color: #003366;
+  }
+
+  #qw-btn-next,
+  #qw-btn-submit {
+    padding: 12px 28px;
+    background: #ff6600;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s, opacity 0.18s;
+    margin-left: auto;
+  }
+
+  #qw-btn-next:hover,
+  #qw-btn-submit:hover {
+    background: #cc5200;
+  }
+
+  #qw-btn-next:disabled,
+  #qw-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  #qw-btn-submit {
+    display: none;
+  }
+
+  #qw-submit-error {
+    color: #dc2626;
+    font-size: 0.82rem;
+    text-align: center;
+    margin: 0 32px 8px;
+    display: none;
+  }
+
+  #qw-aria-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 580px) {
+    #qw-header,
+    #qw-progress-wrap,
+    #qw-body {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    #qw-nav {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    #qw-service-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    #qw-btn-next,
+    #qw-btn-submit {
+      padding: 12px 20px;
+      font-size: 0.88rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    #qw-service-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<!-- Accessible live region -->
+<div id="qw-aria-live" aria-live="polite" aria-atomic="true"></div>
+
+<div id="qw-container" role="main" aria-label="Quote Request Wizard">
+
+  <!-- Header -->
+  <div id="qw-header">
+    <h2>Get a Free Quote</h2>
+    <p>From Rapid Flow Plumbing — answer a few quick questions and we'll get back to you fast.</p>
+  </div>
+
+  <!-- Progress -->
+  <div id="qw-progress-wrap">
+    <span id="qw-step-label">Step 1 of 5</span>
+    <div id="qw-progress-track" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5" aria-label="Wizard progress">
+      <div id="qw-progress-fill" style="width:20%"></div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div id="qw-body">
+
+    <!-- ===== STEP 1: Service Selection ===== -->
+    <div class="qw-step active" id="qw-step-1" role="group" aria-labelledby="qw-s1-title">
+      <h3 class="qw-step-title" id="qw-s1-title">What do you need?</h3>
+      <p class="qw-step-sub">Select all that apply — you can choose more than one.</p>
+
+      <div id="qw-service-grid" role="group" aria-label="Service selection">
+        <div class="qw-service-card" tabindex="0" role="checkbox" aria-checked="false" data-service="Emergency call-out">Emergency call-out</div>
+        <div class="qw-service-card" tabindex="0" role="checkbox" aria-checked="false" data-service="Boiler service &amp; repair">Boiler service &amp; repair</div>
+        <div class="qw-service-card" tabindex="0" role="checkbox" aria-checked="false" data-service="Bathroom installation">Bathroom installation</div>
+        <div class="qw-service-card" tabindex="0" role="checkbox" aria-checked="false" data-service="Leaking tap or pipe">Leaking tap or pipe</div>
+        <div class="qw-service-card" tabindex="0" role="checkbox" aria-checked="false" data-service="Blocked drains">Blocked drains</div>
+        <div class="qw-service-card" tabindex="0" role="checkbox" aria-checked="false" data-service="Other">Other</div>
+      </div>
+
+      <div id="qw-s1-error" class="qw-error-msg" style="display:none; margin-top:10px;" role="alert">Please select at least one service to continue.</div>
+    </div>
+
+    <!-- ===== STEP 2: Tell us more ===== -->
+    <div class="qw-step" id="qw-step-2" role="group" aria-labelledby="qw-s2-title">
+      <h3 class="qw-step-title" id="qw-s2-title">Tell us more</h3>
+      <p class="qw-step-sub">A few details help us give you an accurate quote.</p>
+
+      <div class="qw-field" id="qw-field-desc">
+        <label for="qw-description">Describe what you need in a few words…</label>
+        <textarea id="qw-description" name="description" placeholder="e.g. Boiler stopped working this morning, no hot water — need someone today if possible." aria-required="true"></textarea>
+        <span class="qw-error-msg" id="qw-desc-error" role="alert">Please add a brief description so we can help you better.</span>
+      </div>
+
+      <!-- Plumber follow-up Q1: Is this a repair or new installation? -->
+      <div class="qw-field" id="qw-field-repair-new">
+        <label for="qw-repair-new">Is this a repair or a new installation?</label>
+        <select id="qw-repair-new" name="repair_or_new">
+          <option value="">— Please select —</option>
+          <option value="Repair">Repair</option>
+          <option value="New installation">New installation</option>
+          <option value="Not sure">Not sure</option>
+        </select>
+      </div>
+
+      <!-- Plumber follow-up Q2: Is this urgent? -->
+      <div class="qw-field" id="qw-field-urgency">
+        <label for="qw-urgency">Is this urgent? <span class="qw-optional">(e.g. active leak or no hot water)</span></label>
+        <select id="qw-urgency" name="urgency">
+          <option value="">— Please select —</option>
+          <option value="Yes, urgent">Yes, urgent</option>
+          <option value="No, can wait">No, can wait</option>
+        </select>
+      </div>
+
+      <!-- Plumber follow-up Q3: Area affected -->
+      <div class="qw-field" id="qw-field-area">
+        <label for="qw-area">What area is affected?</label>
+        <select id="qw-area" name="area_affected">
+          <option value="">— Please select —</option>
+          <option value="Bathroom">Bathroom</option>
+          <option value="Kitchen">Kitchen</option>
+          <option value="Boiler/heating">Boiler/heating</option>
+          <option value="Outside">Outside</option>
+          <option value="Multiple areas">Multiple areas</option>
+          <option value="Not applicable">Not applicable</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: Photos ===== -->
+    <div class="qw-step" id="qw-step-3" role="group" aria-labelledby="qw-s3-title">
+      <h3 class="qw-step-title" id="qw-s3-title">Add photos <span style="font-weight:400; color:#888; font-size:0.9rem;">(optional)</span></h3>
+      <p class="qw-step-sub">Upload up to 4 photos — a picture helps us give you an accurate quote.</p>
+
+      <span id="qw-photo-label-text" id="qw-photo-lbl">Photos</span>
+      <div id="qw-photo-drop" role="button" tabindex="0" aria-label="Upload photos — click or drag and drop" aria-describedby="qw-photo-count">
+        <input type="file" id="qw-file-input" name="photos[]" multiple accept=".jpg,.jpeg,.png,.webp,.heic" aria-label="Choose photos to upload" />
+        <p>Drag &amp; drop photos here</p>
+        <span>JPG, PNG, WEBP or HEIC — max 5MB each</span><br>
+        <button type="button" id="qw-choose-btn" aria-label="Browse files to upload">Browse files</button>
+      </div>
+      <div id="qw-photo-previews" role="list" aria-label="Selected photos"></div>
+      <span id="qw-photo-count" aria-live="polite">0 of 4 photos selected</span>
+      <div id="qw-photo-error" class="qw-error-msg" role="alert" style="display:none; margin-top:6px;"></div>
+    </div>
+
+    <!-- ===== STEP 4: Contact Details ===== -->
+    <div class="qw-step" id="qw-step-4" role="group" aria-labelledby="qw-s4-title">
+      <h3 class="qw-step-title" id="qw-s4-title">Your details</h3>
+      <p class="qw-step-sub">So we know who to contact with your quote.</p>
+
+      <div class="qw-field" id="qw-field-name">
+        <label for="qw-name">Full name</label>
+        <input type="text" id="qw-name" name="name" placeholder="e.g. Sarah Johnson" autocomplete="name" aria-required="true" />
+        <span class="qw-error-msg" role="alert">Please enter your full name.</span>
+      </div>
+
+      <div class="qw-two-col">
+        <div class="qw-field" id="qw-field-phone">
+          <label for="qw-phone">Phone number</label>
+          <input type="tel" id="qw-phone" name="phone" placeholder="e.g. 07700 900123" autocomplete="tel" aria-required="true" />
+          <span class="qw-error-msg" role="alert">Please enter a valid phone number.</span>
+        </div>
+        <div class="qw-field" id="qw-field-postcode">
+          <label for="qw-postcode">Postcode <span class="qw-optional">(recommended)</span></label>
+          <input type="text" id="qw-postcode" name="postcode" placeholder="e.g. SW1A 1AA" autocomplete="postal-code" />
+        </div>
+      </div>
+
+      <div class="qw-field" id="qw-field-email">
+        <label for="qw-email">Email address</label>
+        <input type="email" id="qw-email" name="email" placeholder="e.g. sarah@example.com" autocomplete="email" aria-required="true" />
+        <span class="qw-error-msg" role="alert">Please enter a valid email address.</span>
+      </div>
+    </div>
+
+    <!-- ===== STEP 5: Confirm & Submit ===== -->
+    <div class="qw-step" id="qw-step-5" role="group" aria-labelledby="qw-s5-title">
+      <h3 class="qw-step-title" id="qw-s5-title">Confirm &amp; send</h3>
+      <p class="qw-step-sub">Here's a summary of your request. Happy with everything? Hit send!</p>
+
+      <div id="qw-summary-box" aria-label="Quote request summary">
+        <h4>Services requested:</h4>
+        <ul id="qw-summary-services" aria-label="Selected services"></ul>
+        <p id="qw-summary-note">We'll review your details and get back to you with a quote as soon as possible. Urgent jobs are always prioritised.</p>
+      </div>
+
+      <!-- Hidden fields for Formspree submission -->
+      <input type="hidden" name="business" value="Rapid Flow Plumbing" />
+      <input type="hidden" id="qw-hidden-services" name="services_requested" value="" />
+      <input type="hidden" id="qw-hidden-description" name="job_description" value="" />
+      <input type="hidden" id="qw-hidden-repair-new" name="repair_or_new" value="" />
+      <input type="hidden" id="qw-hidden-urgency" name="urgency" value="" />
+      <input type="hidden" id="qw-hidden-area" name="area_affected" value="" />
+      <input type="hidden" id="qw-hidden-name" name="customer_name" value="" />
+      <input type="hidden" id="qw-hidden-phone" name="customer_phone" value="" />
+      <input type="hidden" id="qw-hidden-email" name="customer_email" value="" />
+      <input type="hidden" id="qw-hidden-postcode" name="customer_postcode" value="" />
+
+      <p style="font-size:0.82rem; color:#888; margin:0 0 4px;">By submitting this form, you consent to Rapid Flow Plumbing contacting you about your enquiry.</p>
+    </div>
+
+    <!-- ===== SUCCESS ===== -->
+    <div id="qw-success" role="alert" aria-live="assertive">
+      <div class="qw-tick" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>Quote request sent!</h3>
+      <p>Thanks for getting in touch with Rapid Flow Plumbing.<br>We'll review your details and get back to you shortly.<br><strong>Urgent jobs are always prioritised.</strong></p>
+    </div>
+
+  </div><!-- /qw-body -->
+
+  <!-- Submit error -->
+  <div id="qw-submit-error" role="alert" aria-live="polite"></div>
+
+  <!-- Navigation -->
+  <div id="qw-nav">
+    <button type="button" id="qw-btn-back" aria-label="Go to previous step">&#8592; Back</button>
+    <button type="button" id="qw-btn-next" aria-label="Go to next step">Next &#8594;</button>
+    <button type="button" id="qw-btn-submit" aria-label="Send my quote request">Send My Quote Request</button>
+  </div>
+
+</div><!-- /qw-container -->
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== CONFIG ===== */
+  var FORMSPREE_ID = 'xkzgbpqw';
+  var FORMSPREE_URL = 'https://formspree.io/f/' + FORMSPREE_ID;
+  var TOTAL_STEPS = 5;
+
+  /* ===== STATE ===== */
+  var currentStep = 1;
+  var selectedServices = [];
+  var selectedFiles = [];
+
+  /* ===== ELEMENT REFS ===== */
+  var elStepLabel   = document.getElementById('qw-step-label');
+  var elProgressBar = document.getElementById('qw-progress-fill');
+  var elProgressTrack = document.getElementById('qw-progress-track');
+  var elBtnBack     = document.getElementById('qw-btn-back');
+  var elBtnNext     = document.getElementById('qw-btn-next');
+  var elBtnSubmit   = document.getElementById('qw-btn-submit');
+  var elSuccess     = document.getElementById('qw-success');
+  var elBody        = document.getElementById('qw-body');
+  var elNav         = document.getElementById('qw-nav');
+  var elAriaLive    = document.getElementById('qw-aria-live');
+  var elSubmitError = document.getElementById('qw-submit-error');
+
+  /* ===== STEP MANAGEMENT ===== */
+  function showStep(n) {
+    for (var i = 1; i <= TOTAL_STEPS; i++) {
+      var el = document.getElementById('qw-step-' + i);
+      if (el) {
+        el.classList.remove('active');
+      }
+    }
+    var target = document.getElementById('qw-step-' + n);
+    if (target) {
+      target.classList.add('active');
+    }
+
+    elStepLabel.textContent = 'Step ' + n + ' of ' + TOTAL_STEPS;
+    elProgressBar.style.width = ((n / TOTAL_STEPS) * 100) + '%';
+    elProgressTrack.setAttribute('aria-valuenow', n);
+
+    elBtnBack.style.display   = (n > 1) ? 'inline-block' : 'none';
+    elBtnNext.style.display   = (n < TOTAL_STEPS) ? 'inline-block' : 'none';
+    elBtnSubmit.style.display = (n === TOTAL_STEPS) ? 'inline-block' : 'none';
+
+    elAriaLive.textContent = 'Step ' + n + ' of ' + TOTAL_STEPS;
+
+    if (n === TOTAL_STEPS) {
+      buildSummary();
+      syncHiddenFields();
+    }
+  }
+
+  /* ===== SERVICE CARD SELECTION ===== */
+  var serviceCards = document.querySelectorAll('.qw-service-card');
+  serviceCards.forEach(function (card) {
+    card.addEventListener('click', function () {
+      toggleCard(card);
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleCard(card);
+      }
+    });
+  });
+
+  function toggleCard(card) {
+    var service = card.getAttribute('data-service');
+    var idx = selectedServices.indexOf(service);
+    if (idx === -1) {
+      selectedServices.push(service);
+      card.classList.add('selected');
+      card.setAttribute('aria-checked', 'true');
+    } else {
+      selectedServices.splice(idx, 1);
+      card.classList.remove('selected');
+      card.setAttribute('aria-checked', 'false');
+    }
+    document.getElementById('qw-s1-error').style.display = 'none';
+  }
+
+  /* ===== PHOTO UPLOAD ===== */
+  var elDrop      = document.getElementById('qw-photo-drop');
+  var elFileInput = document.getElementById('qw-file-input');
+  var elPreviews  = document.getElementById('qw-photo-previews');
+  var elPhotoCount= document.getElementById('qw-photo-count');
+  var elPhotoErr  = document.getElementById('qw-photo-error');
+  var elChooseBtn = document.getElementById('qw-choose-btn');
+
+  elChooseBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    elFileInput.click();
+  });
+
+  elDrop.addEventListener('click', function () {
+    elFileInput.click();
+  });
+
+  elDrop.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      elFileInput.click();
+    }
+  });
+
+  elDrop.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    elDrop.classList.add('drag-over');
+  });
+
+  elDrop.addEventListener('dragleave', function () {
+    elDrop.classList.remove('drag-over');
+  });
+
+  elDrop.addEventListener('drop', function (e) {
+    e.preventDefault();
+    elDrop.classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  elFileInput.addEventListener('change', function () {
+    handleFiles(elFileInput.files);
+    elFileInput.value = '';
+  });
+
+  function handleFiles(files) {
+    elPhotoErr.style.display = 'none';
+    var allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+    var maxSize = 5 * 1024 * 1024;
+    var errors = [];
+
+    Array.prototype.forEach.call(files, function (file) {
+      if (selectedFiles.length >= 4) {
+        errors.push('Maximum 4 photos allowed.');
+        return;
+      }
+      if (allowed.indexOf(file.type.toLowerCase()) === -1 && file.name.toLowerCase().indexOf('.heic') === -1) {
+        errors.push(file.name + ' is not a supported format (JPG, PNG, WEBP, HEIC only).');
+        return;
+      }
+      if (file.size > maxSize) {
+        errors.push(file.name + ' is too large (max 5MB per photo).');
+        return;
+      }
+      selectedFiles.push(file);
+    });
+
+    if (errors.length) {
+      elPhotoErr.textContent = errors.join(' ');
+      elPhotoErr.style.display = 'block';
+    }
+
+    renderPreviews();
+  }
+
+  function renderPreviews() {
+    elPreviews.innerHTML = '';
+    selectedFiles.forEach(function (file, idx) {
+      var wrap = document.createElement('div');
+      wrap.className = 'qw-thumb-wrap';
+      wrap.setAttribute('role', 'listitem');
+
+      var img = document.createElement('img');
+      img.alt = 'Photo ' + (idx + 1);
+      var reader = new FileReader();
+      reader.onload = (function (imgEl) {
+        return function (e) { imgEl.src = e.target.result; };
+      }(img));
+      reader.readAsDataURL(file);
+
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'qw-thumb-remove';
+      removeBtn.setAttribute('aria-label', 'Remove photo ' + (idx + 1));
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', (function (i) {
+        return function (e) {
+          e.stopPropagation();
+          selectedFiles.splice(i, 1);
+          renderPreviews();
+        };
+      }(idx)));
+
+      wrap.appendChild(img);
+      wrap.appendChild(removeBtn);
+      elPreviews.appendChild(wrap);
+    });
+
+    elPhotoCount.textContent = selectedFiles.length + ' of 4 photo' + (selectedFiles.length === 1 ? '' : 's') + ' selected';
+  }
+
+  /* ===== VALIDATION ===== */
+  function validateStep(n) {
+    if (n === 1) {
+      if (selectedServices.length === 0) {
+        var err = document.getElementById('qw-s1-error');
+        err.style.display = 'block';
+        elAriaLive.textContent = 'Please select at least one service to continue.';
+        return false;
+      }
+      return true;
+    }
+
+    if (n === 2) {
+      var desc = document.getElementById('qw-description');
+      var fieldDesc = document.getElementById('qw-field-desc');
+      if (!desc.value.trim()) {
+        fieldDesc.classList.add('has-error');
+        document.getElementById('qw-desc-error').style.display = 'block';
+        desc.focus();
+        elAriaLive.textContent = 'Please add a brief description.';
+        return false;
+      }
+      fieldDesc.classList.remove('has-error');
+      document.getElementById('qw-desc-error').style.display = 'none';
+      return true;
+    }
+
+    if (n === 3) {
+      // Photo step is optional
+      return true;
+    }
+
+    if (n === 4) {
+      var valid = true;
+
+      // Name
+      var name = document.getElementById('qw-name');
+      var fieldName = document.getElementById('qw-field-name');
+      if (!name.value.trim()) {
+        fieldName.classList.add('has-error');
+        if (!valid) { /* already focused */ } else { name.focus(); }
+        valid = false;
+      } else {
+        fieldName.classList.remove('has-error');
+      }
+
+      // Phone
+      var phone = document.getElementById('qw-phone');
+      var fieldPhone = document.getElementById('qw-field-phone');
+      if (!phone.value.trim() || phone.value.trim().length < 7) {
+        fieldPhone.classList.add('has-error');
+        if (valid) { phone.focus(); }
+        valid = false;
+      } else {
+        fieldPhone.classList.remove('has-error');
+      }
+
+      // Email
+      var email = document.getElementById('qw-email');
+      var fieldEmail = document.getElementById('qw-field-email');
+      var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
+        fieldEmail.classList.add('has-error');
+        if (valid) { email.focus(); }
+        valid = false;
+      } else {
+        fieldEmail.classList.remove('has-error');
+      }
+
+      if (!valid) {
+        elAriaLive.textContent = 'Please fill in all required contact details.';
+      }
+      return valid;
+    }
+
+    return true;
+  }
+
+  /* ===== SUMMARY ===== */
+  function buildSummary() {
+    var list = document.getElementById('qw-summary-services');
+    list.innerHTML = '';
+    selectedServices.forEach(function (svc) {
+      var li = document.createElement('li');
+      li.textContent = svc;
+      list.appendChild(li);
+    });
+  }
+
+  /* ===== SYNC HIDDEN FIELDS FOR FORMSPREE ===== */
+  function syncHiddenFields() {
+    document.getElementById('qw-hidden-services').value    = selectedServices.join(', ');
+    document.getElementById('qw-hidden-description').value = document.getElementById('qw-description').value;
+    document.getElementById('qw-hidden-repair-new').value  = document.getElementById('qw-repair-new').value;
+    document.getElementById('qw-hidden-urgency').value     = document.getElementById('qw-urgency').value;
+    document.getElementById('qw-hidden-area').value        = document.getElementById('qw-area').value;
+    document.getElementById('qw-hidden-name').value        = document.getElementById('qw-name').value;
+    document.getElementById('qw-hidden-phone').value       = document.getElementById('qw-phone').value;
+    document.getElementById('qw-hidden-email').value       = document.getElementById('qw-email').value;
+    document.getElementById('qw-hidden-postcode').value    = document.getElementById('qw-postcode').value;
+  }
+
+  /* ===== NAVIGATION ===== */
+  elBtnNext.addEventListener('click', function () {
+    if (!validateStep(currentStep)) return;
+    currentStep++;
+    showStep(currentStep);
+    window.scrollTo({ top: document.getElementById('quote-wizard').offsetTop - 20, behavior: 'smooth' });
+  });
+
+  elBtnBack.addEventListener('click', function () {
+    if (currentStep > 1) {
+      currentStep--;
+      showStep(currentStep);
+      window.scrollTo({ top: document.getElementById('quote-wizard').offsetTop - 20, behavior: 'smooth' });
+    }
+  });
+
+  /* ===== SUBMIT ===== */
+  elBtnSubmit.addEventListener('click', function () {
+    elSubmitError.style.display = 'none';
+    elBtnSubmit.disabled = true;
+    elBtnSubmit.textContent = 'Sending…';
+
+    var formData = new FormData();
+
+    // Core fields
+    formData.append('business', 'Rapid Flow Plumbing');
+    formData.append('services_requested', selectedServices.join(', '));
+    formData.append('job_description', document.getElementById('qw-description').value);
+    formData.append('repair_or_new', document.getElementById('qw-repair-new').value);
+    formData.append('urgency', document.getElementById('qw-urgency').value);
+    formData.append('area_affected', document.getElementById('qw-area').value);
+    formData.append('customer_name', document.getElementById('qw-name').value);
+    formData.append('customer_phone', document.getElementById('qw-phone').value);
+    formData.append('customer_email', document.getElementById('qw-email').value);
+    formData.append('customer_postcode', document.getElementById('qw-postcode').value);
+
+    // Formspree reply-to
+    formData.append('_replyto', document.getElementById('qw-email').value);
+    formData.append('_subject', 'New Quote Request — Rapid Flow Plumbing');
+
+    // Photo attachments
+    selectedFiles.forEach(function (file, idx) {
+      formData.append('photo_' + (idx + 1), file, file.name);
+    });
+
+    fetch(FORMSPREE_URL, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) {
+      if (res.ok) {
+        showSuccessState();
+      } else {
+        return res.json().then(function (data) {
+          throw new Error(data.error || 'Submission failed. Please try again.');
+        });
+      }
+    })
+    .catch(function (err) {
+      elBtnSubmit.disabled = false;
+      elBtnSubmit.textContent = 'Send My Quote Request';
+      elSubmitError.textContent = err.message || 'Something went wrong. Please try again or call us directly.';
+      elSubmitError.style.display = 'block';
+      elAriaLive.textContent = 'Submission failed. ' + (err.message || 'Please try again.');
+    });
+  });
+
+  /* ===== SUCCESS ===== */
+  function showSuccessState() {
+    // Hide all steps and nav
+    for (var i = 1; i <= TOTAL_STEPS; i++) {
+      var el = document.getElementById('qw-step-' + i);
+      if (el) el.style.display = 'none';
+    }
+    elNav.style.display = 'none';
+    document.getElementById('qw-submit-error').style.display = 'none';
+
+    // Update progress to 100%
+    elProgressBar.style.width = '100%';
+    elStepLabel.textContent = 'Complete!';
+    elProgressTrack.setAttribute('aria-valuenow', TOTAL_STEPS);
+
+    // Show success
+    elSuccess.style.display = 'block';
+    elAriaLive.textContent = 'Your quote request has been sent successfully! We will be in touch shortly.';
+
+    window.scrollTo({ top: document.getElementById('quote-wizard').offsetTop - 20, behavior: 'smooth' });
+  }
+
+  /* ===== INIT ===== */
+  showStep(1);
+
+}());
+</script>
+</section>

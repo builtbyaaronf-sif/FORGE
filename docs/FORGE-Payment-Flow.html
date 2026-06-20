@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE — Payment Flow Setup</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0a;
+    color: #e8e8e8;
+    padding: 48px 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h1 { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  h1 span { color: #f97316; }
+  .meta { color: #555; font-size: 13px; margin-top: 6px; margin-bottom: 48px; }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .flow-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+  .flow-node {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 20px 24px;
+    flex: 1;
+    position: relative;
+  }
+  .flow-node.highlight { border-color: #f97316; background: #1a0800; }
+  .flow-node.done { border-color: #14532d; background: #0a1a0a; }
+  .flow-node .step-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #555;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .flow-node .step-label.orange { color: #f97316; }
+  .flow-node .step-label.green { color: #4ade80; }
+  .flow-node h3 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .flow-node p { font-size: 13px; color: #888; }
+  .flow-node .tool-tag {
+    display: inline-block;
+    margin-top: 10px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: #aaa;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    color: #333;
+    font-size: 20px;
+  }
+  .flow-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  /* Setup steps */
+  .section-head {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #444;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1a1a1a;
+    margin-top: 48px;
+  }
+
+  .setup-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .setup-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .setup-num {
+    width: 32px; height: 32px;
+    background: #f97316;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .setup-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .setup-tool {
+    margin-left: auto;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #888;
+  }
+  .setup-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .setup-steps li {
+    font-size: 13px;
+    color: #aaa;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .setup-steps li::before {
+    content: counter(step);
+    counter-increment: step;
+    position: absolute;
+    left: 0;
+    color: #f97316;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .setup-steps { counter-reset: step; }
+  .setup-steps li strong { color: #fff; }
+  .setup-steps li code {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: #f97316;
+    font-family: monospace;
+  }
+  .setup-note {
+    margin-top: 14px;
+    background: #0f1a0f;
+    border: 1px solid #1a3a1a;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #666;
+  }
+  .setup-note strong { color: #4ade80; }
+
+  .time-badge {
+    display: inline-block;
+    background: #1e3a5f;
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  /* Zapier map */
+  .zap-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .zap-header {
+    background: #141414;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    border-bottom: 1px solid #1e1e1e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .zap-trigger { color: #60a5fa; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .zap-action { color: #4ade80; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .zap-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #1a1a1a;
+    gap: 16px;
+    font-size: 13px;
+  }
+  .zap-row:last-child { border-bottom: none; }
+  .zap-icon { font-size: 16px; flex-shrink: 0; width: 24px; }
+  .zap-desc { color: #aaa; }
+  .zap-desc strong { color: #fff; }
+
+  /* Package invoice table */
+  .inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .inv-table th {
+    background: #141414;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .inv-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #1a1a1a;
+    color: #aaa;
+  }
+  .inv-table tr:last-child td { border-bottom: none; }
+  .inv-table td:first-child { color: #fff; font-weight: 600; }
+  .inv-table td.price { color: #4ade80; font-weight: 700; font-size: 15px; }
+
+  /* Current state box */
+  .current-box {
+    background: #0a1a2a;
+    border: 1px solid #1e3a5f;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+  .current-box h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; margin-bottom: 12px; }
+  .current-box p { font-size: 14px; color: #888; line-height: 1.7; }
+  .current-box strong { color: #fff; }
+
+  footer { margin-top: 64px; font-size: 11px; color: #333; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>FORGE <span>//</span> Payment Flow</h1>
+<div class="meta">Target: visitor clicks CTA → receives invoice → pays → work starts · Built: June 2026</div>
+
+<!-- Current state -->
+<div class="current-box">
+  <h2>Right now (Phase 1 — Live today)</h2>
+  <p>All CTAs on the FORGE site now point to <strong>https://calendly.com/builtbyaaronf</strong>. A visitor books a 15-minute call. You confirm the package on the call and <strong>manually send an invoice</strong> from Stripe or email. This works — but it has a human bottleneck at the invoice step. The flow below removes it.</p>
+</div>
+
+<!-- Flow diagram -->
+<div class="section-head">Target flow — Phase 2 (build this week)</div>
+
+<div class="flow">
+
+  <div class="flow-node done">
+    <div class="step-label green">Step 1 — Already live</div>
+    <h3>Visitor lands on FORGE site</h3>
+    <p>Sees package, price, and a single clear CTA per package.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="flow-node highlight">
+    <div class="step-label orange">Step 2 — Build this</div>
+    <h3>Clicks package CTA → Tally form opens</h3>
+    <p>4 fields: business name, email, location, package (pre-selected from which button they clicked). Takes under 60 seconds to complete.</p>
+    <span class="tool-tag">Tally.so — free</span>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="flow-node highlight">
+    <div class="step-label orange">Step 3 — Zapier automation</div>
+    <h3>Form submits → Zapier fires instantly</h3>
+    <p>Three things happen simultaneously, all automated, no human needed.</p>
+    <span class="tool-tag">Zapier — from $20/mo</span>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="flow-split">
+    <div class="flow-node">
+      <div class="step-label">Action A</div>
+      <h3>Stripe invoice sent</h3>
+      <p>Invoice created for the selected package amount and emailed to the client automatically. One-click pay via card.</p>
+      <span class="tool-tag">Stripe Invoicing — 0.4% fee</span>
+    </div>
+    <div class="flow-node">
+      <div class="step-label">Action B</div>
+      <h3>HubSpot contact created</h3>
+      <p>New deal opened in HubSpot pipeline at "Invoice Sent" stage. You see it immediately in your CRM.</p>
+      <span class="tool-tag">HubSpot — free CRM</span>
+    </div>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="flow-node done">
+    <div class="step-label green">Step 4 — Client pays</div>
+    <h3>Client clicks "Pay now" in invoice email</h3>
+    <p>Stripe handles card processing. You get notified. Deal moves to "Paid" in HubSpot.</p>
+  </div>
+
+  <div class="flow-arrow">↓</div>
+
+  <div class="flow-node done">
+    <div class="step-label green">Step 5 — Work starts</div>
+    <h3>FORGE deploy begins immediately</h3>
+    <p>Payment confirmation triggers the deploy workflow. Client gets a confirmation email with expected delivery time.</p>
+  </div>
+
+</div>
+
+<!-- Setup steps -->
+<div class="section-head">Setup guide — total time: ~90 minutes</div>
+
+<div class="setup-card">
+  <div class="setup-header">
+    <div class="setup-num">1</div>
+    <div class="setup-title">Set up Stripe <span class="time-badge">~20 min</span></div>
+    <div class="setup-tool">stripe.com</div>
+  </div>
+  <ol class="setup-steps">
+    <li>Go to <strong>stripe.com</strong> and create an account with builtbyaaronf@gmail.com.</li>
+    <li>Complete business verification (you'll need your name, address, and bank account details for payouts).</li>
+    <li>Go to <strong>Invoicing → Invoice templates</strong> and set up your FORGE branding (logo, colours, payment terms: "Due on receipt").</li>
+    <li>Create three Products: <code>Quick Deploy — £64.99</code>, <code>Standard Deploy — £444.99</code>, <code>Full Deploy — £949.99</code>. These become line items on invoices.</li>
+    <li>Note your <strong>Stripe API key</strong> (Developers → API Keys → Restricted key with Invoice write access) — you'll need it for Zapier.</li>
+  </ol>
+  <div class="setup-note"><strong>Fee:</strong> Stripe charges 1.5% + 25p per transaction (UK cards) or 2.9% + 25p (international). On a £444.99 Standard Deploy that's ~£6.95 — worth it for zero manual work.</div>
+</div>
+
+<div class="setup-card">
+  <div class="setup-header">
+    <div class="setup-num">2</div>
+    <div class="setup-title">Build the Tally form <span class="time-badge">~20 min</span></div>
+    <div class="setup-tool">tally.so</div>
+  </div>
+  <ol class="setup-steps">
+    <li>Sign up at <strong>tally.so</strong> (free plan is sufficient).</li>
+    <li>Create a new form titled <strong>"FORGE — Get Started"</strong>.</li>
+    <li>Add these fields in order:
+      <br>• <strong>Business name</strong> (Short text, required)
+      <br>• <strong>Your email</strong> (Email, required)
+      <br>• <strong>Business location / area</strong> (Short text, required)
+      <br>• <strong>Which package?</strong> (Dropdown: Quick Deploy £64.99 / Standard Deploy £444.99 / Full Deploy £949.99, required)
+      <br>• <strong>Anything else?</strong> (Long text, optional)
+    </li>
+    <li>Set up a <strong>Thank you page</strong> message: "We've received your brief. Your invoice will arrive within 2 hours. Work begins the moment payment clears."</li>
+    <li>Copy the form's <strong>share URL</strong> — you'll link to it from the FORGE site, replacing the Calendly links on the package cards.</li>
+    <li>To pre-select the package, Tally supports URL parameters: <code>?package=Quick+Deploy</code> — use this when you link each package CTA to the form so the right package is pre-filled.</li>
+  </ol>
+  <div class="setup-note"><strong>Tip:</strong> Keep Calendly for the nav and hero CTA (discovery call path). Use the Tally form for the package card CTAs (buy now path). Two conversion paths: high-intent buyers go straight to form; uncertain visitors book a call.</div>
+</div>
+
+<div class="setup-card">
+  <div class="setup-header">
+    <div class="setup-num">3</div>
+    <div class="setup-title">Wire it up with Zapier <span class="time-badge">~30 min</span></div>
+    <div class="setup-tool">zapier.com</div>
+  </div>
+  <ol class="setup-steps">
+    <li>Sign up at <strong>zapier.com</strong> (Starter plan at ~$20/mo covers this).</li>
+    <li><strong>Create Zap 1 — Stripe Invoice:</strong>
+      <br>Trigger: <em>Tally → New Submission</em>
+      <br>Action: <em>Stripe → Create Invoice</em> — map Customer Email from Tally, look up the product by package name, set auto-advance to true so it sends immediately.
+    </li>
+    <li><strong>Create Zap 2 — HubSpot Contact + Deal:</strong>
+      <br>Trigger: <em>Tally → New Submission</em> (same trigger, second Zap)
+      <br>Action 1: <em>HubSpot → Create/Update Contact</em> — map email, name (from business name), company.
+      <br>Action 2: <em>HubSpot → Create Deal</em> — deal name = business name + package, amount = package price, stage = "Invoice Sent".
+    </li>
+    <li><strong>Create Zap 3 — Your notification:</strong>
+      <br>Trigger: <em>Tally → New Submission</em>
+      <br>Action: <em>Gmail → Send email to builtbyaaronf@gmail.com</em> with subject "New FORGE order — [Business Name] — [Package]" and all form fields in the body. You know instantly when a brief comes in.
+    </li>
+    <li>Test all three Zaps with a real test submission before going live.</li>
+  </ol>
+  <div class="setup-note"><strong>Cost:</strong> Zapier Starter ~$20/mo. At £64.99 per Quick Deploy, one sale per month more than covers it. At £444.99 per Standard Deploy, the ROI is instant.</div>
+</div>
+
+<div class="setup-card">
+  <div class="setup-header">
+    <div class="setup-num">4</div>
+    <div class="setup-title">Update the FORGE site CTAs <span class="time-badge">~15 min</span></div>
+    <div class="setup-tool">index.html</div>
+  </div>
+  <ol class="setup-steps">
+    <li>Keep nav and hero CTAs pointing to Calendly (discovery call path).</li>
+    <li>Update each package card CTA to point to the Tally form URL with the package pre-filled:
+      <br>Quick Deploy: <code>https://tally.so/r/YOURFORMID?package=Quick+Deploy</code>
+      <br>Standard Deploy: <code>https://tally.so/r/YOURFORMID?package=Standard+Deploy</code>
+      <br>Full Deploy: <code>https://tally.so/r/YOURFORMID?package=Full+Deploy</code>
+    </li>
+    <li>Update the #contact section to show both paths: "Book a call" (Calendly) and "Or fill in your brief and we'll send your invoice within 2 hours" (Tally).</li>
+  </ol>
+</div>
+
+<!-- Invoice table -->
+<div class="section-head">Invoice amounts by package</div>
+
+<table class="inv-table">
+  <thead>
+    <tr>
+      <th>Package</th>
+      <th>Invoice amount</th>
+      <th>Stripe fee (approx UK card)</th>
+      <th>You receive</th>
+      <th>Stripe Product ID (fill in after setup)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Quick Deploy</td>
+      <td class="price">£64.99</td>
+      <td>~£1.22</td>
+      <td>~£63.77</td>
+      <td style="color:#555; font-style:italic;">prod_xxxxxxxx</td>
+    </tr>
+    <tr>
+      <td>Standard Deploy</td>
+      <td class="price">£444.99</td>
+      <td>~£6.92</td>
+      <td>~£438.07</td>
+      <td style="color:#555; font-style:italic;">prod_xxxxxxxx</td>
+    </tr>
+    <tr>
+      <td>Full Deploy</td>
+      <td class="price">£949.99</td>
+      <td>~£14.50</td>
+      <td>~£935.49</td>
+      <td style="color:#555; font-style:italic;">prod_xxxxxxxx</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Zapier map -->
+<div class="section-head">Full Zapier automation map</div>
+
+<div class="zap-card">
+  <div class="zap-header">
+    <span class="zap-trigger">Trigger</span> Tally form submitted
+  </div>
+  <div class="zap-row">
+    <div class="zap-icon">⚡</div>
+    <div class="zap-desc"><span class="zap-action">Action A</span> — <strong>Stripe:</strong> Create invoice for selected package → auto-send to client's email → client pays via card link</div>
+  </div>
+  <div class="zap-row">
+    <div class="zap-icon">⚡</div>
+    <div class="zap-desc"><span class="zap-action">Action B</span> — <strong>HubSpot:</strong> Create contact + open deal at "Invoice Sent" stage with package value</div>
+  </div>
+  <div class="zap-row">
+    <div class="zap-icon">⚡</div>
+    <div class="zap-desc"><span class="zap-action">Action C</span> — <strong>Gmail:</strong> Send you an instant notification email with all brief details so you're never caught off guard</div>
+  </div>
+</div>
+
+<div class="zap-card">
+  <div class="zap-header">
+    <span class="zap-trigger">Trigger</span> Stripe invoice paid
+  </div>
+  <div class="zap-row">
+    <div class="zap-icon">⚡</div>
+    <div class="zap-desc"><span class="zap-action">Action A</span> — <strong>HubSpot:</strong> Move deal to "Paid / In Production" stage</div>
+  </div>
+  <div class="zap-row">
+    <div class="zap-icon">⚡</div>
+    <div class="zap-desc"><span class="zap-action">Action B</span> — <strong>Gmail:</strong> Send client a confirmation: "Payment received — your FORGE team is deploying now. Estimated delivery: [time by package]."</div>
+  </div>
+  <div class="zap-row">
+    <div class="zap-icon">⚡</div>
+    <div class="zap-desc"><span class="zap-action">Action C</span> — <strong>Gmail to you:</strong> "Payment cleared — [Business Name] — [Package] — start the deploy."</div>
+  </div>
+</div>
+
+<footer>FORGE Internal · Payment Flow Design · June 2026 · builtbyaaronf@gmail.com</footer>
+
+</body>
+</html>

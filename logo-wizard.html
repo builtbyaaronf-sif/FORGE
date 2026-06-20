@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Your Logo | FORGE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #090909;
+      --surface: #0D0D0D;
+      --border:  #1A1A1A;
+      --text:    #FFFFFF;
+      --muted:   #888888;
+      --blue:    #0099FF;
+      --green:   #28C840;
+      --accent:  #0099FF; /* overridden by JS to client brand colour */
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 80px;
+    }
+
+    /* Header */
+    .forge-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 56px;
+      align-self: flex-start;
+      max-width: 960px; width: 100%;
+    }
+    .forge-mark {
+      width: 40px; height: 40px;
+      background: var(--blue); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900; font-size: 22px; color: #fff;
+    }
+    .forge-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900; font-size: 20px; letter-spacing: 2px;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 100%; max-width: 960px;
+      margin-bottom: 48px;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .progress-step {
+      flex: 1; height: 3px; background: var(--border);
+      border-radius: 2px; transition: background 0.3s;
+    }
+    .progress-step.done   { background: var(--blue); }
+    .progress-step.active { background: rgba(0,153,255,0.45); }
+
+    /* Step panels */
+    .step {
+      display: none; flex-direction: column;
+      align-items: center;
+      width: 100%; max-width: 960px;
+    }
+    .step.visible { display: flex; }
+
+    /* Intro */
+    .step-intro {
+      text-align: center; margin-bottom: 48px; max-width: 640px;
+    }
+    .step-badge {
+      display: inline-block;
+      background: rgba(0,153,255,0.1);
+      border: 1px solid rgba(0,153,255,0.3);
+      color: var(--blue);
+      font-size: 12px; letter-spacing: 3px;
+      padding: 6px 16px; border-radius: 20px;
+      margin-bottom: 24px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .step-intro h1, .step-intro h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(26px, 4.5vw, 40px);
+      font-weight: 900; line-height: 1.1; margin-bottom: 14px;
+    }
+    .step-intro h1 span, .step-intro h2 span { color: var(--blue); }
+    .step-intro p { color: var(--muted); font-size: 15px; line-height: 1.65; }
+
+    /* Options grid */
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; width: 100%; margin-bottom: 40px;
+    }
+
+    /* Option cards */
+    .option-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      cursor: pointer; transition: all 0.2s ease;
+      position: relative; user-select: none;
+    }
+    .option-card:hover {
+      border-color: rgba(0,153,255,0.4);
+      transform: translateY(-2px);
+    }
+    .option-card.selected {
+      border-color: var(--blue);
+      background: rgba(0,153,255,0.06);
+    }
+    .option-card.selected::after {
+      content: '\2713';
+      position: absolute; top: 16px; right: 16px;
+      width: 28px; height: 28px;
+      background: var(--blue); border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+
+    .option-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 3px; color: var(--blue);
+      margin-bottom: 16px; text-transform: uppercase;
+    }
+    .option-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 15px; margin-bottom: 6px;
+    }
+    .option-desc { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    /* ── Live lockup previews ── */
+    .lockup-preview-box {
+      width: 100%; border-radius: 10px;
+      background: #111; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .lockup-preview-box.wide   { aspect-ratio: 16/5; padding: 20px 28px; }
+    .lockup-preview-box.square { aspect-ratio: 1;    padding: 28px; max-height: 220px; }
+    .lockup-preview-box.icon-only { aspect-ratio: 1; padding: 24px; max-height: 200px; }
+
+    /* Horizontal: icon left, name right */
+    .lp-horizontal {
+      display: flex; align-items: center; gap: 18px;
+    }
+    .lp-horizontal .lp-icon {
+      width: 54px; height: 54px; border-radius: 8px;
+      object-fit: contain; flex-shrink: 0;
+    }
+    .lp-horizontal .lp-text { text-align: left; }
+    .lp-horizontal .lp-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900; font-size: clamp(18px, 3vw, 26px);
+      letter-spacing: -0.02em; line-height: 1;
+      color: #fff;
+    }
+    .lp-horizontal .lp-trade {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px; letter-spacing: 3px;
+      color: var(--accent); margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Stacked: icon top, name bottom */
+    .lp-stacked {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 14px;
+      width: 100%;
+    }
+    .lp-stacked .lp-icon {
+      width: 80px; height: 80px; border-radius: 10px;
+      object-fit: contain;
+    }
+    .lp-stacked .lp-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900; font-size: clamp(16px, 2.5vw, 22px);
+      letter-spacing: -0.02em; color: #fff; text-align: center;
+    }
+    .lp-stacked .lp-trade {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px; letter-spacing: 3px;
+      color: var(--accent); text-transform: uppercase;
+      text-align: center; margin-top: -8px;
+    }
+
+    /* Icon only */
+    .lp-icon-only {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+    }
+    .lp-icon-only .lp-icon {
+      width: 100px; height: 100px; border-radius: 12px;
+      object-fit: contain;
+    }
+    .lp-icon-only .lp-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px; letter-spacing: 2.5px;
+      color: #444; text-transform: uppercase;
+    }
+
+    /* Actions */
+    .step-actions {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 14px; width: 100%;
+    }
+    .btn-primary {
+      background: var(--blue); color: #fff; border: none;
+      border-radius: 12px; padding: 18px 52px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      letter-spacing: 0.5px; opacity: 0.35; pointer-events: none;
+    }
+    .btn-primary.active { opacity: 1; pointer-events: all; }
+    .btn-primary.active:hover  { background: #007ACC; transform: translateY(-1px); }
+    .btn-primary.active:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 32px; font-family: 'Inter', sans-serif;
+      font-size: 14px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: #444; color: #ccc; }
+    .action-hint { color: var(--muted); font-size: 13px; }
+
+    /* Icon always delivered note */
+    .icon-delivery-note {
+      width: 100%;
+      background: rgba(0,153,255,0.06);
+      border: 1px solid rgba(0,153,255,0.15);
+      border-radius: 10px; padding: 14px 20px;
+      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 13px; line-height: 1.5;
+    }
+    .icon-delivery-note span { font-size: 18px; flex-shrink: 0; }
+    .icon-delivery-note strong { color: #ccc; }
+
+    /* Loading */
+    .loading-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(9,9,9,0.95); z-index: 100;
+      flex-direction: column; align-items: center;
+      justify-content: center; gap: 24px;
+    }
+    .loading-overlay.visible { display: flex; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px; color: var(--muted);
+    }
+
+    /* Success */
+    .success-screen {
+      display: none; flex-direction: column;
+      align-items: center; text-align: center;
+      gap: 20px; max-width: 540px; margin: 0 auto;
+    }
+    .success-screen.visible { display: flex; }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: rgba(40,200,64,0.1);
+      border: 2px solid var(--green); border-radius: 50%;
+      display: grid; place-items: center; font-size: 32px;
+    }
+    .success-screen h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px; font-weight: 900;
+    }
+    .success-screen p { color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .asset-count {
+      background: rgba(0,153,255,0.1);
+      border: 1px solid rgba(0,153,255,0.3);
+      border-radius: 8px; padding: 12px 20px;
+      color: var(--blue);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="forge-header">
+    <div class="forge-mark">F</div>
+    <span class="forge-name">FORGE</span>
+  </header>
+
+  <!-- Progress bar: 2 steps -->
+  <div class="progress-bar">
+    <div class="progress-step active" id="prog1"></div>
+    <div class="progress-step"        id="prog2"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       STEP 1: Choose your icon
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="step visible" id="step1">
+
+    <div class="step-intro">
+      <div class="step-badge">STEP 1 OF 2: YOUR ICON MARK</div>
+      <h1>Choose your icon, <span id="businessName">your business</span>.</h1>
+      <p>Three icon marks generated specifically for your brand colour. This becomes your profile picture across every platform and pairs with your business name on your website and materials.</p>
+    </div>
+
+    <!-- Loading state -->
+    <div id="iconLoadingState" style="text-align:center;padding:60px 0;width:100%">
+      <div class="spinner" style="margin:0 auto 24px"></div>
+      <div style="color:var(--muted);font-size:15px">Generating your icon options</div>
+      <div style="color:#444;font-size:12px;margin-top:8px">This takes about 15 seconds</div>
+    </div>
+
+    <!-- Error state -->
+    <div id="iconErrorState" style="display:none;text-align:center;padding:40px;width:100%">
+      <div style="color:#888;font-size:15px;margin-bottom:16px">Icon generation failed. Please reload and try again.</div>
+      <button class="btn-ghost" onclick="loadAIIcons()">Try again</button>
+    </div>
+
+    <!-- Icon cards: populated by JS -->
+    <div class="options" id="iconGrid" style="display:none"></div>
+
+    <div class="step-actions">
+      <button class="btn-primary" id="step1NextBtn" onclick="goToStep2()">
+        Next: Choose your layout
+      </button>
+      <p class="action-hint" id="step1Hint">Select an icon above to continue</p>
+    </div>
+
+  </div><!-- /step1 -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       STEP 2: Choose lockup
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="step" id="step2">
+
+    <div class="step-intro">
+      <div class="step-badge">STEP 2 OF 2: YOUR LOGO LAYOUT</div>
+      <h2>How should your logo <span>come together?</span></h2>
+      <p>Choose how your icon and business name are arranged. These are live previews of your actual logo.</p>
+    </div>
+
+    <!-- Always-on note: icon delivered separately regardless -->
+    <div class="icon-delivery-note">
+      <span>&#8594;</span>
+      <div>
+        <strong>Your icon is always included separately</strong> — whatever you choose here,
+        you receive your icon mark as a standalone file ready to upload as your profile picture on Instagram, Facebook, and Google Business.
+      </div>
+    </div>
+
+    <div class="options" id="lockupGrid">
+
+      <!-- Lockup 1: Horizontal -->
+      <div class="option-card" data-lockup="horizontal" onclick="selectLockup(this)">
+        <div class="option-label">OPTION 1: SIDE BY SIDE</div>
+        <div class="lockup-preview-box wide" style="padding:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;">
+          <img id="preview-horizontal" alt="Side by side logo preview" style="width:100%;height:100%;object-fit:contain;display:block;">
+          <div id="preview-horizontal-loading" style="position:absolute;color:#555;font-size:13px;letter-spacing:1px">Rendering...</div>
+        </div>
+        <div class="option-title">Side by Side</div>
+        <div class="option-desc">Icon left, business name right. The most versatile layout for website headers, email footers, and printed materials.</div>
+      </div>
+
+      <!-- Lockup 2: Stacked -->
+      <div class="option-card" data-lockup="stacked" onclick="selectLockup(this)">
+        <div class="option-label">OPTION 2: STACKED</div>
+        <div class="lockup-preview-box square" style="padding:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;">
+          <img id="preview-stacked" alt="Stacked logo preview" style="width:100%;height:100%;object-fit:contain;display:block;">
+          <div id="preview-stacked-loading" style="position:absolute;color:#555;font-size:13px;letter-spacing:1px">Rendering...</div>
+        </div>
+        <div class="option-title">Stacked</div>
+        <div class="option-desc">Icon above, business name below. Strong in square spaces — social post headers, signage, and stamp formats.</div>
+      </div>
+
+      <!-- Lockup 3: Icon only -->
+      <div class="option-card" data-lockup="separate" onclick="selectLockup(this)">
+        <div class="option-label">OPTION 3: ICON MARK ONLY</div>
+        <div class="lockup-preview-box icon-only" style="padding:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;">
+          <img id="preview-icon-only" alt="Icon only logo preview" style="width:100%;height:100%;object-fit:contain;display:block;">
+          <div id="preview-icon-only-loading" style="position:absolute;color:#555;font-size:13px;letter-spacing:1px">Rendering...</div>
+        </div>
+        <div class="option-title">Icon Only</div>
+        <div class="option-desc">Just the icon mark, no business name. Ideal if you prefer to set your own text style across platforms. Your wordmark is still delivered separately.</div>
+      </div>
+
+    </div>
+
+    <div class="step-actions">
+      <button class="btn-primary" id="step2ConfirmBtn" onclick="confirmLogo()">
+        Confirm my logo
+      </button>
+      <p class="action-hint" id="step2Hint">Select a layout above to confirm</p>
+    </div>
+
+  </div><!-- /step2 -->
+
+  <!-- Success screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">&#10003;</div>
+    <h2>Logo confirmed.</h2>
+    <p>Your logo has been saved. FORGE has been notified and will update your site. <strong>9 brand asset files, ready to use across every platform.</strong></p>
+    <div class="asset-count">9 brand assets being prepared for your business</div>
+    <p style="font-size:13px">You will receive an email with all your files shortly. No action needed from you.</p>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Locking in your logo...</div>
+  </div>
+
+  <script>
+    // ── URL params ──────────────────────────────────────────────────────────────
+    const p     = new URLSearchParams(window.location.search);
+    const slug  = p.get('slug')  || 'client';
+    const name  = p.get('name')  || 'My Business';
+    const trade = p.get('trade') || 'professional';
+    const color = p.get('color') || '0099FF';
+    const email = p.get('email') || '';
+    const pkg   = p.get('pkg')   || '1';
+    // Style is auto-assigned A — not a client choice in this flow
+    const style = p.get('style') || 'A';
+
+    // Apply brand colour as CSS accent variable
+    const accentHex = color.startsWith('#') ? color : `#${color}`;
+    document.documentElement.style.setProperty('--accent', accentHex);
+
+    document.getElementById('businessName').textContent = name;
+    document.title = `Choose Your Logo | ${name}`;
+
+    // Derive a clean trade tagline (max 3 words, uppercase)
+    const tradeTag = trade.split(' ').slice(0, 3).join(' ').toUpperCase();
+
+    // ── State ───────────────────────────────────────────────────────────────────
+    let selectedIcon       = null;   // AI variant id ('spark-burst' etc)
+    let selectedIconUrl    = null;   // base64 data URI — display only
+    let selectedIconCdnUrl = null;   // https CDN URL — stored in KV
+    let selectedLockup     = null;
+
+    // ── Step 1: load AI icons on page load ──────────────────────────────────────
+    loadAIIcons();
+
+    async function loadAIIcons() {
+      document.getElementById('iconLoadingState').style.display = 'block';
+      document.getElementById('iconErrorState').style.display   = 'none';
+      document.getElementById('iconGrid').style.display         = 'none';
+      document.getElementById('iconGrid').innerHTML             = '';
+      selectedIcon = selectedIconUrl = selectedIconCdnUrl = null;
+      document.getElementById('step1NextBtn').classList.remove('active');
+      document.getElementById('step1Hint').textContent = 'Select an icon above to continue';
+
+      try {
+        const res = await fetch(`/api/logo-ai?color=${encodeURIComponent(color)}&trade=${encodeURIComponent(trade)}`);
+        if (!res.ok) throw new Error(`API ${res.status}`);
+        const data = await res.json();
+        if (!data.icons || !data.icons.length) throw new Error('No icons returned');
+
+        const grid = document.getElementById('iconGrid');
+        data.icons.forEach((icon, i) => {
+          const card = document.createElement('div');
+          card.className = 'option-card';
+          card.dataset.iconId     = icon.id;
+          card.dataset.iconUrl    = icon.url;         // base64
+          card.dataset.iconCdnUrl = icon.cdn_url || '';
+          card.onclick = () => selectIcon(card);
+          card.innerHTML = `
+            <div class="option-label">OPTION ${i + 1}: ${icon.label.toUpperCase()}</div>
+            <img src="${icon.url}"
+                 style="width:100%;border-radius:10px;display:block;margin-bottom:16px;aspect-ratio:1;object-fit:cover;background:#111"
+                 alt="${icon.label}">
+            <div class="option-title">${icon.label}</div>
+            <div class="option-desc">${icon.desc}</div>
+          `;
+          grid.appendChild(card);
+        });
+
+        document.getElementById('iconLoadingState').style.display = 'none';
+        document.getElementById('iconGrid').style.display         = '';
+      } catch (err) {
+        console.error('Icon load error:', err);
+        document.getElementById('iconLoadingState').style.display = 'none';
+        document.getElementById('iconErrorState').style.display   = 'block';
+      }
+    }
+
+    function selectIcon(card) {
+      document.querySelectorAll('#iconGrid .option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedIcon       = card.dataset.iconId;
+      selectedIconUrl    = card.dataset.iconUrl;
+      selectedIconCdnUrl = card.dataset.iconCdnUrl;
+      document.getElementById('step1NextBtn').classList.add('active');
+      document.getElementById('step1Hint').textContent =
+        `${card.querySelector('.option-title').textContent} selected. Click to continue.`;
+    }
+
+    // ── Step 1 → Step 2 ─────────────────────────────────────────────────────────
+    // ── Canvas-based lockup previews (client-side, zero network) ────────────────
+    // The icon base64 is already in the browser from step 1. We composite
+    // everything on a canvas — no server call needed. Instant and reliable.
+
+    function canvasPreview(layout, iconImg, canvasEl) {
+      const acc = accentHex;
+      const bg  = '#040404'; // near-black — blends with fal.ai icon background
+
+      if (layout === 'horizontal') {
+        const W = 900, H = 300;
+        canvasEl.width = W; canvasEl.height = H;
+        const ctx = canvasEl.getContext('2d');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Icon — no container, no circle. Dark bg blends, glow floats freely.
+        const iconSize = 260;
+        ctx.drawImage(iconImg, 20, (H - iconSize) / 2, iconSize, iconSize);
+
+        // Name — same visual height, tight gap
+        const nameX    = 20 + iconSize + 8;
+        const nameSize = fitFont(ctx, name, W - nameX - 20, '900', 130, 48);
+        ctx.font       = `900 ${nameSize}px "Space Grotesk", sans-serif`;
+        ctx.fillStyle  = '#FFFFFF';
+        ctx.fillText(name, nameX, H / 2 + nameSize * 0.36);
+
+        // Accent underline — same width as name
+        const nameW = ctx.measureText(name).width;
+        ctx.fillStyle = acc;
+        ctx.fillRect(nameX, H / 2 + nameSize * 0.36 + 12, Math.min(nameW, W - nameX - 20), 3);
+
+      } else if (layout === 'stacked') {
+        const W = 500, H = 500;
+        canvasEl.width = W; canvasEl.height = H;
+        const ctx = canvasEl.getContext('2d');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Icon top — no container
+        const iconSize = 280;
+        ctx.drawImage(iconImg, (W - iconSize) / 2, 20, iconSize, iconSize);
+
+        // Name centred below
+        ctx.textAlign  = 'center';
+        const nameSize = fitFont(ctx, name, 460, '900', 80, 32);
+        ctx.font       = `900 ${nameSize}px "Space Grotesk", sans-serif`;
+        ctx.fillStyle  = '#FFFFFF';
+        ctx.fillText(name, W / 2, 20 + iconSize + 20 + nameSize);
+
+        // Accent underline centred
+        const nameW = ctx.measureText(name).width;
+        ctx.fillStyle = acc;
+        ctx.fillRect((W - nameW) / 2, 20 + iconSize + 28 + nameSize, nameW, 3);
+        ctx.textAlign = 'left';
+
+      } else {
+        // Icon only — full bleed, dark bg blends with icon bg
+        const W = 500, H = 500;
+        canvasEl.width = W; canvasEl.height = H;
+        const ctx = canvasEl.getContext('2d');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(iconImg, 0, 0, W, H);
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function fitFont(ctx, text, maxPx, weight, startSize, minSize) {
+      let size = startSize;
+      ctx.font = `${weight} ${size}px "Space Grotesk", sans-serif`;
+      while (size > minSize && ctx.measureText(text).width > maxPx) {
+        size -= 2;
+        ctx.font = `${weight} ${size}px "Space Grotesk", sans-serif`;
+      }
+      return size;
+    }
+
+    function renderLockupPreview(layout, iconImg) {
+      const imgEl     = document.getElementById(`preview-${layout}`);
+      const loadingEl = document.getElementById(`preview-${layout}-loading`);
+
+      // Draw on an offscreen canvas, export as dataURL, set as img src
+      const canvas = document.createElement('canvas');
+      canvasPreview(layout, iconImg, canvas);
+      imgEl.src = canvas.toDataURL('image/png');
+      if (loadingEl) loadingEl.style.display = 'none';
+    }
+
+    function goToStep2() {
+      if (!selectedIconUrl) return;
+
+      document.getElementById('prog1').classList.add('done');
+      document.getElementById('prog1').classList.remove('active');
+      document.getElementById('prog2').classList.add('active');
+      switchStep('step1', 'step2');
+
+      // Wait for fonts + icon before drawing — ensures Space Grotesk renders correctly
+      const iconImg = new Image();
+      iconImg.onload = async () => {
+        await document.fonts.ready;
+        renderLockupPreview('horizontal', iconImg);
+        renderLockupPreview('stacked', iconImg);
+        renderLockupPreview('icon-only', iconImg);
+      };
+      iconImg.src = selectedIconUrl; // base64 data URI already in memory
+    }
+
+    // ── Step 2: select lockup ───────────────────────────────────────────────────
+    function selectLockup(card) {
+      document.querySelectorAll('#lockupGrid .option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedLockup = card.dataset.lockup;
+      document.getElementById('step2ConfirmBtn').classList.add('active');
+      document.getElementById('step2Hint').textContent =
+        `${card.querySelector('.option-title').textContent} selected. Click to confirm.`;
+    }
+
+    // ── Confirm: POST to logo-confirm ───────────────────────────────────────────
+    async function confirmLogo() {
+      if (!selectedLockup) return;
+
+      document.getElementById('loadingOverlay').classList.add('visible');
+      document.getElementById('loadingText').textContent = 'Locking in your logo...';
+
+      try {
+        const res = await fetch('/api/logo-confirm', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug, name, trade, color,
+            style,
+            icon:     selectedIcon,
+            icon_url: selectedIconCdnUrl,
+            lockup:   selectedLockup,
+            email, pkg,
+          }),
+        });
+
+        const data = await res.json();
+        document.getElementById('loadingOverlay').classList.remove('visible');
+
+        if (data.success) {
+          document.getElementById('step2').classList.remove('visible');
+          document.getElementById('successScreen').classList.add('visible');
+          document.getElementById('prog2').classList.add('done');
+          document.getElementById('prog2').classList.remove('active');
+        } else {
+          alert('Something went wrong. Please try again or contact FORGE directly.');
+        }
+      } catch (err) {
+        document.getElementById('loadingOverlay').classList.remove('visible');
+        alert('Connection error. Please try again.');
+      }
+    }
+
+    // ── Utility ─────────────────────────────────────────────────────────────────
+    function switchStep(from, to) {
+      document.getElementById(from).classList.remove('visible');
+      document.getElementById(to).classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE — Affiliate Programs</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0a;
+    color: #e8e8e8;
+    padding: 48px 32px;
+    min-height: 100vh;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .header h1 span {
+    color: #f97316;
+  }
+
+  .header p {
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .summary-card {
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .summary-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  .summary-card .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f97316;
+  }
+
+  .summary-card .sub {
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #444;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .table-wrap {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: #141414;
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    font-weight: 600;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #1a1a1a;
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #161616; }
+
+  tbody td {
+    padding: 16px 20px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  .program-name {
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .program-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .commission {
+    font-weight: 700;
+    color: #4ade80;
+    font-size: 15px;
+  }
+
+  .commission.flat { color: #60a5fa; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-open { background: #14532d; color: #4ade80; }
+  .badge-closed { background: #3b0000; color: #f87171; }
+  .badge-partner { background: #1e3a5f; color: #60a5fa; }
+
+  .priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .p-high { background: #f97316; }
+  .p-med { background: #facc15; }
+  .p-low { background: #6b7280; }
+
+  .apply-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #e8e8e8;
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .apply-link:hover {
+    background: #f97316;
+    border-color: #f97316;
+    color: #fff;
+  }
+
+  .platform-tag {
+    font-size: 11px;
+    color: #555;
+    font-style: italic;
+  }
+
+  .cookie { color: #888; font-size: 13px; }
+
+  .notes-col { color: #666; font-size: 12px; max-width: 200px; line-height: 1.5; }
+
+  .notes-col strong { color: #f97316; font-size: 12px; }
+
+  .checklist {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 12px;
+    padding: 28px;
+  }
+
+  .checklist h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .checklist-item:last-child { border-bottom: none; }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    cursor: pointer;
+  }
+
+  .checklist-text strong {
+    display: block;
+    font-size: 13px;
+    color: #e8e8e8;
+    margin-bottom: 3px;
+  }
+
+  .checklist-text span {
+    font-size: 12px;
+    color: #555;
+  }
+
+  .rule-box {
+    background: #0f1a0f;
+    border: 1px solid #1a3a1a;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+
+  .rule-box h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4ade80;
+    margin-bottom: 14px;
+  }
+
+  .rule-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rule-box ul li {
+    font-size: 13px;
+    color: #aaa;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .rule-box ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #f97316;
+  }
+
+  footer {
+    margin-top: 48px;
+    font-size: 11px;
+    color: #333;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>FORGE <span>// Affiliate Programs</span></h1>
+  <p>Every service we recommend to clients — we earn from. Last updated June 2026.</p>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-card">
+    <div class="label">Programs to Join</div>
+    <div class="value">7</div>
+    <div class="sub">Across all client packages</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Highest Commission</div>
+    <div class="value">30%</div>
+    <div class="sub">HubSpot — recurring forever</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Best Cookie Window</div>
+    <div class="value">180d</div>
+    <div class="sub">HubSpot affiliate cookie</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Tracking Platforms</div>
+    <div class="value">3</div>
+    <div class="sub">Impact · PartnerStack · Dub</div>
+  </div>
+</div>
+
+<div class="rule-box">
+  <h2>Non-Negotiable Rules</h2>
+  <ul>
+    <li>Never recommend Cloudflare for domains — no affiliate program. Always push Namecheap instead.</li>
+    <li>Every client handoff document must use affiliate links, not plain URLs.</li>
+    <li>Canva monthly subscription earns more (80% × 2 months) than annual (15%). Push monthly first.</li>
+    <li>HubSpot is the most valuable recurring affiliate — even a £15/mo starter client = income for life.</li>
+    <li>Build a public FORGE "Tools We Use" page with all affiliate links for passive organic income.</li>
+  </ul>
+</div>
+
+<div class="section-title">All Programs</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Program</th>
+        <th>Commission</th>
+        <th>Cookie</th>
+        <th>Platform</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Notes</th>
+        <th>Apply</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#ff5a00;color:#fff;">H</div>
+            HubSpot
+          </div>
+        </td>
+        <td><span class="commission">30% recurring</span></td>
+        <td><span class="cookie">180 days</span></td>
+        <td><span class="platform-tag">Impact</span></td>
+        <td><span class="priority-dot p-high"></span>High</td>
+        <td><span class="badge badge-open">Open</span></td>
+        <td class="notes-col"><strong>#1 priority.</strong> Every Package 2+ client = recurring income forever. Free to join, instant approval.</td>
+        <td><a class="apply-link" href="https://www.hubspot.com/partners/affiliates" target="_blank">Apply →</a></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#1a1a2e;color:#60a5fa;">N</div>
+            Namecheap
+          </div>
+        </td>
+        <td><span class="commission">20–35% + renewals</span></td>
+        <td><span class="cookie">120 days</span></td>
+        <td><span class="platform-tag">Impact</span></td>
+        <td><span class="priority-dot p-high"></span>High</td>
+        <td><span class="badge badge-open">Open</span></td>
+        <td class="notes-col"><strong>Default domain rec.</strong> Recurring commission on every renewal. Long cookie = easy wins.</td>
+        <td><a class="apply-link" href="https://www.namecheap.com/affiliates/" target="_blank">Apply →</a></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#000;color:#fff;">▲</div>
+            Vercel
+          </div>
+        </td>
+        <td><span class="commission flat">$100/Pro referral</span></td>
+        <td><span class="cookie">30 days</span></td>
+        <td><span class="platform-tag">Dub</span></td>
+        <td><span class="priority-dot p-high"></span>High</td>
+        <td><span class="badge badge-open">Open</span></td>
+        <td class="notes-col">Every site we deploy is on Vercel. Push clients to upgrade to Pro = $100 flat. v0 program also earns 30% for 6 months.</td>
+        <td><a class="apply-link" href="https://partners.dub.co/v0" target="_blank">Apply →</a></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#7c3aed;color:#fff;">Kv</div>
+            Klaviyo
+          </div>
+        </td>
+        <td><span class="commission">20% recurring / 12mo</span></td>
+        <td><span class="cookie">30 days</span></td>
+        <td><span class="platform-tag">Direct</span></td>
+        <td><span class="priority-dot p-med"></span>Medium</td>
+        <td><span class="badge badge-open">Open</span></td>
+        <td class="notes-col">Push for all e-commerce clients. 12 months of recurring makes this stack up fast at scale.</td>
+        <td><a class="apply-link" href="https://www.klaviyo.com/partners/become-a-partner" target="_blank">Apply →</a></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#00c4cc;color:#fff;">Ca</div>
+            Calendly
+          </div>
+        </td>
+        <td><span class="commission">15–20% recurring</span></td>
+        <td><span class="cookie">90 days</span></td>
+        <td><span class="platform-tag">PartnerStack</span></td>
+        <td><span class="priority-dot p-med"></span>Medium</td>
+        <td><span class="badge badge-open">Open</span></td>
+        <td class="notes-col">Recommend for any client who takes bookings. 90-day cookie is generous.</td>
+        <td><a class="apply-link" href="https://calendly.partnerstack.com/?group=newreferralpartner" target="_blank">Apply →</a></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#00c4cc;color:#fff;">Nt</div>
+            Netlify
+          </div>
+        </td>
+        <td><span class="commission">15–20% revshare</span></td>
+        <td><span class="cookie">—</span></td>
+        <td><span class="platform-tag">PartnerStack</span></td>
+        <td><span class="priority-dot p-low"></span>Low</td>
+        <td><span class="badge badge-partner">Partner</span></td>
+        <td class="notes-col">Backup hosting option. Apply as Ecosystem Partner. Use when Vercel isn't suitable.</td>
+        <td><a class="apply-link" href="https://www.netlify.com/partners/" target="_blank">Apply →</a></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="program-name">
+            <div class="program-icon" style="background:#7d2ae8;color:#fff;">Cv</div>
+            Canva
+          </div>
+        </td>
+        <td><span class="commission">80% × 2mo / 15% annual</span></td>
+        <td><span class="cookie">30 days</span></td>
+        <td><span class="platform-tag">Impact</span></td>
+        <td><span class="priority-dot p-med"></span>Medium</td>
+        <td><span class="badge badge-closed">Waitlist</span></td>
+        <td class="notes-col"><strong>Currently closed.</strong> Join the Canvassador waitlist. Check back regularly — worth getting when open.</td>
+        <td><a class="apply-link" href="https://public.canva.site/canvassadors" target="_blank">Waitlist →</a></td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+<div class="section-title">Application Checklist</div>
+
+<div class="checklist">
+  <h2>Complete these in order — highest value first</h2>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>1. HubSpot Affiliate — via Impact</strong>
+      <span>Visit hubspot.com/partners/affiliates → click Sign Up → complete Impact profile. Approval: 2–3 days.</span>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>2. Namecheap Affiliate — via Impact</strong>
+      <span>Visit namecheap.com/affiliates → Apply via Impact Radius. Approval: a few days.</span>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>3. Vercel / v0 Affiliate — via Dub</strong>
+      <span>Visit partners.dub.co/v0 → apply directly. Also check vercel.com/partners for Pro referral link.</span>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>4. Klaviyo Partner — Direct</strong>
+      <span>Visit klaviyo.com/partners/become-a-partner → apply as Agency/Freelancer. Response within 1 week.</span>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>5. Calendly Affiliate — via PartnerStack</strong>
+      <span>Visit calendly.partnerstack.com → apply as referral partner. Approval: a few days.</span>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>6. Netlify Ecosystem Partner — via PartnerStack</strong>
+      <span>Visit netlify.com/partners → apply as Ecosystem Partner (creator/agency).</span>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <div class="checkbox"></div>
+    <div class="checklist-text">
+      <strong>7. Canva Canvassador — Waitlist</strong>
+      <span>Program currently closed. Join waitlist at public.canva.site/canvassadors and check monthly.</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  FORGE Internal Document · Updated June 2026 · builtbyaaronf@gmail.com
+</footer>
+
+</body>
+</html>

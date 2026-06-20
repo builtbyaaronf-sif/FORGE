@@ -1,0 +1,48 @@
+{
+  "directory_metadata": {
+    "platform_name": "Target Directory",
+    "target_slug": "target-directory",
+    "contact_first_name": "Dave",
+    "contact_email": "dave@directorysite.co.uk",
+    "total_database_listings": 1500,
+    "primary_trade_vertical": "Plumbers"
+  },
+  "sample_profiles": [
+    {
+      "business_name": "Sample Premium Trade 1",
+      "phone": "020 7946 0192",
+      "short_bio": "High-quality local plumbing specialist serving London residential projects.",
+      "scraped_reviews": [
+        {
+          "reviewer_name": "Sarah M.",
+          "rating_stars": 5,
+          "review_text": "Brilliant execution."
+        }
+      ]
+    },
+    {
+      "business_name": "Sample Premium Trade 2",
+      "phone": "020 7946 0555",
+      "short_bio": "Expert emergency heating and drainage installations across London.",
+      "scraped_reviews": [
+        {
+          "reviewer_name": "Mark T.",
+          "rating_stars": 5,
+          "review_text": "Fast turnaround time."
+        }
+      ]
+    },
+    {
+      "business_name": "Sample Premium Trade 3",
+      "phone": "020 7946 0777",
+      "short_bio": "Bespoke bathroom renovations and complete property repiping specialists.",
+      "scraped_reviews": [
+        {
+          "reviewer_name": "Alex K.",
+          "rating_stars": 5,
+          "review_text": "Highly professional service."
+        }
+      ]
+    }
+  ]
+}

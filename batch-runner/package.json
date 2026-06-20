@@ -1,0 +1,15 @@
+{
+  "name": "forge-agent",
+  "version": "1.0.0",
+  "description": "FORGE — AI-powered marketing agency batch runner",
+  "type": "module",
+  "scripts": {
+    "run": "node forge-runner.js",
+    "status": "node forge-status.js",
+    "collect": "node forge-collect.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.5"
+  }
+}

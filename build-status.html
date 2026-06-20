@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE: Your Build is Launching</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #090909;
+  --bg2:    #111111;
+  --bg3:    #181818;
+  --border: #222222;
+  --ink:    #F0F0F0;
+  --ink2:   #888888;
+  --orange: #FF4A1C;
+  --green:  #4ade80;
+  --blue:   #0099FF;
+  --font:   'Inter', system-ui, sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LOADING OVERLAY ── */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 9, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+#loadingOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+.loading-text {
+  font-size: 14px;
+  color: var(--ink2);
+  font-weight: 500;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── LAYOUT ── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* ── LOGO ── */
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 48px;
+}
+.logo span { color: var(--orange); }
+
+/* ── PULSE ICON ── */
+.pulse-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 32px;
+}
+.pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  opacity: 0;
+  animation: pulseRing 2s ease-out infinite;
+}
+.pulse-ring:nth-child(2) { animation-delay: 0.6s; }
+.pulse-ring:nth-child(3) { animation-delay: 1.2s; }
+@keyframes pulseRing {
+  0%   { transform: scale(0.7); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.pulse-icon {
+  position: absolute;
+  inset: 12px;
+  background: var(--orange);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pulse-icon svg { width: 28px; height: 28px; }
+
+/* ── HEADLINE ── */
+.headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  max-width: 520px;
+}
+.headline em { font-style: normal; color: var(--orange); }
+
+.subline {
+  color: var(--ink2);
+  font-size: 1.0625rem;
+  max-width: 480px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+.subline strong { color: var(--ink); }
+
+/* ── BUILD STEPS ── */
+.build-steps {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.step:last-child { border-bottom: none; }
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--ink2);
+  transition: all 0.4s ease;
+}
+.step-dot.done   { background: var(--green); border-color: var(--green); color: #000; }
+.step-dot.active { background: var(--orange); border-color: var(--orange); color: #fff; animation: spinDot 1s linear infinite; }
+@keyframes spinDot {
+  0%   { box-shadow: 0 0 0 0 rgba(255,74,28,0.4); }
+  50%  { box-shadow: 0 0 0 6px rgba(255,74,28,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,74,28,0); }
+}
+.step-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink2);
+  transition: color 0.4s ease;
+}
+.step.active .step-label { color: var(--ink); }
+.step.done  .step-label  { color: var(--green); }
+.step-sub {
+  font-size: 12px;
+  color: var(--ink2);
+  margin-top: 2px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.step.active .step-sub,
+.step.done   .step-sub { opacity: 1; }
+
+/* ── DELIVERY CARD ── */
+.delivery-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto 32px;
+  text-align: left;
+}
+.delivery-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.delivery-row:last-child { border-bottom: none; }
+.delivery-key { color: var(--ink2); }
+.delivery-val { font-weight: 600; color: var(--ink); }
+.delivery-val.highlight { color: var(--orange); }
+
+/* ── ETA BADGE ── */
+.eta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,74,28,0.1);
+  border: 1px solid rgba(255,74,28,0.25);
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--orange);
+  margin-bottom: 32px;
+}
+.eta-dot { width: 7px; height: 7px; background: var(--orange); border-radius: 50%; animation: blink 1s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── VIDEO AGENT ── */
+.agent-section {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 40px;
+}
+.agent-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 12px;
+  text-align: left;
+}
+.agent-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  aspect-ratio: 16/9;
+}
+.agent-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--bg2);
+  transition: opacity 0.5s ease;
+}
+.agent-loading.hidden { opacity: 0; pointer-events: none; }
+.agent-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.agent-loading-text {
+  font-size: 13px;
+  color: var(--ink2);
+  font-weight: 500;
+}
+.agent-unavailable {
+  display: none;
+  padding: 28px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+#tavusFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+#tavusFrame.ready { opacity: 1; }
+
+/* ── UPGRADE SECTION ── */
+.upgrade-section {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto 48px;
+  text-align: left;
+}
+.upgrade-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.upgrade-subtitle {
+  font-size: 13px;
+  color: var(--ink2);
+  margin-bottom: 20px;
+}
+.upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.upgrade-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.upgrade-card.recommended {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+.upgrade-card:hover { border-color: #444; }
+.upgrade-badge {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+.upgrade-pkg-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+.upgrade-retail {
+  font-size: 12px;
+  color: var(--ink2);
+  text-decoration: line-through;
+  margin-bottom: 2px;
+}
+.upgrade-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--blue);
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+}
+.upgrade-price span { font-size: 0.875rem; font-weight: 500; color: var(--ink2); }
+#upgradeGrid .paypal-btn-wrap { min-height: 44px; }
+
+/* ── RETAINER SECTION ── */
+.retainer-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto 32px;
+  color: var(--ink2);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.retainer-divider::before,
+.retainer-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.retainer-section {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto 64px;
+  text-align: left;
+}
+.retainer-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.retainer-subtitle {
+  font-size: 13px;
+  color: var(--ink2);
+  margin-bottom: 20px;
+}
+.retainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.retainer-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.retainer-card.featured {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+.retainer-badge {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+.retainer-tier-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+.retainer-trial {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.retainer-price {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--blue);
+  letter-spacing: -0.04em;
+  margin-bottom: 12px;
+}
+.retainer-price span { font-size: 0.75rem; font-weight: 500; color: var(--ink2); }
+.retainer-deliverables {
+  list-style: none;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.retainer-deliverables li {
+  font-size: 12px;
+  color: var(--ink2);
+  padding-left: 14px;
+  position: relative;
+}
+.retainer-deliverables li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+}
+.retainer-cancel {
+  font-size: 11px;
+  color: var(--ink2);
+  text-align: center;
+  margin-top: 8px;
+}
+#retainerGrid .paypal-sub-btn-wrap { min-height: 44px; }
+
+/* ── FOOTER NOTE ── */
+.footer-note {
+  font-size: 13px;
+  color: var(--ink2);
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+.footer-note a { color: var(--orange); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Verifying your payment…</div>
+</div>
+
+<div class="page">
+
+  <div class="logo">FORGE<span>.</span></div>
+
+  <!-- Pulse animation -->
+  <div class="pulse-wrap">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+    </div>
+  </div>
+
+  <h1 class="headline">Your <em>FORGE machine</em><br>is now live.</h1>
+  <p class="subline" id="subline">Payment confirmed. Our AI agents are building your digital presence right now. <strong>Do not close this tab.</strong></p>
+
+  <!-- ETA badge -->
+  <div class="eta-badge">
+    <div class="eta-dot"></div>
+    <span id="etaBadge">Building your package…</span>
+  </div>
+
+  <!-- Tavus AI Video Agent -->
+  <div class="agent-section" id="agentSection">
+    <div class="agent-label">Your FORGE agent is live</div>
+    <div class="agent-frame">
+      <div class="agent-loading" id="agentLoading">
+        <div class="agent-spinner"></div>
+        <div class="agent-loading-text">Connecting to your FORGE agent…</div>
+      </div>
+      <div class="agent-unavailable" id="agentUnavailable">
+        Your handover document will be emailed to you shortly.
+      </div>
+      <iframe
+        id="tavusFrame"
+        allow="camera; microphone; fullscreen; display-capture"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- Upgrade section (visible only if upgrades available) -->
+  <div class="upgrade-section" id="upgradeSection" style="display:none">
+    <div class="upgrade-label">Upgrade while your build runs</div>
+    <div class="upgrade-subtitle">Pay the difference. We add the extra agents to your active build.</div>
+    <div class="upgrade-grid" id="upgradeGrid"></div>
+  </div>
+
+  <!-- Retainer section (visible only if subscription plans available) -->
+  <div class="retainer-divider" id="retainerDivider" style="display:none">
+    <span>or build a long-term growth engine</span>
+  </div>
+  <div class="retainer-section" id="retainerSection" style="display:none">
+    <div class="retainer-label">Monthly Retainer Plans</div>
+    <div class="retainer-subtitle">First 30 days free. Cancel anytime. FORGE runs automatically every month.</div>
+    <div class="retainer-grid" id="retainerGrid"></div>
+  </div>
+
+  <!-- Build steps (populated by JS) -->
+  <div class="build-steps" id="buildSteps"></div>
+
+  <!-- Delivery card -->
+  <div class="delivery-card" id="deliveryCard" style="display:none">
+    <div class="delivery-row">
+      <span class="delivery-key">Package</span>
+      <span class="delivery-val highlight" id="dPkg">...</span>
+    </div>
+    <div class="delivery-row">
+      <span class="delivery-key">Business</span>
+      <span class="delivery-val" id="dName">...</span>
+    </div>
+    <div class="delivery-row">
+      <span class="delivery-key">Handover email to</span>
+      <span class="delivery-val" id="dEmail">...</span>
+    </div>
+    <div class="delivery-row">
+      <span class="delivery-key">Order ID</span>
+      <span class="delivery-val" id="dOrder" style="font-size:12px;color:var(--ink2)">...</span>
+    </div>
+    <div class="delivery-row">
+      <span class="delivery-key">Estimated delivery</span>
+      <span class="delivery-val highlight" id="dEta">...</span>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    Your handover document (live URL, login details, and next steps) will be emailed to you within the estimated delivery time.
+    Questions? <a href="mailto:builtbyaaronf@gmail.com">builtbyaaronf@gmail.com</a>
+  </p>
+
+</div>
+
+<script>
+// ── Session State (in-memory, no localStorage) ──────────────────────────────
+let sessionData = null;
+
+// ── Extract orderId from PayPal return URL ─────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const orderId = urlParams.get('token') || urlParams.get('orderId');
+
+// ── Package config ─────────────────────────────────────────────────────────
+const PKG_CONFIG = {
+  p1: {
+    label: 'Package 1: Launch',
+    steps: [
+      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
+      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
+      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all links' },
+    ]
+  },
+  p2: {
+    label: 'Package 2: Brand',
+    steps: [
+      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
+      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
+      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
+      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
+    ]
+  },
+  p3: {
+    label: 'Package 3: Convert',
+    steps: [
+      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
+      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
+      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
+      { label: 'WIRE: Setting up your CRM and forms',   sub: 'HubSpot pipeline, quote wizard, lead routing' },
+      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
+    ]
+  },
+  p4: {
+    label: 'Package 4: Book',
+    steps: [
+      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
+      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
+      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
+      { label: 'WIRE: Setting up your CRM and forms',   sub: 'HubSpot pipeline, quote wizard, lead routing' },
+      { label: 'BOOK: Configuring Calendly',           sub: 'Event types, availability, booking widget on your site' },
+      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
+    ]
+  },
+  p5: {
+    label: 'Package 5: Grow',
+    steps: [
+      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
+      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
+      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
+      { label: 'WIRE: Setting up your CRM and forms',   sub: 'HubSpot pipeline, quote wizard, lead routing' },
+      { label: 'BOOK: Configuring Calendly',           sub: 'Event types, availability, booking widget on your site' },
+      { label: 'SPARK: Building your social content',  sub: 'Full month of captions, hashtags, and posting schedule' },
+      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
+    ]
+  }
+};
+
+// ── Init session (verify PayPal order server-side) ──────────────────────────
+async function initSession() {
+  if (!orderId) {
+    // Fallback for direct nav / testing — use URL params if present
+    return {
+      name: urlParams.get('name') || 'your business',
+      email: urlParams.get('email') || '...',
+      location: urlParams.get('location') || '',
+      pkg: urlParams.get('pkg') || 'p1',
+      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'p1']?.label || 'Package 1: Launch',
+      pkgPrice: '£74.99',
+      eta: '~10 minutes',
+      paypal_client_id: null,
+      proRataGrid: []
+    };
+  }
+
+  const res = await fetch('/api/session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId })
+  });
+
+  if (!res.ok) {
+    console.warn(`Session verification failed (${res.status})`);
+    // Fail open: fall back to URL params
+    return {
+      name: urlParams.get('name') || 'your business',
+      email: urlParams.get('email') || '...',
+      location: urlParams.get('location') || '',
+      pkg: urlParams.get('pkg') || 'p1',
+      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'p1']?.label || 'Package 1: Launch',
+      pkgPrice: '£74.99',
+      eta: '~10 minutes',
+      paypal_client_id: null,
+      proRataGrid: []
+    };
+  }
+
+  return res.json();
+}
+
+// ── Populate UI with verified session data ──────────────────────────────────
+function populateUI(data) {
+  const config = PKG_CONFIG[data.pkg] || PKG_CONFIG.p1;
+
+  // Populate delivery card
+  document.getElementById('dPkg').textContent   = data.pkgLabel;
+  document.getElementById('dName').textContent  = data.name;
+  document.getElementById('dEmail').textContent = data.email;
+  document.getElementById('dOrder').textContent = orderId || '...';
+  document.getElementById('dEta').textContent   = data.eta;
+  document.getElementById('deliveryCard').style.display = 'block';
+
+  // Update subline with business name
+  document.getElementById('subline').innerHTML =
+    `Payment confirmed. Our AI agents are building <strong>${data.name}'s</strong> digital presence right now.`;
+
+  // Update ETA badge
+  document.getElementById('etaBadge').textContent = `Estimated delivery: ${data.eta}`;
+
+  // ── Render build steps ─────────────────────────────────────────────────────
+  const stepsContainer = document.getElementById('buildSteps');
+  config.steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'step';
+    div.id = `step-${i}`;
+    div.innerHTML = `
+      <div class="step-dot" id="dot-${i}">${i + 1}</div>
+      <div>
+        <div class="step-label">${s.label}</div>
+        <div class="step-sub">${s.sub}</div>
+      </div>
+    `;
+    stepsContainer.appendChild(div);
+  });
+
+  // ── Animate steps (purely visual — real deployment happens server-side) ────
+  let currentStepIdx = 0;
+  const totalSteps = config.steps.length;
+
+  // Timing: spread steps across the eta window (best-effort visual)
+  const etaMinutes = parseFloat((data.eta || '10').replace(/[^\d.]/g, '')) || 10;
+  const stepDuration = Math.max(4000, (etaMinutes * 60 * 1000) / totalSteps);
+
+  function activateStep(idx) {
+    if (idx >= totalSteps) return;
+    const stepEl = document.getElementById(`step-${idx}`);
+    const dotEl  = document.getElementById(`dot-${idx}`);
+    if (!stepEl) return;
+
+    // Mark previous as done
+    if (idx > 0) {
+      const prevStep = document.getElementById(`step-${idx - 1}`);
+      const prevDot  = document.getElementById(`dot-${idx - 1}`);
+      if (prevStep) prevStep.classList.replace('active', 'done');
+      if (prevDot)  { prevDot.classList.replace('active', 'done'); prevDot.textContent = '✓'; }
+    }
+
+    stepEl.classList.add('active');
+    dotEl.classList.add('active');
+    dotEl.textContent = '';
+
+    currentStepIdx = idx;
+
+    if (idx < totalSteps - 1) {
+      setTimeout(() => activateStep(idx + 1), stepDuration);
+    } else {
+      // Final step — mark done after a moment
+      setTimeout(() => {
+        stepEl.classList.replace('active', 'done');
+        dotEl.classList.replace('active', 'done');
+        dotEl.textContent = '✓';
+        document.getElementById('etaBadge').textContent = '✓ Build complete. Check your email.';
+      }, stepDuration);
+    }
+  }
+
+  // Start after a short delay
+  setTimeout(() => activateStep(0), 1200);
+}
+
+// ── Load PayPal SDK and render upgrade grid + subscription options ────────
+function loadPayPalAndRenderUpgrades(data) {
+  const hasUpgrades = data.proRataGrid && data.proRataGrid.length > 0;
+  const hasSubscriptions = data.subscriptionOptions && data.subscriptionOptions.length > 0;
+  const hasPayPal = data.paypal_client_id;
+
+  if (!hasPayPal || (!hasUpgrades && !hasSubscriptions)) {
+    return; // Nothing to render
+  }
+
+  // Dynamically load PayPal SDK
+  const script = document.createElement('script');
+  script.src = `https://www.paypal.com/sdk/js?client-id=${data.paypal_client_id}&currency=GBP`;
+  script.onload = () => {
+    if (hasUpgrades) renderUpgradeGrid(data);
+    if (hasSubscriptions) renderRetainerGrid(data);
+  };
+  document.head.appendChild(script);
+}
+
+function renderUpgradeGrid(data) {
+  const grid = document.getElementById('upgradeGrid');
+  grid.innerHTML = '';
+
+  data.proRataGrid.forEach(tier => {
+    const cardId = `paypal-btn-${tier.pkg}`;
+    const card = document.createElement('div');
+    card.className = `upgrade-card${tier.is_recommended ? ' recommended' : ''}`;
+    card.innerHTML = `
+      ${tier.is_recommended ? '<div class="upgrade-badge">Recommended</div>' : ''}
+      <div class="upgrade-pkg-name">Package ${tier.pkg.replace('p','')} ${tier.label}</div>
+      <div class="upgrade-retail">Retail: £${tier.retail_price.toFixed(2)}</div>
+      <div class="upgrade-price">£${tier.pro_rata_price.toFixed(2)} <span>pay the difference</span></div>
+      <div class="paypal-btn-wrap" id="${cardId}"></div>
+    `;
+    grid.appendChild(card);
+
+    // Render PayPal button into this card
+    if (window.paypal) {
+      paypal.Buttons({
+        style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay', height: 40 },
+        createOrder: (orderData, actions) => actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: tier.pro_rata_price.toFixed(2),
+              currency_code: 'GBP'
+            },
+            custom_id: btoa(JSON.stringify({
+              name: data.name,
+              email: data.email,
+              location: data.location,
+              pkg: tier.pkg,
+              upgrade_from: data.pkg,
+              original_order_id: orderId,
+              is_upgrade: true
+            }))
+          }]
+        }),
+        onApprove: (orderData, actions) => actions.order.capture().then(() => {
+          card.innerHTML = '<div style="padding:16px;text-align:center;color:#4ade80;font-weight:600;">✓ Upgrade confirmed — agents queued</div>';
+        }),
+        onError: (err) => console.error('PayPal upgrade error:', err)
+      }).render(`#${cardId}`);
+    }
+  });
+
+  document.getElementById('upgradeSection').style.display = 'block';
+}
+
+function renderRetainerGrid(data) {
+  if (!data.subscriptionOptions || !data.subscriptionOptions.length) return;
+
+  const grid = document.getElementById('retainerGrid');
+  grid.innerHTML = '';
+
+  data.subscriptionOptions.forEach((opt, idx) => {
+    const btnId = `paypal-sub-btn-${opt.tier}`;
+    const isFeatured = opt.tier === 't2';
+    const card = document.createElement('div');
+    card.className = `retainer-card${isFeatured ? ' featured' : ''}`;
+
+    const deliverableItems = (opt.deliverables || [])
+      .map(d => `<li>${d}</li>`).join('');
+
+    card.innerHTML = `
+      ${isFeatured ? '<div class="retainer-badge">Most Popular</div>' : ''}
+      <div class="retainer-tier-name">${opt.label}</div>
+      <div class="retainer-trial">30 days free</div>
+      <div class="retainer-price">${opt.monthly_label} <span>/month after trial</span></div>
+      <ul class="retainer-deliverables">${deliverableItems}</ul>
+      <div class="paypal-sub-btn-wrap" id="${btnId}"></div>
+      <div class="retainer-cancel">Cancel anytime</div>
+    `;
+    grid.appendChild(card);
+
+    if (window.paypal) {
+      paypal.Buttons({
+        style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'subscribe', height: 40 },
+        createSubscription: (data, actions) => actions.subscription.create({
+          plan_id: opt.plan_id,
+          custom_id: btoa(JSON.stringify({
+            name: sessionData.name,
+            email: sessionData.email,
+            location: sessionData.location,
+            tier: opt.tier,
+            is_subscription: true,
+            original_order_id: orderId
+          })),
+          subscriber: {
+            name: { given_name: sessionData.name.split(' ')[0] },
+            email_address: sessionData.email
+          },
+          application_context: {
+            brand_name: 'FORGE',
+            user_action: 'SUBSCRIBE_NOW',
+            payment_method: { payer_selected: 'PAYPAL', payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED' }
+          }
+        }),
+        onApprove: (data) => {
+          card.innerHTML = `
+            <div style="padding:20px;text-align:center">
+              <div style="color:#4ade80;font-weight:700;margin-bottom:8px">✓ Subscribed</div>
+              <div style="font-size:12px;color:var(--ink2)">Your first month is free. FORGE will run automatically every month.</div>
+            </div>
+          `;
+        },
+        onError: (err) => console.error('PayPal subscription error:', err)
+      }).render(`#${btnId}`);
+    }
+  });
+
+  document.getElementById('retainerDivider').style.display = 'flex';
+  document.getElementById('retainerSection').style.display = 'block';
+}
+
+// ── Tavus CVI — initialise video agent ────────────────────────────────────
+async function initTavusAgent(data) {
+  const frame    = document.getElementById('tavusFrame');
+  const loading  = document.getElementById('agentLoading');
+  const unavail  = document.getElementById('agentUnavailable');
+  const config   = PKG_CONFIG[data.pkg] || PKG_CONFIG.p1;
+
+  try {
+    const res = await fetch('/api/tavus-conversation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pkg: data.pkg, name: data.name, eta: data.eta, pkgLabel: data.pkgLabel })
+    });
+
+    if (!res.ok) throw new Error(`API ${res.status}`);
+
+    const tavusData = await res.json();
+
+    if (!tavusData.conversation_url) throw new Error('No conversation URL returned');
+
+    // Load the conversation into the iframe
+    frame.src = tavusData.conversation_url;
+    frame.onload = () => {
+      loading.classList.add('hidden');
+      frame.classList.add('ready');
+    };
+
+  } catch (err) {
+    console.warn('Tavus agent unavailable:', err.message);
+    loading.classList.add('hidden');
+    unavail.style.display = 'block';
+    document.getElementById('agentSection').style.display = 'none';
+  }
+}
+
+// ── Main execution flow ────────────────────────────────────────────────────
+async function main() {
+  try {
+    // Verify session (fetch from /api/session or fall back to URL params)
+    sessionData = await initSession();
+
+    // Hide loading overlay
+    document.getElementById('loadingOverlay').classList.add('hidden');
+
+    // Populate all UI with verified data
+    populateUI(sessionData);
+
+    // Load PayPal SDK and render upgrade grid (if available)
+    loadPayPalAndRenderUpgrades(sessionData);
+
+    // Initialise Tavus agent (after session resolves)
+    setTimeout(() => initTavusAgent(sessionData), 800);
+
+  } catch (err) {
+    console.error('Session init failed:', err);
+    // Hide loading overlay anyway
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+}
+
+// Start on page load
+window.addEventListener('DOMContentLoaded', main);
+</script>
+
+</body>
+</html>

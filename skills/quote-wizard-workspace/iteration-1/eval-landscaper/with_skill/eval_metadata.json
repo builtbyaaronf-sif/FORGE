@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "landscaper-whatsapp",
+  "prompt": "Create a quote request form for Green Garden Landscaping. Services they offer: Garden design & consultation, Lawn care & maintenance, Decking & patio installation, Tree surgery, Hedge trimming & shaping. Route to WhatsApp number +447891234567. Brand colours: #2d5a1b (primary), #f4a623 (accent).",
+  "config": "with_skill"
+}

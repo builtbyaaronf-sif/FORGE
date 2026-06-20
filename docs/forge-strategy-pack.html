@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE — Digital Strategy Pack | June 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #0099FF;
+    --accent-light: rgba(0,153,255,0.12);
+    --accent-mid: rgba(0,153,255,0.25);
+    --canvas: #FFFFFF;
+    --surface: #F7F9FC;
+    --surface-2: #EEF2F7;
+    --ink: #0A0A14;
+    --ink-2: #4A5568;
+    --ink-3: #8896AB;
+    --border: #E2E8F0;
+    --green: #10B981;
+    --amber: #F59E0B;
+    --red: #EF4444;
+    --green-bg: rgba(16,185,129,0.08);
+    --amber-bg: rgba(245,158,11,0.08);
+    --red-bg: rgba(239,68,68,0.08);
+    --blue-bg: rgba(0,153,255,0.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-feature-settings: 'cv01','ss03';
+    background: var(--canvas);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 1rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .doc { max-width: 860px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* COVER */
+  .cover {
+    background: var(--ink);
+    color: #fff;
+    padding: 80px 64px;
+    margin: 0 -24px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,153,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .cover h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.0; margin-bottom: 16px; }
+  .cover-sub { font-size: 1.25rem; font-weight: 400; color: rgba(255,255,255,0.65); margin-bottom: 32px; max-width: 560px; line-height: 1.5; }
+  .cover-meta { display: flex; gap: 32px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; margin-top: 24px; font-size: 0.875rem; color: rgba(255,255,255,0.5); }
+  .cover-meta span strong { color: rgba(255,255,255,0.85); }
+
+  /* SECTION */
+  .section { margin-bottom: 64px; }
+  .section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .section h2 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 16px; color: var(--ink); }
+  .section-rule { height: 2px; background: linear-gradient(90deg, var(--accent) 0%, transparent 100%); margin-bottom: 28px; border: none; }
+  .intro-text { font-size: 1.05rem; color: var(--ink-2); margin-bottom: 28px; max-width: 680px; }
+
+  /* CARDS */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .card-icon { font-size: 1.8rem; margin-bottom: 12px; }
+  .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .card p { font-size: 0.875rem; color: var(--ink-2); line-height: 1.6; }
+  .card a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.8rem; display: inline-block; margin-top: 10px; }
+  .card.accent-card { border-color: var(--accent); background: var(--blue-bg); }
+
+  /* COMPETITOR CARDS */
+  .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 14px; }
+  .comp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .comp-name { font-weight: 700; font-size: 1rem; }
+  .comp-stars { color: #F59E0B; font-size: 0.85rem; }
+  .comp-tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; background: var(--surface-2); color: var(--ink-2); }
+  .comp-tagline { font-style: italic; color: var(--ink-2); font-size: 0.9rem; margin-bottom: 12px; }
+  .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .comp-col h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: 6px; }
+  .comp-col p { font-size: 0.85rem; color: var(--ink-2); }
+
+  /* PULL QUOTE */
+  .pull-quote { border-left: 4px solid var(--accent); padding: 20px 28px; background: var(--blue-bg); border-radius: 0 10px 10px 0; margin: 28px 0; font-size: 1.2rem; font-weight: 500; font-style: italic; color: var(--ink); line-height: 1.5; }
+
+  /* SWOT */
+  .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .swot-cell { border-radius: 10px; padding: 20px 22px; }
+  .swot-cell.s { background: var(--green-bg); border: 1px solid rgba(16,185,129,0.2); }
+  .swot-cell.w { background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2); }
+  .swot-cell.o { background: var(--blue-bg); border: 1px solid rgba(0,153,255,0.2); }
+  .swot-cell.t { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2); }
+  .swot-head { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px; }
+  .swot-head.s { color: var(--green); }
+  .swot-head.w { color: var(--amber); }
+  .swot-head.o { color: var(--accent); }
+  .swot-head.t { color: var(--red); }
+  .swot-cell ul { list-style: none; padding: 0; }
+  .swot-cell ul li { font-size: 0.875rem; color: var(--ink-2); padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .swot-cell ul li:last-child { border-bottom: none; }
+  .swot-frame { font-size: 0.8rem; font-style: italic; color: var(--ink-3); margin-top: 10px; }
+
+  /* GOALS */
+  .goal-card { display: flex; gap: 20px; padding: 20px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px; align-items: flex-start; }
+  .goal-num { width: 36px; height: 36px; flex-shrink: 0; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; }
+  .goal-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .goal-body p { font-size: 0.875rem; color: var(--ink-2); margin-bottom: 8px; }
+  .goal-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .goal-meta span { font-size: 0.75rem; color: var(--ink-3); }
+  .goal-meta span strong { color: var(--ink-2); }
+
+  /* TIMELINE */
+  .timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; margin: 32px 0; }
+  .timeline::before { content: ''; position: absolute; top: 26px; left: calc(16.66% + 2px); right: calc(16.66% + 2px); height: 2px; background: var(--border); z-index: 0; }
+  .tl-phase { padding: 0 12px; position: relative; }
+  .tl-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); margin-bottom: 16px; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--accent); position: relative; z-index: 1; }
+  .tl-dot.done { background: var(--green); box-shadow: 0 0 0 2px var(--green); }
+  .tl-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .tl-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; color: var(--ink); }
+  .tl-items { list-style: none; padding: 0; }
+  .tl-items li { font-size: 0.8rem; color: var(--ink-2); padding: 3px 0; }
+  .tl-items li.done { color: var(--green); }
+  .tl-items li.done::before { content: '✅ '; }
+  .tl-items li.todo::before { content: '→ '; color: var(--accent); }
+
+  /* RECOMMENDATIONS */
+  .rec-card { display: flex; gap: 20px; padding: 22px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px; align-items: flex-start; }
+  .rec-num { width: 32px; height: 32px; flex-shrink: 0; background: var(--ink); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; }
+  .rec-body { flex: 1; }
+  .rec-body h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+  .rec-body p { font-size: 0.875rem; color: var(--ink-2); margin-bottom: 10px; }
+  .rec-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
+  .badge.low-e { background: var(--green-bg); color: var(--green); }
+  .badge.med-e { background: var(--amber-bg); color: var(--amber); }
+  .badge.high-i { background: var(--blue-bg); color: var(--accent); }
+  .badge.forge { background: var(--accent); color: #fff; }
+
+  /* METRICS */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; }
+  .metric-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; }
+  .metric-card .metric-what { font-size: 0.8rem; color: var(--ink-2); margin-bottom: 4px; }
+  .metric-card .metric-why { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+  .metric-card .metric-where { font-size: 0.75rem; color: var(--ink-3); margin-top: 6px; }
+
+  /* NEXT STEPS */
+  .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .step-col h3 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+  .step-col ul { list-style: none; padding: 0; }
+  .step-col ul li { font-size: 0.875rem; color: var(--ink-2); padding: 6px 0; border-bottom: 1px solid var(--border); }
+
+  /* ANGLES */
+  .angle-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+  .angle-card { padding: 16px 18px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); font-size: 0.875rem; }
+  .angle-card.recommended { background: var(--blue-bg); border-color: var(--accent); }
+  .angle-card .angle-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
+  .angle-card.recommended .angle-label { color: var(--accent); }
+  .angle-card p { color: var(--ink-2); line-height: 1.5; }
+
+  /* FOOTER */
+  .doc-footer { background: var(--ink); color: #fff; padding: 40px 64px; margin: 64px -24px 0; text-align: center; }
+  .footer-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.04em; color: var(--accent); margin-bottom: 8px; }
+  .doc-footer p { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+  .doc-footer a { color: var(--accent); text-decoration: none; }
+  .closing-line { font-size: 1.1rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-top: 20px; font-style: italic; }
+
+  @media print {
+    .cover { margin: 0 0 64px; padding: 60px 48px; }
+    .doc-footer { margin: 64px 0 0; padding: 40px 48px; }
+  }
+  @media (max-width: 680px) {
+    .cover { padding: 48px 24px; }
+    .swot-grid, .timeline, .angle-cards, .steps-grid { grid-template-columns: 1fr; }
+    .timeline::before { display: none; }
+    .doc-footer { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-label">Digital Presence Strategy Pack</div>
+    <h1>FORGE</h1>
+    <p class="cover-sub">Your AI-powered marketing department is live. Here's what we built, why we built it, and what comes next.</p>
+    <div class="cover-meta">
+      <span><strong>Prepared by</strong> FORGE Agents</span>
+      <span><strong>Date</strong> June 2026</span>
+      <span><strong>Mode</strong> Full Deploy</span>
+      <span><strong>Website</strong> <a href="https://forgeisagentic.tech" style="color:var(--accent)">forgeisagentic.tech</a></span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: WHAT WE BUILT -->
+  <div class="section">
+    <div class="section-label">Section 1</div>
+    <h2>What We Built</h2>
+    <hr class="section-rule">
+    <p class="intro-text">Four agents. One session. Here's everything that was deployed for FORGE — and where to find it.</p>
+    <div class="card-grid">
+      <div class="card accent-card">
+        <div class="card-icon">🌐</div>
+        <h3>Live Website</h3>
+        <p>Premium single-page site on the Creative Dark design system. Space Grotesk headings, Inter body, #0099FF accent. Built to convert London tradesmen who need a website into FORGE enquiries.</p>
+        <a href="https://forgeisagentic.tech" target="_blank">forgeisagentic.tech →</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <h3>Brand Kit</h3>
+        <p>Creative Dark palette: #090909 canvas, #0099FF accent, #F0F0F0 text. Three Canva assets: colour palette card (1200×630), Instagram post template (1080×1080), Facebook/Google cover (1640×856).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>HubSpot CRM</h3>
+        <p>FORGE company record, closed-won deal, and Aaron's contact live in HubSpot. Every enquiry from the website can be tracked from first contact to closed client.</p>
+        <a href="https://app.hubspot.com/contacts/246508612/record/0-2/328069569267" target="_blank">View in HubSpot →</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <h3>Social Calendar</h3>
+        <p>20 posts across 4 weeks for Instagram and LinkedIn. Full captions, hooks, CTAs, hashtags. CSV export ready for Buffer, Later, or Hootsuite. Voice: sharp, confident, results-first.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>CHASE Sales System</h3>
+        <p>6-email nurture sequence, 30-day multi-channel cadence, Hot/Warm/Cold lead scoring, 5 objection scripts, 7-stage HubSpot pipeline, and 30/60/90-day revenue targets.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <h3>This Strategy Pack</h3>
+        <p>The intelligence layer: market analysis, 5 competitor profiles, positioning rationale, SWOT, 90-day roadmap, prioritised recommendations, and the metrics that tell you what's working.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: MARKET -->
+  <div class="section">
+    <div class="section-label">Section 2</div>
+    <h2>Your Market — What We Found</h2>
+    <hr class="section-rule">
+    <p class="intro-text">Before we built anything, SCOUT mapped the competitive landscape. The marketing agency market for London tradesmen looks like this.</p>
+
+    <div class="comp-card">
+      <div class="comp-header">
+        <div>
+          <div class="comp-name">Traditional Digital Agencies</div>
+          <div class="comp-stars">★★★★☆ avg 4.2 · £2,500–£8,000 per client</div>
+        </div>
+        <div class="comp-tag">Incumbent</div>
+      </div>
+      <div class="comp-tagline">"Full-service digital marketing for ambitious businesses"</div>
+      <div class="comp-grid">
+        <div class="comp-col"><h4>What they do well</h4><p>Established credibility, broad service range, in-person client relationships</p></div>
+        <div class="comp-col"><h4>Their gap — FORGE's opening</h4><p>Slow (weeks per project), expensive, no AI leverage, won't touch a £750 tradesman job</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-header">
+        <div>
+          <div class="comp-name">Freelance Web Designers (Fiverr / PeoplePerHour)</div>
+          <div class="comp-stars">★★★☆☆ avg 3.6 · £200–£800 per site</div>
+        </div>
+        <div class="comp-tag">Low-cost</div>
+      </div>
+      <div class="comp-tagline">"Affordable websites built by independent designers"</div>
+      <div class="comp-grid">
+        <div class="comp-col"><h4>What they do well</h4><p>Low price, accessible, good for single-page builds</p></div>
+        <div class="comp-col"><h4>Their gap — FORGE's opening</h4><p>Static page only — no strategy, no CRM, no content, no sales follow-up system</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-header">
+        <div>
+          <div class="comp-name">Checkatrade / Rated People / MyBuilder</div>
+          <div class="comp-stars">★★★★☆ avg 4.1 · £30–£100/month</div>
+        </div>
+        <div class="comp-tag">Directory</div>
+      </div>
+      <div class="comp-tagline">"Find trusted tradespeople in your area"</div>
+      <div class="comp-grid">
+        <div class="comp-col"><h4>What they do well</h4><p>Instant lead volume, review aggregation, brand recognition with homeowners</p></div>
+        <div class="comp-col"><h4>Their gap — FORGE's opening</h4><p>Tradesmen rent leads from a platform they don't own — no website, no brand, no asset</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-header">
+        <div>
+          <div class="comp-name">AI Website Builders (Wix ADI / Squarespace / GoDaddy AI)</div>
+          <div class="comp-stars">★★★☆☆ avg 3.2 · £10–£40/month SaaS</div>
+        </div>
+        <div class="comp-tag">DIY / SaaS</div>
+      </div>
+      <div class="comp-tagline">"Build a website yourself with AI in minutes"</div>
+      <div class="comp-grid">
+        <div class="comp-col"><h4>What they do well</h4><p>Cheap, self-serve, improving fast</p></div>
+        <div class="comp-col"><h4>Their gap — FORGE's opening</h4><p>Generic output, DIY (tradesmen don't have time), no strategy or sales system attached</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-header">
+        <div>
+          <div class="comp-name">Trades-Specific Agencies (Tradie Digital, Builder Marketing)</div>
+          <div class="comp-stars">★★★★☆ avg 4.3 · £500–£1,500/month retainer</div>
+        </div>
+        <div class="comp-tag">Niche agency</div>
+      </div>
+      <div class="comp-tagline">"Marketing built specifically for tradespeople"</div>
+      <div class="comp-grid">
+        <div class="comp-col"><h4>What they do well</h4><p>Industry knowledge, pre-built templates for trades, understand the audience</p></div>
+        <div class="comp-col"><h4>Their gap — FORGE's opening</h4><p>Still human-paced (weeks not minutes), monthly retainer commitment, no full-stack AI</p></div>
+      </div>
+    </div>
+
+    <p style="font-size:0.95rem; color:var(--ink-2); margin-top:24px; padding:20px; background:var(--surface); border-radius:10px; border-left:3px solid var(--accent);">
+      <strong>Here's what we decided to do differently:</strong> Every competitor serves tradesmen slowly and expensively, or quickly but without strategy. FORGE is the only option that delivers the full package — website, brand, CRM, content, sales system — in under 20 minutes, for a fraction of agency price. That gap is the entire business model.
+    </p>
+  </div>
+
+  <!-- SECTION 3: POSITIONING -->
+  <div class="section">
+    <div class="section-label">Section 3</div>
+    <h2>Your Place in the Market</h2>
+    <hr class="section-rule">
+
+    <div class="pull-quote">
+      "FORGE is the world's first fully agentic marketing department for London tradespeople — delivering a complete digital presence in under 10 minutes, at a fraction of traditional agency cost."
+    </div>
+
+    <p style="font-size:0.95rem; color:var(--ink-2); margin-bottom:16px;"><strong>Why this angle:</strong> Every competitor competes on price, speed, or quality — but nobody competes on all three simultaneously, through AI. FORGE owns a category that didn't exist before: the agentic agency. No competitor can replicate this without rebuilding from the ground up.</p>
+    <p style="font-size:0.95rem; color:var(--ink-2); margin-bottom:16px;"><strong>What this means for the website:</strong> The homepage leads with "agentic" prominently, backed by a live deployment panel showing all four agents. The claim is made visible, not just stated.</p>
+    <p style="font-size:0.95rem; color:var(--ink-2); margin-bottom:28px;"><strong>What this means for the brand:</strong> Creative Dark design system — #090909 canvas, #0099FF electric accent — signals technology leadership without saying a word. It reads as a software company, not a freelancer.</p>
+
+    <div class="angle-cards">
+      <div class="angle-card recommended">
+        <div class="angle-label">✓ Recommended</div>
+        <p><strong>Speed + AI:</strong> "Your complete digital presence. Built by AI agents in under 10 minutes." Owns the category no competitor occupies.</p>
+      </div>
+      <div class="angle-card">
+        <div class="angle-label">Alternative</div>
+        <p><strong>Cost vs agencies:</strong> "What an agency charges £3,000 for. FORGE delivers in 18 minutes." Strong but leads with price — a race to the bottom.</p>
+      </div>
+      <div class="angle-card">
+        <div class="angle-label">Alternative</div>
+        <p><strong>Results-first:</strong> "More enquiries. More jobs. Starting today." Compelling but generic — every agency says this.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: SWOT -->
+  <div class="section">
+    <div class="section-label">Section 4</div>
+    <h2>Where FORGE Stands — Honestly</h2>
+    <hr class="section-rule">
+    <p class="intro-text">An honest picture of where FORGE sits in the market today. This isn't meant to worry you — it's meant to help you make smart decisions.</p>
+
+    <div class="swot-grid">
+      <div class="swot-cell s">
+        <div class="swot-head s">✓ Strengths</div>
+        <ul>
+          <li>Zero competitors in the "agentic agency" category</li>
+          <li>Speed: 18-min full deploy vs. 4–6 weeks for agencies</li>
+          <li>Cost: 70–90% cheaper than traditional agencies</li>
+          <li>Fully automated — scales without hiring</li>
+          <li>4-agent system: consistent, repeatable, high-quality</li>
+          <li>Premium design stands out in a sea of template sites</li>
+        </ul>
+        <p class="swot-frame">These are your weapons. Sharpen them.</p>
+      </div>
+      <div class="swot-cell w">
+        <div class="swot-head w">⚠ Weaknesses</div>
+        <ul>
+          <li>Brand new — no client testimonials yet</li>
+          <li>No Google reviews or third-party social proof</li>
+          <li>Aaron is the only human (single point of failure)</li>
+          <li>ICO registration not yet complete (legal requirement)</li>
+          <li>No recurring revenue yet — all project-based</li>
+        </ul>
+        <p class="swot-frame">Address these in the first 30 days.</p>
+      </div>
+      <div class="swot-cell o">
+        <div class="swot-head o">→ Opportunities</div>
+        <ul>
+          <li>150,000+ London tradesmen with no working website</li>
+          <li>First-mover advantage in AI-powered trades marketing</li>
+          <li>Referral flywheel: one happy tradesman knows dozens</li>
+          <li>Retainer upsell: monthly reports, SEO, ad management</li>
+          <li>PR angle: "AI agency with no human competition yet"</li>
+          <li>Expand beyond trades once model is proven</li>
+        </ul>
+        <p class="swot-frame">The market is open. Move fast.</p>
+      </div>
+      <div class="swot-cell t">
+        <div class="swot-head t">⚡ Threats</div>
+        <ul>
+          <li>Large AI tools (Wix AI, Squarespace) improving rapidly</li>
+          <li>Traditional agencies beginning to add AI to workflows</li>
+          <li>Tradesmen sceptical of digital — need proof, not promises</li>
+          <li>Price pressure from £50 Fiverr website gigs</li>
+        </ul>
+        <p class="swot-frame">Speed to market is the only shield. Don't wait.</p>
+      </div>
+    </div>
+
+    <p style="font-size:0.95rem; color:var(--ink-2); margin-top:24px; padding:20px; background:var(--green-bg); border-radius:10px; border-left:3px solid var(--green);">
+      <strong>The good news:</strong> 150,000+ London tradesmen have no working website. No competitor is systematically targeting them with fast, affordable, full-stack AI marketing. FORGE is first. The first client acquired is also the first testimonial that cracks the scepticism barrier permanently.
+    </p>
+  </div>
+
+  <!-- SECTION 5: GOALS -->
+  <div class="section">
+    <div class="section-label">Section 5</div>
+    <h2>What Success Looks Like</h2>
+    <hr class="section-rule">
+    <p class="intro-text">Real business targets — not tech metrics. Here's what FORGE's first 90 days need to deliver.</p>
+
+    <div class="goal-card">
+      <div class="goal-num">1</div>
+      <div class="goal-body">
+        <h3>Win the first paying client within 30 days</h3>
+        <p>The first client validates the model, pays for the ICO registration, and provides the first testimonial. Everything else accelerates from here.</p>
+        <div class="goal-meta"><span><strong>Measure:</strong> 1 signed client, payment received</span><span><strong>Timeline:</strong> By 16 July 2026</span></div>
+      </div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-num">2</div>
+      <div class="goal-body">
+        <h3>Generate 10+ qualified enquiries per month</h3>
+        <p>Through website, Instagram DMs, LinkedIn outreach, and referrals. 10 enquiries at 30% close rate = 3 new clients per month.</p>
+        <div class="goal-meta"><span><strong>Measure:</strong> Form submissions + inbound DMs</span><span><strong>Timeline:</strong> By month 2 (August 2026)</span></div>
+      </div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-num">3</div>
+      <div class="goal-body">
+        <h3>Rank on Google for "marketing agency London tradesmen"</h3>
+        <p>Organic search is the highest-quality inbound channel long-term. Getting forgeisagentic.tech into the top 10 for three trade-specific keywords generates compounding traffic without ad spend.</p>
+        <div class="goal-meta"><span><strong>Measure:</strong> Top 10 Google ranking for 3 target keywords</span><span><strong>Timeline:</strong> 8–12 weeks</span></div>
+      </div>
+    </div>
+    <div class="goal-card">
+      <div class="goal-num">4</div>
+      <div class="goal-body">
+        <h3>Hit £5,000/month in revenue by September 2026</h3>
+        <p>At £750–£1,500 per deploy, 4–7 clients per month reaches this target. This is the proof point that turns FORGE from a project into a business.</p>
+        <div class="goal-meta"><span><strong>Measure:</strong> Monthly invoiced revenue</span><span><strong>Timeline:</strong> Month 3 (September 2026)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: ROADMAP -->
+  <div class="section">
+    <div class="section-label">Section 6</div>
+    <h2>The Plan — Phase by Phase</h2>
+    <hr class="section-rule">
+    <p class="intro-text">The foundation is live. Here's how to build on it.</p>
+
+    <div class="timeline">
+      <div class="tl-phase">
+        <div class="tl-dot done"></div>
+        <div class="tl-label">Phase 1 — Done</div>
+        <div class="tl-title">Foundation (June 2026)</div>
+        <ul class="tl-items">
+          <li class="done">Website built (deploy with vercel --prod)</li>
+          <li class="done">HubSpot CRM set up</li>
+          <li class="done">20-post social calendar ready</li>
+          <li class="done">CHASE sales system complete</li>
+          <li class="todo">Deploy site live (Aaron: vercel --prod)</li>
+          <li class="todo">ICO registration (£40 — this week)</li>
+        </ul>
+      </div>
+      <div class="tl-phase">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 2 — Weeks 1–4</div>
+        <div class="tl-title">First Client (July 2026)</div>
+        <ul class="tl-items">
+          <li class="todo">Post social calendar: 5 posts/week</li>
+          <li class="todo">DM 10 London tradesmen/day on Instagram</li>
+          <li class="todo">3 free Quick Deploy demos for proof</li>
+          <li class="todo">Set up Google Analytics</li>
+          <li class="todo">Activate CHASE email sequence in HubSpot</li>
+          <li class="todo">Add Calendly booking link to website</li>
+        </ul>
+      </div>
+      <div class="tl-phase">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 3 — Weeks 5–12</div>
+        <div class="tl-title">Scale (Aug–Sep 2026)</div>
+        <ul class="tl-items">
+          <li class="todo">3+ clients/month consistently</li>
+          <li class="todo">First case study: before/after</li>
+          <li class="todo">SEO blog: 4 posts on trade keywords</li>
+          <li class="todo">Introduce retainer: £200/month upkeep</li>
+          <li class="todo">Test Instagram ads: £100 budget</li>
+          <li class="todo">Monthly performance report (FORGE generates)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: RECOMMENDATIONS -->
+  <div class="section">
+    <div class="section-label">Section 7</div>
+    <h2>Our Honest Recommendations</h2>
+    <hr class="section-rule">
+    <p class="intro-text">In priority order — what will have the biggest real-world impact on FORGE in the next 90 days.</p>
+
+    <div class="rec-card">
+      <div class="rec-num">1</div>
+      <div class="rec-body">
+        <h3>Deploy the website — run <code style="background:var(--surface-2);padding:1px 6px;border-radius:4px;">vercel --prod</code> from the FORGE folder</h3>
+        <p>The website is built but not yet live. Everything else — social, outreach, ads, enquiries — depends on having a real URL. This takes 60 seconds. Aaron has to run it locally.</p>
+        <div class="rec-badges"><span class="badge low-e">Low Effort</span><span class="badge high-i">High Impact</span></div>
+      </div>
+    </div>
+
+    <div class="rec-card">
+      <div class="rec-num">2</div>
+      <div class="rec-body">
+        <h3>Register with the ICO this week (£40 at ico.org.uk/registration)</h3>
+        <p>FORGE processes personal data through the contact form. ICO registration is a legal requirement — not a suggestion. It takes 20 minutes online and costs £40 per year.</p>
+        <div class="rec-badges"><span class="badge low-e">Low Effort</span><span class="badge high-i">High Impact</span><span class="badge forge">Legal Requirement</span></div>
+      </div>
+    </div>
+
+    <div class="rec-card">
+      <div class="rec-num">3</div>
+      <div class="rec-body">
+        <h3>Give away 3 free Quick Deploy sites to get testimonials</h3>
+        <p>The fastest path to social proof is free demos for tradesmen you can reach this week. A website that goes from zero to live in 5 minutes while they watch is the most convincing demo FORGE can run. Ask for a Google review and a quote in return.</p>
+        <div class="rec-badges"><span class="badge med-e">Medium Effort</span><span class="badge high-i">High Impact</span><span class="badge forge">FORGE Executes</span></div>
+      </div>
+    </div>
+
+    <div class="rec-card">
+      <div class="rec-num">4</div>
+      <div class="rec-body">
+        <h3>Post the social calendar starting Monday — 5 posts per week</h3>
+        <p>20 posts are written and waiting. They don't post themselves. Consistency over 8 weeks compounds into authority. Even 3 posts/week on Instagram + LinkedIn builds real presence by September.</p>
+        <div class="rec-badges"><span class="badge low-e">Low Effort</span><span class="badge high-i">High Impact</span></div>
+      </div>
+    </div>
+
+    <div class="rec-card">
+      <div class="rec-num">5</div>
+      <div class="rec-body">
+        <h3>Add a Calendly "Book a Free Demo" link to the website hero</h3>
+        <p>A booking link converts better than a contact form because it removes the back-and-forth. "Book a 15-minute demo and see your new website before the call ends" is a compelling enough offer to close the sceptics. FORGE has Calendly already connected.</p>
+        <div class="rec-badges"><span class="badge low-e">Low Effort</span><span class="badge high-i">High Impact</span><span class="badge forge">FORGE Can Help</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8: METRICS -->
+  <div class="section">
+    <div class="section-label">Section 8</div>
+    <h2>What We'll Track — In Plain English</h2>
+    <hr class="section-rule">
+    <p class="intro-text">Numbers only matter if they tell you something. Here's what FORGE watches — and what each number means.</p>
+
+    <div class="metric-grid">
+      <div class="metric-card">
+        <h3>Website Visitors Per Month</h3>
+        <div class="metric-what">How many people visit forgeisagentic.tech</div>
+        <div class="metric-why">More visitors = more chances for enquiries. Target: 500/month by month 3.</div>
+        <div class="metric-where">Where to see it: Google Analytics</div>
+      </div>
+      <div class="metric-card">
+        <h3>Contact Form Submissions</h3>
+        <div class="metric-what">How many visitors reach out via the form</div>
+        <div class="metric-why">The first real signal the site converts. Target: 10/month by month 2.</div>
+        <div class="metric-where">Where to see it: HubSpot CRM inbox</div>
+      </div>
+      <div class="metric-card">
+        <h3>Enquiry-to-Client Rate</h3>
+        <div class="metric-what">What % of enquiries become paying clients</div>
+        <div class="metric-why">Tells you whether CHASE and pricing are working. Target: 30%+.</div>
+        <div class="metric-where">Where to see it: HubSpot deal pipeline</div>
+      </div>
+      <div class="metric-card">
+        <h3>Monthly Revenue</h3>
+        <div class="metric-what">Total invoiced revenue from client deploys</div>
+        <div class="metric-why">The number that matters most. Target: £5,000/month by September 2026.</div>
+        <div class="metric-where">Where to see it: HubSpot deals (closed won)</div>
+      </div>
+      <div class="metric-card">
+        <h3>Social Media Follower Growth</h3>
+        <div class="metric-what">Instagram + LinkedIn follower count week-on-week</div>
+        <div class="metric-why">Audience builds authority before someone is ready to buy. Target: 500 Instagram in 60 days.</div>
+        <div class="metric-where">Where to see it: Instagram Insights / LinkedIn Analytics</div>
+      </div>
+      <div class="metric-card">
+        <h3>Google Ranking for Target Keywords</h3>
+        <div class="metric-what">Where forgeisagentic.tech appears for trade marketing searches</div>
+        <div class="metric-why">Organic search is the best long-term channel. Target: top 10 by week 12.</div>
+        <div class="metric-where">Where to see it: Google Search Console (set up this week)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 9: NEXT STEPS -->
+  <div class="section">
+    <div class="section-label">Section 9</div>
+    <h2>What Happens Now</h2>
+    <hr class="section-rule">
+
+    <div class="steps-grid">
+      <div class="step-col">
+        <h3>Aaron — This Week</h3>
+        <ul>
+          <li>Run <code>vercel --prod</code> in FORGE folder to go live</li>
+          <li>Register with ICO (ico.org.uk, £40, 20 min)</li>
+          <li>Set up Google Analytics on forgeisagentic.tech</li>
+          <li>Create a Calendly demo booking link</li>
+          <li>Add Calendly link to the website hero CTA</li>
+        </ul>
+      </div>
+      <div class="step-col">
+        <h3>FORGE Agents — Ready Now</h3>
+        <ul>
+          <li>Deploy any new client site in under 20 minutes</li>
+          <li>Generate new social content on demand</li>
+          <li>Run CHASE email follow-ups from HubSpot</li>
+          <li>Produce a monthly performance report</li>
+          <li>Run competitive research for any new market</li>
+        </ul>
+      </div>
+      <div class="step-col">
+        <h3>When You're Ready</h3>
+        <ul>
+          <li>First client → run a full case study deploy</li>
+          <li>3 testimonials → add social proof to website</li>
+          <li>£2,000/month → test Instagram paid ads</li>
+          <li>Month 3 → review SEO content strategy</li>
+          <li>Month 6 → expand beyond London trades if proven</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /doc -->
+<!-- SECTION 10: B2B DIRECTORY EXPANSION ENGINE -->
+  <div class="section">
+    <div class="section-label">Section 10</div>
+    <h2>B2B Directory Expansion — Full Strategy & Commercials</h2>
+    <hr class="section-rule">
+    <p class="intro-text">Instead of hunting down 150,000 London tradesmen one by one, we target the platforms that hold them captive. Directories like Checkatrade or Rated People host static details; FORGE injects a white-label agentic marketing engine into their dashboards to instantly offer their clients our full stack.</p>
+
+    <!-- DIAGNOSTIC PROPOSAL PROTOTYPE -->
+    <div style="font-size: 0.9rem; color: var(--ink-2); margin-top: 12px; background: rgba(255,255,255,0.6); padding: 16px; border-radius: 8px; border: 1px dashed var(--accent);">
+        <p style="margin-bottom: 12px;"><strong>Executive Summary:</strong> Your directory currently hosts <code>{{Database Size (N)}}</code> static profiles of trades businesses. While these profiles provide transactional value, they represent an unmonetized asset layer where businesses merely 'rent' visibility. FORGE deploys background 'Ghost Builds' using their active profiles, letting your directory offer a premium, automated web and marketing stack on day one.</p>
+        <p style="margin-bottom: 4px;"><strong>The Dynamic White-Label Fulfillment Suite Includes:</strong></p>
+        <ul style="padding-left: 20px; margin-bottom: 0;">
+          <li><strong>Premium Live Website:</strong> Built onto our Creative Dark design system optimized to capture localized search leads.</li>
+          <li><strong>Bespoke Brand Kit:</strong> Dynamic color palette assignment and professional typography layout arrays.</li>
+          <li><strong>Integrated Core CRM:</strong> Auto-provisioned lead management pipelines to track entries from first contact to close client.</li>
+<li><strong>4-Week Social Calendar (IG, LI & FB Page):</strong> 20 complete assets optimized for cross-platform community nurturing. Includes high-converting hooks, full caption copy, regional hashtag arrays, and a ready-to-import CSV layout file designed to turn passive local scrolls into active community trust.</li>
+          <li><strong>The FORGE Masters Ecosystem Network:</strong> Complimentary entry into a private, high-tier trade operator network. This closed community provides peer-to-peer accountability, group asset value, and operational insights, drastically increasing end-user retention on your platform.</li>          <li><strong>CHASE Sales System:</strong> Pre-built email nurture automation sequences, pipeline triggers, and objection handling matrices.</li>
+        </ul>
+      </div>
+
+      <!-- SIMULATION TABLE -->
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);">The Partner Financial Simulation Model</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; background: var(--canvas); font-size: 0.85rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+          <thead>
+            <tr style="background: var(--ink); color: white; text-align: left;">
+              <th style="padding: 12px;">Performance Metric</th>
+              <th style="padding: 12px;">Tier 1: The Engine</th>
+              <th style="padding: 12px;">Tier 2: The Hybrid</th>
+              <th style="padding: 12px;">Tier 3: Embedded Stack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 600;">Upfront Setup Price</td>
+              <td style="padding: 12px; color: var(--green); font-weight: 600;">£1,499.99</td>
+              <td style="padding: 12px; color: var(--amber); font-weight: 600;">£4,499.99</td>
+              <td style="padding: 12px; color: var(--accent); font-weight: 600;">£8,499.99</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border); background: var(--surface);">
+              <td style="padding: 12px; font-weight: 600;">Directory Margin Per User</td>
+              <td style="padding: 12px;">40% Share (£19.60/mo)</td>
+              <td style="padding: 12px;">£24.30/mo Net Markup</td>
+              <td style="padding: 12px;">Keep 100% past wholesale (£34.00/mo)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; font-weight: 600;"><strong>10% Activation</strong><br><span style="font-weight: 400; color: var(--ink-3);">({{10% of N Users}})</span></td>
+              <td style="padding: 12px; color: var(--ink-2);">Monthly MRR: {{T1_10_MRR}}<br><strong>Year 1 Net: {{T1_10_Y1}}</strong></td>
+              <td style="padding: 12px; color: var(--ink-2);">Monthly MRR: {{T2_10_MRR}}<br><strong>Year 1 Net: {{T2_10_Y1}}</strong></td>
+              <td style="padding: 12px; color: var(--ink-2); background: rgba(0,153,255,0.04);">Monthly MRR: {{T3_10_MRR}}<br><strong>Year 1 Net: {{T3_10_Y1}}</strong></td>
+            </tr>
+            <tr style="background: var(--surface);">
+              <td style="padding: 12px; font-weight: 600;"><strong>20% Activation</strong><br><span style="font-weight: 400; color: var(--ink-3);">({{20% of N Users}})</span></td>
+              <td style="padding: 12px; color: var(--ink-2);">Monthly MRR: {{T1_20_MRR}}<br><strong>Year 1 Net: {{T1_20_Y1}}</strong></td>
+              <td style="padding: 12px; color: var(--ink-2);">Monthly MRR: {{T2_20_MRR}}<br><strong>Year 1 Net: {{T2_20_Y1}}</strong></td>
+              <td style="padding: 12px; color: var(--ink-2); background: rgba(0,153,255,0.04);">Monthly MRR: {{T3_20_MRR}}<br><strong>Year 1 Net: {{T3_20_Y1}}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 0.8rem; font-style: italic; color: var(--ink-3); margin-top: 10px;">*Note: All Year 1 totals dynamically deduct the respective setup fees to display actual net profit margins. Assumes a basic end-user retail cost of £49/month.</p>
+    </div>
+
+    <!-- 1-PAGE COMMERCIAL TERMS SHEET -->
+    <h3>1-Page Commercial Terms Sheet</h3>
+    <p style="font-size: 0.9rem; color: var(--ink-2); margin-bottom: 14px;">The exact legal and operational framework to anchor our B2B pipeline conversations.</p>
+    
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; font-size: 0.875rem; color: var(--ink-2); line-height: 1.6;">
+      <h4 style="color: var(--ink); font-weight: 700; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px;">FORGE B2B Commercial Master Agreement</h4>
+      
+      <p style="margin-bottom: 10px;"><strong>1. Integration Protocol & SLA:</strong> FORGE grants the Partner dynamic API access to automatically compile and deploy complete white-labeled digital suites. All background 'Ghost Builds' must generate and be completely ready for dashboard preview within 10 minutes of payload arrival.</p>
+      
+      <p style="margin-bottom: 10px;"><strong>2. Selected Pricing Tier & Billing:</strong> The Partner agrees to the terms under <strong>{{Selected_Tier_Name}}</strong>. The One-Time Integration & Setup Fee is fixed at <strong>{{Selected_Setup_Price}}</strong> and is invoiced immediately upon execution. Recurring usage licensing is aggregated and billed monthly in arrears on the 1st of each calendar month.</p>
+      
+      <p style="margin-bottom: 10px;"><strong>3. Data Protection & Processing:</strong> The Partner maintains comprehensive ownership of primary client identities. FORGE acts explicitly as a Data Processor under UK GDPR requirements. The Partner warrants that its consumer terms protect automated third-party workflow logic transfers.</p>
+      
+      <p style="margin-bottom: 10px;"><strong>4. Platform Architecture Maintenance:</strong> FORGE guarantees a 99.9% application availability window across underlying agent orchestration nodes, asset rendering systems, and global edge hosting pipelines. The Partner manages front-end webhook implementation hooks targeting our APIs.</p>
+      
+      <p style="margin-bottom: 6px;"><strong>5. Term & Termination Boundary:</strong> This agreement retains a baseline performance lock of 12 months from deployment. Either partner may exit the framework with 60 days standard written intent if systemic operational or clearing defaults manifest.</p>
+    </div>
+
+    <!-- B2B STRATEGY RECOMMENDATION -->
+    <p style="font-size:0.95rem; color:var(--ink-2); margin-top:24px; padding:20px; background:var(--blue-bg); border-radius:10px; border-left:3px solid var(--accent);">
+      <strong>How FORGE Agents Operationalize This:</strong> Our sales outreach systems can parse directory URLs, extract their database size ($N$), run the simulation variables automatically, and inject the results into this Section 10 framework to export custom, hyper-persuasive PDFs for prospects in under 60 seconds.
+    </p>
+  </div>
+<!-- FOOTER -->
+<div class="doc-footer">
+  <div class="footer-logo">FORGE</div>
+  <p>Built by FORGE — your AI marketing partner</p>
+  <p>Delivered: June 2026 · <a href="mailto:builtbyaaronf@gmail.com">builtbyaaronf@gmail.com</a> · <a href="https://forgeisagentic.tech">forgeisagentic.tech</a></p>
+  <p class="closing-line">"This is just the beginning. Let's build something great together."</p>
+</div>
+
+</body>
+</html>

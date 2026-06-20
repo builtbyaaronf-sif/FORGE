@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms &amp; Conditions — FORGE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0A0A0A; --bg2: #111111; --border: #2A2A2A;
+      --orange: #FF4A1C; --white: #FFFFFF; --grey: #9CA3AF; --grey2: #6B7280;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+    html, body { font-family: var(--font); background: var(--bg); color: var(--white); -webkit-font-smoothing: antialiased; }
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 60px;
+      background: rgba(10,10,10,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 17px; font-weight: 800; letter-spacing: 0.12em; color: var(--white); text-decoration: none; }
+    .logo span { color: var(--orange); }
+    .back-link { font-size: 13px; color: var(--grey2); text-decoration: none; font-weight: 500; transition: color 0.15s; }
+    .back-link:hover { color: var(--white); }
+    .container { max-width: 760px; margin: 0 auto; padding: 60px 24px 100px; }
+    .page-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; }
+    h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 900; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .last-updated { font-size: 13px; color: var(--grey2); margin-bottom: 48px; }
+    .section { margin-bottom: 40px; }
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    p { font-size: 15px; color: var(--grey); line-height: 1.8; margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+    ul { list-style: none; margin-bottom: 14px; }
+    ul li { font-size: 15px; color: var(--grey); line-height: 1.8; padding-left: 18px; position: relative; margin-bottom: 6px; }
+    ul li::before { content: ''; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+    a { color: var(--orange); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .highlight-box {
+      background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--orange);
+      border-radius: 8px; padding: 18px 20px; margin-bottom: 14px;
+    }
+    .highlight-box p { margin-bottom: 0; font-size: 14px; }
+    .price-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 14px; }
+    .price-table th { text-align: left; padding: 10px 14px; background: var(--bg2); color: var(--grey2); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
+    .price-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--grey); }
+    .price-table tr:last-child td { border-bottom: none; }
+    .price-table td:last-child { color: var(--white); font-weight: 600; }
+    footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
+    footer p { font-size: 13px; color: var(--grey2); margin-bottom: 0; }
+    footer a { color: var(--grey2); margin: 0 12px; }
+    footer a:hover { color: var(--white); }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="index.html" class="logo">F<span>O</span>RGE</a>
+  <a href="index.html" class="back-link">← Back to home</a>
+</div>
+
+<div class="container">
+  <div class="page-label">Legal</div>
+  <h1>Terms &amp; Conditions</h1>
+  <p class="last-updated">Last updated: 16 June 2026</p>
+
+  <div class="highlight-box">
+    <p>Please read these Terms and Conditions carefully before placing an order. By completing our onboarding questionnaire and making a payment, you agree to be bound by these terms. These terms form a legally binding contract between you and FORGE.</p>
+  </div>
+
+  <div class="section">
+    <h2>1. About us</h2>
+    <p>FORGE is a trading name operated by Aaron F, a sole trader based in the United Kingdom.</p>
+    <p><strong>Contact:</strong> <a href="mailto:agent01101001@forgeisagentic.tech">agent01101001@forgeisagentic.tech</a><br />
+    <strong>Website:</strong> <a href="https://forgeisagentic.tech">forgeisagentic.tech</a></p>
+  </div>
+
+  <div class="section">
+    <h2>2. Our services</h2>
+    <p>FORGE provides AI-powered digital marketing services for small businesses, delivered remotely. Our packages are as follows:</p>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Package</th>
+          <th>What's included</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Quick Deploy</strong></td>
+          <td>Competitor research, live website on Vercel, brand colour palette, mobile-first design</td>
+          <td>£64.99</td>
+        </tr>
+        <tr>
+          <td><strong>Standard Deploy</strong></td>
+          <td>Everything in Quick Deploy, plus: Canva brand kit (3 assets), HubSpot CRM setup, 20-post social media calendar, client strategy document</td>
+          <td>£444.99</td>
+        </tr>
+        <tr>
+          <td><strong>Full Deploy</strong></td>
+          <td>Everything in Standard Deploy, plus: 6-email automated follow-up sequence, 30-day sales cadence, lead scoring system, 5 objection handling scripts, HubSpot 7-stage pipeline, 30/60/90-day revenue targets</td>
+          <td>£949.99</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>All prices are in GBP and inclusive of any applicable VAT where required. Delivery timescales are estimates and may vary. FORGE reserves the right to update package contents and pricing with reasonable notice.</p>
+  </div>
+
+  <div class="section">
+    <h2>3. Placing an order</h2>
+    <p>An order is placed when you complete our onboarding questionnaire at <a href="https://forgeisagentic.tech/start">forgeisagentic.tech/start</a> and submit payment via PayPal. Your order is confirmed when payment has cleared.</p>
+    <p>By placing an order you confirm that:</p>
+    <ul>
+      <li>You are at least 18 years old</li>
+      <li>You are authorised to purchase on behalf of your business (if applicable)</li>
+      <li>The information you have provided in the brief is accurate to the best of your knowledge</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>4. Payment</h2>
+    <p>All payments are processed securely by PayPal. FORGE does not store or access your payment card details. By proceeding to payment you agree to PayPal's terms of service.</p>
+    <p>Work begins as soon as payment has cleared. We do not begin work on unpaid orders.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Cancellations and refunds</h2>
+    <p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, you ordinarily have the right to cancel a distance contract within 14 days without giving a reason.</p>
+    <p><strong>However:</strong> by completing our onboarding questionnaire and proceeding to payment, you expressly request that we begin performing the service immediately. You acknowledge that once work has commenced, your right to cancel without charge is lost in accordance with Regulation 36(1) of the Consumer Contracts Regulations 2013.</p>
+    <p>Given the nature of our service (AI-generated digital deliverables produced immediately upon payment), all sales are final once work has begun.</p>
+    <p>If you believe we have failed to deliver what was described, please contact us within 7 days of delivery at <a href="mailto:agent01101001@forgeisagentic.tech">agent01101001@forgeisagentic.tech</a> and we will work to put it right. Disputes are handled at our discretion and may include revision of deliverables where reasonable.</p>
+    <p>This does not affect your statutory rights under the Consumer Rights Act 2015.</p>
+  </div>
+
+  <div class="section">
+    <h2>6. Delivery</h2>
+    <p>Deliverables are provided digitally via email to the address you provide in the onboarding questionnaire. Estimated delivery times are:</p>
+    <ul>
+      <li>Quick Deploy: under 5 minutes from payment</li>
+      <li>Standard Deploy: 10 to 14 minutes from payment</li>
+      <li>Full Deploy: 14 to 18 minutes from payment</li>
+    </ul>
+    <p>These are estimates and may be affected by technical issues outside our control. If delivery is significantly delayed, we will notify you by email.</p>
+  </div>
+
+  <div class="section">
+    <h2>7. Intellectual property</h2>
+    <p>Upon full payment, you own the deliverables produced for you (website content, brand assets, copy, and documents). You are free to use, modify, and publish them without restriction.</p>
+    <p>FORGE retains the right to use anonymised examples of our work in our own marketing and portfolio, unless you explicitly request otherwise in writing.</p>
+    <p>The FORGE brand, website, and methodology remain the intellectual property of Aaron F, trading as FORGE. You may not reproduce our onboarding process, methodology documents, or marketing materials without written permission.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Third-party services</h2>
+    <p>Our service involves setting up third-party accounts and tools on your behalf, including Vercel (website hosting), HubSpot (CRM), and Canva (brand kit). Use of these platforms is subject to their own terms of service. FORGE is not responsible for changes to third-party pricing, availability, or terms.</p>
+    <p>Hosting on Vercel's free tier may be subject to Vercel's fair use policy. We recommend upgrading to a paid plan for commercial use.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Limitation of liability</h2>
+    <p>To the fullest extent permitted by law:</p>
+    <ul>
+      <li>FORGE's total liability to you in connection with any order shall not exceed the amount you paid for that order.</li>
+      <li>We are not liable for any indirect, consequential, or loss-of-profit damages arising from use of our service or deliverables.</li>
+      <li>We are not liable for the actions, availability, or terms of any third-party platform used to deliver our service.</li>
+    </ul>
+    <p>Nothing in these terms limits liability for death or personal injury caused by negligence, fraudulent misrepresentation, or any other liability that cannot be excluded by law.</p>
+  </div>
+
+  <div class="section">
+    <h2>10. Governing law</h2>
+    <p>These terms are governed by the laws of England and Wales. Any disputes arising from these terms or our services shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+  </div>
+
+  <div class="section">
+    <h2>11. Changes to these terms</h2>
+    <p>We may update these Terms and Conditions from time to time. The date at the top of this page reflects the most recent version. Changes apply to orders placed after the updated terms are published.</p>
+  </div>
+
+  <div class="section">
+    <h2>12. Contact</h2>
+    <p>If you have any questions about these terms, please contact us at <a href="mailto:agent01101001@forgeisagentic.tech">agent01101001@forgeisagentic.tech</a>.</p>
+  </div>
+</div>
+
+<footer>
+  <p>
+    <a href="index.html">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms &amp; Conditions</a>
+  </p>
+  <p style="margin-top:12px;">© 2026 FORGE. All rights reserved. Aaron F, trading as FORGE.</p>
+</footer>
+
+</body>
+</html>

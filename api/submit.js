@@ -44,8 +44,7 @@ module.exports = async (req, res) => {
           jobtitle:       trade,
           city:           area,
           lifecyclestage: 'lead',
-          hs_lead_status: 'NEW',
-          description:    `Trade: ${trade} | Area: ${area}${message ? ' | ' + message : ''}`
+          hs_lead_status: 'NEW'
         }
       })
     });

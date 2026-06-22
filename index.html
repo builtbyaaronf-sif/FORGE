@@ -314,6 +314,15 @@ h1,h2,h3,h4,h5{
   margin-bottom:56px;
   align-items:stretch;
 }
+.pkg-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+.pkg-select-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:left;color:#fff;transition:border-color .2s,background .2s;width:100%;}
+.pkg-select-card:hover,.pkg-select-card:focus{border-color:rgba(99,102,241,.6);background:rgba(99,102,241,.1);outline:none;}
+.pkg-select-card--featured{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.06);}
+.pkg-select-badge{font-size:9px;letter-spacing:1px;color:#6366f1;font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;}
+.pkg-select-name{font-size:15px;font-weight:700;margin-bottom:2px;}
+.pkg-select-price{font-size:20px;font-weight:800;color:#6366f1;margin-bottom:4px;}
+.pkg-select-desc{font-size:11px;color:#888;line-height:1.4;}
+.pkg-select-full{grid-column:1/-1;}
 .pkg-card{
   display:flex;flex-direction:column;
   background:var(--surface2);border:1px solid var(--border);
@@ -889,7 +898,45 @@ h1,h2,h3,h4,h5{
         </div>
 
         <!-- Step 1: Trade -->
-        <div class="wiz-step active" id="ws0">
+                <div class="wiz-step active" id="wsPkg">
+          <p class="wiz-title">Which package?</p>
+          <p class="wiz-sub">Pick the one that fits — you can upgrade any time.</p>
+          <div class="pkg-select-grid">
+            <button class="pkg-select-card" type="button" onclick="wizPickPkg('Package 1 — Launch (£74.99)')">
+              <span class="pkg-select-badge">PACKAGE 1</span>
+              <div class="pkg-select-name">Launch</div>
+              <div class="pkg-select-price">£74.99</div>
+              <div class="pkg-select-desc">Website · SEO · WhatsApp button</div>
+            </button>
+            <button class="pkg-select-card" type="button" onclick="wizPickPkg('Package 2 — Brand (£149.99)')">
+              <span class="pkg-select-badge">PACKAGE 2</span>
+              <div class="pkg-select-name">Brand</div>
+              <div class="pkg-select-price">£149.99</div>
+              <div class="pkg-select-desc">Launch + Canva brand kit · AI imagery</div>
+            </button>
+            <button class="pkg-select-card pkg-select-card--featured" type="button" onclick="wizPickPkg('Package 3 — Convert (£299.99)')">
+              <span class="pkg-select-badge">&#11088; MOST POPULAR</span>
+              <div class="pkg-select-name">Convert</div>
+              <div class="pkg-select-price">£299.99</div>
+              <div class="pkg-select-desc">Brand + Quote wizard · HubSpot CRM</div>
+            </button>
+            <button class="pkg-select-card" type="button" onclick="wizPickPkg('Package 4 — Book (£499.99)')">
+              <span class="pkg-select-badge">PACKAGE 4</span>
+              <div class="pkg-select-name">Book</div>
+              <div class="pkg-select-price">£499.99</div>
+              <div class="pkg-select-desc">Convert + Calendly · Booking widget</div>
+            </button>
+            <button class="pkg-select-card pkg-select-full" type="button" onclick="wizPickPkg('Package 5 — Grow (£624.99)')">
+              <span class="pkg-select-badge">PACKAGE 5</span>
+              <div class="pkg-select-name">Grow</div>
+              <div class="pkg-select-price">£624.99</div>
+              <div class="pkg-select-desc">Everything + 30 days social content</div>
+            </button>
+          </div>
+          <p style="text-align:center;margin-top:8px;"><a href="#pricing" style="color:#6366f1;font-size:12px;">Compare packages in detail ↑</a></p>
+        </div>
+
+<div class="wiz-step" id="ws0">
           <p class="wiz-title">What is your trade?</p>
           <p class="wiz-sub">Tap yours and we move straight to the next step.</p>
           <div class="trade-grid">
@@ -919,7 +966,7 @@ h1,h2,h3,h4,h5{
             </button>
           </div>
           <div id="wiz-other-wrap" style="display:none;margin-top:10px">
-            <input type="text" id="wiz-trade-other" class="field" placeholder="Your trade (e.g. HVAC engineer, landscaper...)">
+            <input type="tex<div class="wiz-step" id="ws0">placeholder="Your trade (e.g. HVAC engineer, landscaper...)">
             <div class="wiz-nav">
               <button class="wiz-back" onclick="wizBack()">Back</button>
               <button class="wiz-next" onclick="wizNext(0)">Next</button>
@@ -1149,7 +1196,13 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 var _wizStep = 0;
 var _wizData = { trade:'', area:'', fname:'', lname:'', email:'', message:'' };
 
-function wizSetStep(n) {
+function wizPickPkg(name) {
+    window._selectedPackage = name;
+    document.getElementById('wsPkg').classList.remove('active');
+    document.getElementById('ws0').classList.add('active');
+    document.getElementById('wd0').classList.add('active');
+  }
+  function wizSetStep(n) {
   document.getElementById('ws' + _wizStep).classList.remove('active');
   document.getElementById('ws' + n).classList.add('active');
   for (var i = 0; i < 5; i++) {
@@ -1267,7 +1320,12 @@ async function wizUploadLogo(file) {
 }
 
 function wizBack() {
-  if (_wizStep > 0) wizSetStep(_wizStep - 1);
+  if (_wizStep === 0) {
+    document.getElementById('ws0').classList.remove('active');
+    document.getElementById('wsPkg').classList.add('active');
+  } else if (_wizStep > 0) {
+    wizSetStep(_wizStep - 1);
+  }
 }
 
 async function wizSubmit() {
@@ -1289,7 +1347,8 @@ async function wizSubmit() {
     'Trade':      _wizData.trade,
     'Area':       _wizData.area,
     'Message':    _wizData.message || 'None',
-    'Logo':       _wizData.logoUrl  || 'None'
+    'Logo':       _wizData.logoUrl  || 'None',
+    'Package':    window._selectedPackage || 'Not specified'
   };
 
   try {

@@ -909,9 +909,44 @@ h1,h2,h3,h4,h5{
 
         <!-- Step 2: Area -->
         <div class="wiz-step" id="ws1">
-          <p class="wiz-title">Where are you based?</p>
-          <p class="wiz-sub">Your borough or area in London.</p>
-          <input id="wiz-area" type="text" class="field" autocomplete="off">
+          <p class="wiz-title">Where are you located?</p>
+          <select id="wiz-area" class="field" style="cursor:pointer;">
+            <option value="">Select your area...</option>
+            <option>Barking and Dagenham</option>
+            <option>Barnet</option>
+            <option>Bexley</option>
+            <option>Brent</option>
+            <option>Bromley</option>
+            <option>Camden</option>
+            <option>City of London</option>
+            <option>Croydon</option>
+            <option>Ealing</option>
+            <option>Enfield</option>
+            <option>Greenwich</option>
+            <option>Hackney</option>
+            <option>Hammersmith and Fulham</option>
+            <option>Haringey</option>
+            <option>Harrow</option>
+            <option>Havering</option>
+            <option>Hillingdon</option>
+            <option>Hounslow</option>
+            <option>Islington</option>
+            <option>Kensington and Chelsea</option>
+            <option>Kingston upon Thames</option>
+            <option>Lambeth</option>
+            <option>Lewisham</option>
+            <option>Merton</option>
+            <option>Newham</option>
+            <option>Redbridge</option>
+            <option>Richmond upon Thames</option>
+            <option>Southwark</option>
+            <option>Sutton</option>
+            <option>Tower Hamlets</option>
+            <option>Waltham Forest</option>
+            <option>Wandsworth</option>
+            <option>Westminster</option>
+            <option value="Outside London">Outside London</option>
+          </select>
           <div class="wiz-nav">
             <button class="wiz-back" onclick="wizBack()">Back</button>
             <button class="wiz-next" onclick="wizNext(1)">Next</button>

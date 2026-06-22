@@ -1219,10 +1219,17 @@ async function wizUploadLogo(file) {
   status.style.color = '#9ca3af';
   status.textContent = 'Uploading your logo…';
   try {
-    var fd = new FormData();
-    fd.append('logo', file);
-    fd.append('trade', _wizData.trade || 'unknown');
-    var res = await fetch('/api/upload-logo', { method: 'POST', body: fd });
+    var base64 = await new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) { resolve(e.target.result); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    var res = await fetch('/api/upload-logo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ logo: base64, trade: _wizData.trade || 'unknown', filename: file.name })
+    });
     var data = await res.json();
     if (data.url) {
       _wizData.logoUrl = data.url;

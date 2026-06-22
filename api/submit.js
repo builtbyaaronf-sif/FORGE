@@ -1,5 +1,5 @@
 // api/submit.js — FORGE lead capture endpoint
-// Env var required: HUBSPOT_ACCESS_TOKEN (HubSpot Private App token)
+// Env vars required: HUBSPOT_ACCESS_TOKEN (HubSpot Private App token)
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://forgeisagentic.tech');
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   const trade     = body['Trade']      || '';
   const area      = body['Area']       || '';
   const message   = body['Message']    || '';
-
+  const logoUrl   = body['Logo']       || '';
   if (!email || !trade || !area) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -50,16 +50,41 @@ module.exports = async (req, res) => {
     });
 
     if (!hsRes.ok) {
-      const err = await hsRes.json();
+      const err = await hsRes.json().catch(() => ({}));
       if (hsRes.status === 409) return res.status(200).json({ success: true });
       console.error('[FORGE] HubSpot error:', JSON.stringify(err));
       return res.status(500).json({ error: 'CRM error' });
     }
 
     const contact = await hsRes.json();
-    console.log('[FORGE] Contact created:', contact.id, email);
-    return res.status(200).json({ success: true });
+    console.log('[FORGE] Contact created:', contact.id);
 
+    // Attach logo URL and message as a HubSpot Note
+    const noteLines = [];
+    if (message && message !== 'None') noteLines.push('Message: ' + message);
+    if (logoUrl && logoUrl !== 'None') noteLines.push('Logo: ' + logoUrl);
+
+    if (noteLines.length > 0 && contact.id) {
+      await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          properties: {
+            hs_note_body: noteLines.join('\n'),
+            hs_timestamp: Date.now().toString()
+          },
+          associations: [{
+            to: { id: contact.id },
+            types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }]
+          }]
+        })
+      }).catch(e => console.warn('[FORGE] Note failed:', e.message));
+    }
+
+    return res.status(200).json({ success: true });
   } catch (err) {
     console.error('[FORGE] Submit error:', err.message);
     return res.status(500).json({ error: 'Server error' });

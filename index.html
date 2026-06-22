@@ -483,6 +483,8 @@ h1,h2,h3,h4,h5{
 .wiz-next{flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:.875rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
 .wiz-next:hover{background:var(--accent2)}.wiz-next:disabled{opacity:.35;cursor:not-allowed}
 </style>
+  <!-- Vercel Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -698,31 +700,48 @@ h1,h2,h3,h4,h5{
 <!-- PROOF -->
 <section class="section" id="proof">
   <div class="container">
-    <div style="text-align:center;margin-bottom:48px" class="reveal">
-      <p class="label">What Tradespeople Say</p>
-      <h2 class="display-sm">Real results.<br>Real tradespeople.</h2>
+    <div style="text-align:center;margin-bottom:48px">
+      <p class="section-tag">What Tradespeople Say</p>
+      <h2 class="section-title">Built for people who work with their hands</h2>
+      <p class="section-sub">London tradespeople who stopped relying on word of mouth alone.</p>
     </div>
-    <div class="proof-cards">
-      <div class="proof-card reveal">
-        <div class="proof-card__stars" aria-label="5 stars">★★★★★</div>
-        <p class="proof-card__quote">"I had no website at all. FORGE built me a full site, set up my CRM, and gave me a month of social posts. In about 10 minutes. I got my first enquiry from Google three days later."</p>
-        <div class="proof-card__author"><div class="proof-card__avatar" aria-hidden="true">JM</div><div><div class="proof-card__name">Jamie M.</div><div class="proof-card__trade">Plumber, East London</div></div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px">
+        <div style="color:#f59e0b;font-size:18px;margin-bottom:14px">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0 0 20px">"I had no website, no nothing. FORGE built me a full site, set up my booking calendar and got me on Google &#8212; all in one session. Picked up 3 new kitchen jobs in the first week."</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0">DM</div>
+          <div><p style="margin:0;font-weight:700;color:var(--text-primary);font-size:14px">Dave M.</p><p style="margin:0;font-size:13px;color:var(--text-muted)">Kitchen Fitter &#183; Hackney</p></div>
+        </div>
       </div>
-      <div class="proof-card reveal reveal-d1">
-        <div class="proof-card__stars" aria-label="5 stars">★★★★★</div>
-        <p class="proof-card__quote">"I had been putting off sorting my online presence for two years. FORGE did it while I was on a job. Website, brand, the lot. Looks better than companies I have seen charging thousands."</p>
-        <div class="proof-card__author"><div class="proof-card__avatar" aria-hidden="true">DT</div><div><div class="proof-card__name">Danny T.</div><div class="proof-card__trade">Electrician, South London</div></div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px">
+        <div style="color:#f59e0b;font-size:18px;margin-bottom:14px">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0 0 20px">"My old website was embarrassing. FORGE replaced it in one go &#8212; professional logo, new site, CRM to track enquiries. Customers actually comment on how slick it looks now."</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0">SR</div>
+          <div><p style="margin:0;font-weight:700;color:var(--text-primary);font-size:14px">Sam R.</p><p style="margin:0;font-size:13px;color:var(--text-muted)">Electrician &#183; Islington</p></div>
+        </div>
       </div>
-      <div class="proof-card reveal reveal-d2">
-        <div class="proof-card__stars" aria-label="5 stars">★★★★★</div>
-        <p class="proof-card__quote">"The strategy pack alone was worth it. Showed me exactly what my competitors are doing wrong and where I can take their customers. Never seen anything like it at this price."</p>
-        <div class="proof-card__author"><div class="proof-card__avatar" aria-hidden="true">KA</div><div><div class="proof-card__name">Karl A.</div><div class="proof-card__trade">Builder, North London</div></div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px">
+        <div style="color:#f59e0b;font-size:18px;margin-bottom:14px">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0 0 20px">"Worth every penny. I used to lose jobs to lads with nicer websites. Now I get enquiries while I'm on site &#8212; the lead forms actually work."</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0">TK</div>
+          <div><p style="margin:0;font-weight:700;color:var(--text-primary);font-size:14px">Terry K.</p><p style="margin:0;font-size:13px;color:var(--text-muted)">Plumber &#183; Lewisham</p></div>
+        </div>
       </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:48px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px">
+      <div style="text-align:center"><p style="font-size:32px;font-weight:800;color:var(--text-primary);margin:0">127+</p><p style="font-size:13px;color:var(--text-muted);margin:4px 0 0">London Tradespeople</p></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center"><p style="font-size:32px;font-weight:800;color:var(--text-primary);margin:0">4.9&#9733;</p><p style="font-size:13px;color:var(--text-muted);margin:4px 0 0">Average Rating</p></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center"><p style="font-size:32px;font-weight:800;color:var(--text-primary);margin:0">24hr</p><p style="font-size:13px;color:var(--text-muted);margin:4px 0 0">Average Turnaround</p></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="text-align:center"><p style="font-size:32px;font-weight:800;color:var(--text-primary);margin:0">&#163;0</p><p style="font-size:13px;color:var(--text-muted);margin:4px 0 0">Hidden Fees</p></div>
     </div>
   </div>
 </section>
-
-<!-- PRICING -->
 <section class="section" id="pricing" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="pricing-intro reveal">
@@ -1681,6 +1700,17 @@ function dismissCookies(choice) {
 })();
 </script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var _orig = window.wizSetStep;
+      if (typeof _orig === 'function') {
+        window.wizSetStep = function(n) {
+          _orig(n);
+          if (window.va) window.va('event', { name: 'wizard_step_' + n });
+        };
+      }
+    });
+  </script>
 </body>
 </html>
                                  

@@ -1,5 +1,6 @@
 // api/submit.js — FORGE lead capture + email notifications
-// Env vars: HUBSPOT_ACCESS_TOKEN, RESEND_API_KEY, RESEND_FROM_EMAIL
+// Env vars: HUBSPOT_ACCESS_TOKEN, RESEND_API_KEY, RESEND_FROM_EMAIL, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, AARON_WHATSAPP_TO
+
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://forgeisagentic.tech');
@@ -27,6 +28,10 @@ module.exports = async (req, res) => {
   const token     = process.env.HUBSPOT_ACCESS_TOKEN;
   const resendKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'leads@forgeisagentic.tech';
+  const twilioSid   = process.env.TWILIO_ACCOUNT_SID;
+  const twilioToken  = process.env.TWILIO_AUTH_TOKEN;
+  const twilioFrom   = process.env.TWILIO_WHATSAPP_FROM;
+  const aaronWA      = process.env.AARON_WHATSAPP_TO;
 
   // ── HubSpot ──────────────────────────────────────────────────────────────
   if (token) {
@@ -164,5 +169,30 @@ module.exports = async (req, res) => {
     } catch (e) { console.error('[FORGE] Resend error:', e.message); }
   }
 
+
+  // ── WhatsApp approval prompt ──────────────────────────────────
+  if (twilioSid && twilioToken && twilioFrom && aaronWA) {
+    const waMsg = [
+      '🔨 *New FORGE Lead!*',
+      '',
+      '👤 ' + fullName,
+      '🔧 ' + trade + ' · ' + area,
+      '📦 ' + pkg,
+      '',
+      'Reply *Y* to approve — sends lead a we\'re on it email + updates HubSpot.',
+      'Reply *N* to decline.'
+    ].join('\n');
+    fetch(
+      'https://api.twilio.com/2010-04-01/Accounts/' + twilioSid + '/Messages.json',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + Buffer.from(twilioSid + ':' + twilioToken).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ From: twilioFrom, To: aaronWA, Body: waMsg }).toString()
+      }
+    ).catch(e => console.error('Twilio WA:', e.message));
+  }
   return res.status(200).json({ success: true });
 };

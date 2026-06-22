@@ -866,6 +866,7 @@ h1,h2,h3,h4,h5{
           <div class="wiz-dot" id="wd1"></div>
           <div class="wiz-dot" id="wd2"></div>
           <div class="wiz-dot" id="wd3"></div>
+          <div class="wiz-dot" id="wd4"></div>
         </div>
 
         <!-- Step 1: Trade -->
@@ -976,7 +977,22 @@ h1,h2,h3,h4,h5{
         </div>
 
         <!-- Step 4: Submit -->
+        <div         <!-- Step 4: Logo -->
         <div class="wiz-step" id="ws3">
+          <p class="wiz-title">Got a logo?</p>
+          <p class="wiz-sub">Upload it and we'll build your brand around it. Totally optional.</p>
+          <div id="logo-upload-area" style="display:none;margin-bottom:16px">
+            <input type="file" id="wiz-logo" accept="image/*,.svg" class="field" style="padding:10px;cursor:pointer">
+            <p id="logo-status" style="font-size:13px;color:#9ca3af;margin-top:8px;min-height:20px"></p>
+          </div>
+          <div class="wiz-nav" style="gap:10px">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+            <button class="wiz-next" onclick="wizSkipLogo()" style="background:transparent;border:1px solid #374151;color:#9ca3af">No logo</button>
+            <button class="wiz-next" id="wizLogoYesBtn" onclick="wizHaveLogo()">Upload logo</button>
+          </div>
+        </div>
+
+        class="wiz-step" id="ws4">
           <p class="wiz-title">One last thing</p>
           <p class="wiz-sub">Anything you want us to know? Totally optional.</p>
           <textarea id="wiz-message" class="field" rows="3" style="resize:vertical;margin-bottom:16px" placeholder="Years trading, your specialisms, what makes you stand out..."></textarea>
@@ -1117,7 +1133,7 @@ var _wizData = { trade:'', area:'', fname:'', lname:'', email:'', message:'' };
 function wizSetStep(n) {
   document.getElementById('ws' + _wizStep).classList.remove('active');
   document.getElementById('ws' + n).classList.add('active');
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 5; i++) {
     var d = document.getElementById('wd' + i);
     d.classList.remove('active','done');
     if (i < n) d.classList.add('done');
@@ -1172,6 +1188,58 @@ function wizNext(from) {
   }
 }
 
+function wizSkipLogo() {
+  _wizData.logoUrl = '';
+  wizSetStep(4);
+}
+
+function wizHaveLogo() {
+  var uploadArea = document.getElementById('logo-upload-area');
+  var btn = document.getElementById('wizLogoYesBtn');
+  if (uploadArea.style.display === 'none') {
+    uploadArea.style.display = 'block';
+    btn.textContent = 'Continue →';
+    return;
+  }
+  var fileInput = document.getElementById('wiz-logo');
+  if (!fileInput.files.length) {
+    var st = document.getElementById('logo-status');
+    st.style.color = '#ef4444';
+    st.textContent = 'Please select a file first.';
+    return;
+  }
+  wizUploadLogo(fileInput.files[0]);
+}
+
+async function wizUploadLogo(file) {
+  var btn = document.getElementById('wizLogoYesBtn');
+  var status = document.getElementById('logo-status');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+  status.style.color = '#9ca3af';
+  status.textContent = 'Uploading your logo…';
+  try {
+    var fd = new FormData();
+    fd.append('logo', file);
+    fd.append('trade', _wizData.trade || 'unknown');
+    var res = await fetch('/api/upload-logo', { method: 'POST', body: fd });
+    var data = await res.json();
+    if (data.url) {
+      _wizData.logoUrl = data.url;
+      status.style.color = '#22c55e';
+      status.textContent = '✓ Logo uploaded!';
+      setTimeout(function(){ wizSetStep(4); }, 800);
+    } else {
+      throw new Error(data.error || 'Upload failed');
+    }
+  } catch(e) {
+    status.style.color = '#ef4444';
+    status.textContent = 'Upload failed — ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Try again';
+  }
+}
+
 function wizBack() {
   if (_wizStep > 0) wizSetStep(_wizStep - 1);
 }
@@ -1194,7 +1262,8 @@ async function wizSubmit() {
     'Email':      _wizData.email,
     'Trade':      _wizData.trade,
     'Area':       _wizData.area,
-    'Message':    _wizData.message || 'None'
+    'Message':    _wizData.message || 'None',
+    'Logo':       _wizData.logoUrl  || 'None'
   };
 
   try {

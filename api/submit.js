@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
   const area      = body['Area']       || '';
   const message   = body['Message']    || '';
   const logoUrl   = body['Logo']       || '';
+  const pkg      = body['Package'] || 'Not specified';
   const fullName  = (firstName + ' ' + lastName).trim();
 
   if (!email || !trade || !area) {
@@ -46,6 +47,7 @@ module.exports = async (req, res) => {
         const noteLines = [];
         if (message && message !== 'None') noteLines.push('Message: ' + message);
         if (logoUrl  && logoUrl  !== 'None') noteLines.push('Logo: '    + logoUrl);
+        noteLines.push('Package: ' + pkg);
         if (noteLines.length && contact.id) {
           await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
             method: 'POST',
@@ -93,6 +95,7 @@ module.exports = async (req, res) => {
       + '<tr><td>Email</td><td>' + email + '</td></tr>'
       + '<tr><td>Trade</td><td>' + trade + '</td></tr>'
       + '<tr><td>Area</td><td>' + area + '</td></tr>'
+            + '<tr><td>Package</td><td>' + pkg + '</td></tr>'
       + (hasLogo ? '<tr><td>Logo</td><td><a href="' + logoUrl + '" style="color:#6366f1">View logo →</a></td></tr>' : '')
       + '</table>'
       + (hasMsg ? '<p class="msglabel">Message</p><div class="msgbox">' + message + '</div>' : '')

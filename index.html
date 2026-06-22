@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FORGE is the world's first fully agentic marketing department for Greater London tradespeople. Website, brand, CRM, content, and sales system built by AI in under 10 minutes.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="FORGE: Your AI Marketing Department">
+<meta property="og:description" content="Complete digital presence for London tradespeople. Built by AI in 10 minutes.">
+<meta property="og:type" content="website">
+<title>FORGE: The AI Marketing Department for London Tradespeople</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --canvas:  #090909;
+  --surface: #111111;
+  --surface2:#161616;
+  --ink:     #F0F0F0;
+  --ink2:    #999999;
+  --accent:  #0099FF;
+  --accent2: #0077CC;
+  --border:  rgba(255,255,255,0.07);
+  --glow:    rgba(0,153,255,0.18);
+  --r:       12px;
+  --rL:      20px;
+  --max:     1120px;
+  --pad:     24px;
+}
+
+/* ─── RESET ──────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--canvas);
+  color:var(--ink);
+  font-family:'Inter Variable','Inter',sans-serif;
+  font-feature-settings:'cv01','ss03';
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── TYPOGRAPHY ─────────────────────────────────────────── */
+h1,h2,h3,h4,h5{
+  font-family:'Space Grotesk',sans-serif;
+  letter-spacing:-0.04em;
+  line-height:1.05;
+  font-weight:700;
+}
+.display{font-size:clamp(3rem,7vw,6rem);line-height:0.97;letter-spacing:-0.05em}
+.display-sm{font-size:clamp(2rem,4vw,3.5rem)}
+.label{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+
+/* ─── LAYOUT ─────────────────────────────────────────────── */
+.container{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+.section{padding:100px 0}
+
+/* ─── NAV ────────────────────────────────────────────────── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px var(--pad);
+  display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(16px) saturate(160%);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  background:rgba(9,9,9,0.7);
+  border-bottom:1px solid var(--border);
+}
+.nav__logo{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:1.25rem;font-weight:700;letter-spacing:-0.03em;
+  color:var(--ink);
+}
+.nav__logo span{color:var(--accent)}
+.nav__links{display:flex;gap:32px;list-style:none}
+.nav__links a{font-size:.875rem;color:var(--ink2);transition:color .2s ease}
+.nav__links a:hover{color:var(--ink)}
+.nav__cta{
+  background:var(--accent);color:#fff;
+  padding:10px 20px;border-radius:8px;
+  font-size:.875rem;font-weight:600;
+  border:none;transition:background .2s ease,transform .15s ease;
+}
+.nav__cta:hover{background:var(--accent2);transform:translateY(-1px)}
+
+/* ─── HAMBURGER ──────────────────────────────────────────── */
+.nav__hamburger{
+  display:none;flex-direction:column;justify-content:center;
+  gap:5px;background:none;border:none;padding:8px;
+  width:40px;height:40px;cursor:pointer;
+}
+.nav__hamburger span{
+  display:block;width:22px;height:2px;
+  background:var(--ink);border-radius:2px;
+  transition:transform .25s ease,opacity .25s ease;
+  transform-origin:center;
+}
+.nav__hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav__hamburger[aria-expanded="true"] span:nth-child(2){opacity:0;transform:scaleX(0)}
+.nav__hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ─── MOBILE NAV ─────────────────────────────────────────── */
+.nav__mobile{
+  display:none;
+  position:fixed;inset:0;top:61px;z-index:99;
+  background:var(--canvas);
+  padding:24px var(--pad);
+  flex-direction:column;gap:0;
+  border-top:1px solid var(--border);
+  overflow-y:auto;
+}
+.nav__mobile.open{display:flex}
+.nav__mobile a{
+  font-size:1.1rem;color:var(--ink);
+  padding:16px 0;border-bottom:1px solid var(--border);display:block;
+}
+.nav__mobile a:last-of-type{border-bottom:none}
+.nav__mobile .btn{margin-top:20px;width:100%;justify-content:center}
+
+/* ─── HERO ───────────────────────────────────────────────── */
+.hero{
+  min-height:100svh;display:flex;align-items:center;
+  padding:120px 0 80px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);
+  width:900px;height:900px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(0,153,255,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero__grid{display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:center}
+.hero__badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,153,255,.1);border:1px solid rgba(0,153,255,.25);
+  padding:6px 14px;border-radius:100px;
+  font-size:.8rem;font-weight:600;color:var(--accent);
+  margin-bottom:24px;
+}
+.hero__badge::before{content:'';display:block;width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{margin-bottom:20px}
+.hero h1 em{color:var(--accent);font-style:normal}
+.hero__sub{font-size:1.125rem;color:var(--ink2);max-width:480px;margin-bottom:36px;line-height:1.7}
+.hero__actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.hero__stats{display:flex;gap:32px;padding-top:24px;border-top:1px solid var(--border)}
+.hero__stat-num{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-0.04em;color:var(--ink)}
+.hero__stat-label{font-size:.8rem;color:var(--ink2);margin-top:2px}
+
+/* Hero right panel */
+.hero__panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rL);padding:28px;
+  position:relative;
+}
+.hero__panel::before{
+  content:'';position:absolute;inset:0;border-radius:var(--rL);
+  background:conic-gradient(from 220deg at 50% 0%,rgba(0,153,255,.15),transparent 50%);
+  pointer-events:none;
+}
+.panel__title{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:16px}
+.panel__step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.panel__step:last-child{border-bottom:none}
+.step__num{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(0,153,255,.15);border:1px solid rgba(0,153,255,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;color:var(--accent);flex-shrink:0;
+}
+.step__label{font-size:.875rem;font-weight:600;color:var(--ink);margin-bottom:2px}
+.step__desc{font-size:.775rem;color:var(--ink2);line-height:1.55}
+.panel__timer{
+  margin-top:20px;padding:14px;
+  background:rgba(0,153,255,.08);border:1px solid rgba(0,153,255,.2);
+  border-radius:8px;display:flex;align-items:center;gap:10px;
+}
+.timer__icon{
+  width:32px;height:32px;border-radius:50%;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.timer__text{font-size:.8rem;color:var(--ink2)}
+.timer__text strong{color:var(--accent);font-weight:700}
+
+/* ─── BUTTONS ────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 28px;border-radius:10px;font-size:.95rem;font-weight:600;
+  border:none;transition:all .2s ease;cursor:pointer;
+}
+.btn--primary{background:var(--accent);color:#fff}
+.btn--primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,153,255,.35)}
+.btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--border)}
+.btn--ghost:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.04)}
+
+/* ─── STACK ──────────────────────────────────────────────── */
+.stack{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stack__intro{text-align:center;margin-bottom:56px}
+.stack__intro h2{margin-bottom:16px}
+.stack__intro p{color:var(--ink2);font-size:1.0625rem;max-width:560px;margin:0 auto}
+.stack-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+  align-items:stretch;
+}
+.stack-card{
+  display:flex;flex-direction:column;
+  padding:24px 20px;border-radius:var(--r);
+  background:var(--surface2);border:1px solid var(--border);
+  transition:border-color .25s ease,box-shadow .25s ease,transform .2s ease;
+  height:100%;
+}
+.stack-card:hover{
+  border-color:rgba(0,153,255,.3);
+  box-shadow:0 12px 36px rgba(0,153,255,.12);
+  transform:translateY(-4px);
+}
+.stack-card__icon{
+  width:44px;height:44px;border-radius:10px;
+  background:rgba(0,153,255,.12);border:1px solid rgba(0,153,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;flex-shrink:0;
+}
+.stack-card__icon svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.stack-card__num{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.stack-card h3{font-size:.95rem;margin-bottom:8px;letter-spacing:-0.02em}
+.stack-card p{font-size:.8rem;color:var(--ink2);line-height:1.6;flex-grow:1}
+
+/* ─── COMPARISON ─────────────────────────────────────────── */
+.comparison{border:1px solid var(--border);border-radius:var(--rL);overflow:hidden}
+.comparison__header{display:grid;grid-template-columns:200px 1fr 1fr;background:var(--surface2);border-bottom:1px solid var(--border)}
+.comparison__header div{padding:14px 20px;font-size:.8rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.comparison__header .forge-col{color:var(--accent)}
+.comparison__row{display:grid;grid-template-columns:200px 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s ease}
+.comparison__row:last-child{border-bottom:none}
+.comparison__row:hover{background:rgba(255,255,255,.02)}
+.comp-cell{padding:14px 20px;font-size:.875rem;display:flex;align-items:center;gap:8px}
+.comp-cell--feature{color:var(--ink2);border-right:1px solid var(--border)}
+.comp-cell--them{color:var(--ink2)}
+.tick{color:#22c55e}.cross{color:#ef4444}
+
+/* ─── HOW ────────────────────────────────────────────────── */
+.steps-track{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;position:relative}
+.steps-track::before{
+  content:'';position:absolute;top:32px;left:calc(16.67% + 16px);right:calc(16.67% + 16px);
+  height:1px;background:linear-gradient(90deg,rgba(0,153,255,.5),rgba(0,153,255,.15),rgba(0,153,255,.5));
+}
+.step-block{text-align:center;padding:0 16px;position:relative;z-index:1}
+.step-block__circle{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(0,153,255,.12);border:1px solid rgba(0,153,255,.3);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;color:var(--accent);
+}
+.step-block h3{font-size:1.0625rem;margin-bottom:10px;letter-spacing:-0.02em}
+.step-block p{font-size:.85rem;color:var(--ink2);line-height:1.65}
+
+/* ─── WHO ────────────────────────────────────────────────── */
+.trades-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.trade-chip{
+  display:flex;align-items:center;gap:12px;padding:16px 18px;
+  border-radius:10px;background:var(--surface2);border:1px solid var(--border);
+  transition:border-color .2s ease;
+}
+.trade-chip:hover{border-color:rgba(0,153,255,.25)}
+.trade-chip__icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(0,153,255,.1);border:1px solid rgba(0,153,255,.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.trade-chip__icon svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.trade-chip__name{font-size:.9rem;font-weight:600}
+.trade-chip__tag{font-size:.75rem;color:var(--ink2);margin-top:1px}
+.who-cta-box{
+  padding:32px;border-radius:var(--rL);
+  background:rgba(0,153,255,.07);border:1px solid rgba(0,153,255,.2);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.who-cta-box p{font-size:1rem;color:var(--ink);max-width:520px}
+.who-cta-box strong{color:var(--accent)}
+
+/* ─── PROOF ──────────────────────────────────────────────── */
+.proof-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+.proof-card{
+  display:flex;flex-direction:column;
+  padding:28px;border-radius:var(--r);
+  background:var(--surface);border:1px solid var(--border);
+  height:100%;
+}
+.proof-card__quote{font-size:.9rem;color:var(--ink2);line-height:1.75;margin-bottom:20px;font-style:italic;flex-grow:1}
+.proof-card__author{display:flex;align-items:center;gap:12px}
+.proof-card__avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0}
+.proof-card__name{font-size:.875rem;font-weight:600}
+.proof-card__trade{font-size:.775rem;color:var(--ink2)}
+.proof-card__stars{color:#f59e0b;font-size:.875rem;margin-bottom:12px}
+
+/* ─── PRICING ────────────────────────────────────────────── */
+.pricing-intro{text-align:center;margin-bottom:56px}
+.pricing-intro h2{margin-bottom:16px}
+.pricing-intro p{color:var(--ink2);font-size:1.0625rem;max-width:560px;margin:0 auto}
+.pricing-packages{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-bottom:56px;
+  align-items:stretch;
+}
+.pkg-card{
+  display:flex;flex-direction:column;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--rL);padding:24px 20px;
+  height:100%;
+  transition:border-color .25s ease,box-shadow .25s ease,transform .2s ease;
+}
+.pkg-card:hover{border-color:rgba(0,153,255,.3);box-shadow:0 12px 36px rgba(0,153,255,.1);transform:translateY(-4px)}
+.pkg-card--featured{border:1px solid rgba(0,153,255,.4);background:rgba(0,153,255,.06);position:relative}
+.pkg-card--featured:hover{border-color:var(--accent);box-shadow:0 16px 48px rgba(0,153,255,.2)}
+.pkg-badge{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  background:var(--accent);color:#fff;
+  font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 12px;border-radius:0 0 8px 8px;white-space:nowrap;
+}
+.pkg-num{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+.pkg-name{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-0.03em;color:var(--ink);margin-bottom:14px}
+.pkg-price-row{margin-bottom:6px}
+.pkg-price{font-family:'Space Grotesk',sans-serif;font-size:1.875rem;font-weight:700;letter-spacing:-0.04em;color:var(--ink);line-height:1}
+.pkg-price-note{font-size:.75rem;color:var(--ink2);margin-top:4px;margin-bottom:16px;line-height:1.4}
+.pkg-divider{border:none;border-top:1px solid var(--border);margin:0 0 16px}
+.pkg-features{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;flex-grow:1}
+.pkg-features li{font-size:.8rem;color:var(--ink2);padding-left:16px;position:relative;line-height:1.5}
+.pkg-features li::before{content:'–';position:absolute;left:0;color:var(--accent);font-weight:700}
+.pkg-features li strong{color:var(--ink);font-weight:600}
+.pkg-cta{
+  margin-top:20px;display:block;width:100%;
+  padding:10px 0;border-radius:8px;text-align:center;
+  font-size:.825rem;font-weight:600;border:1px solid var(--border);
+  color:var(--ink2);background:transparent;cursor:pointer;
+  transition:all .2s ease;font-family:inherit;flex-shrink:0;
+}
+.pkg-cta:hover{border-color:rgba(0,153,255,.4);color:var(--accent);background:rgba(0,153,255,.06)}
+.pkg-card--featured .pkg-cta{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pkg-card--featured .pkg-cta:hover{background:var(--accent2);border-color:var(--accent2)}
+.retainers-intro{text-align:center;margin-bottom:32px}
+.retainers-intro h3{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:8px}
+.retainers-intro p{font-size:.9rem;color:var(--ink2)}
+.retainers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.retainer-card{
+  display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px;
+  height:100%;
+}
+.retainer-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}
+.retainer-price{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-0.04em;color:var(--accent);margin-bottom:8px}
+.retainer-price span{font-size:.875rem;font-weight:400;color:var(--ink2)}
+.retainer-desc{font-size:.825rem;color:var(--ink2);line-height:1.6;flex-grow:1}
+.pricing-note{text-align:center;margin-top:40px}
+.pricing-note p{font-size:.825rem;color:var(--ink2)}
+.pricing-note a{color:var(--accent);text-decoration:underline;cursor:pointer}
+
+/* ─── CTA SECTION ────────────────────────────────────────── */
+.cta-section{text-align:center;position:relative;overflow:hidden}
+.cta-section::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(0,153,255,.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.cta-section__inner{position:relative;z-index:1}
+.cta-section h2{margin-bottom:16px}
+.cta-section p{color:var(--ink2);font-size:1.0625rem;max-width:480px;margin:0 auto 36px}
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+.footer{padding:48px 0 32px;border-top:1px solid var(--border)}
+.footer__top{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:40px;flex-wrap:wrap}
+.footer__brand__name{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:8px}
+.footer__brand__name span{color:var(--accent)}
+.footer__brand__tagline{font-size:.85rem;color:var(--ink2);max-width:240px;line-height:1.6}
+.footer__links h4{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:14px}
+.footer__links ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.footer__links a{font-size:.85rem;color:var(--ink2);transition:color .2s}
+.footer__links a:hover{color:var(--ink)}
+.footer__bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.footer__bottom p{font-size:.8rem;color:var(--ink2)}
+.footer__legal{display:flex;gap:16px}
+.footer__legal a{font-size:.8rem;color:var(--ink2);transition:color .2s}
+.footer__legal a:hover{color:var(--ink)}
+
+/* ─── COOKIE BANNER ──────────────────────────────────────── */
+.cookie-banner{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;
+  width:min(560px,calc(100vw - 32px));
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  transition:opacity .3s ease,transform .3s ease;
+}
+.cookie-banner.hidden{opacity:0;transform:translateX(-50%) translateY(20px);pointer-events:none}
+.cookie-banner p{font-size:.825rem;color:var(--ink2);line-height:1.5}
+.cookie-banner a{color:var(--accent);text-decoration:underline}
+.cookie-btn-group{display:flex;gap:8px;flex-shrink:0}
+.cookie-btn{padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:600;border:none;cursor:pointer;transition:.2s}
+.cookie-btn--accept{background:var(--accent);color:#fff}
+.cookie-btn--accept:hover{background:var(--accent2)}
+.cookie-btn--decline{background:var(--surface);color:var(--ink2);border:1px solid var(--border)}
+
+/* ─── REVEAL ─────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}
+
+/* ─── FORM FIELDS ────────────────────────────────────────── */
+.field{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:.9rem;color:var(--ink);outline:none;transition:border-color .2s;font-family:inherit}
+.field:focus{border-color:var(--accent)}
+.field[aria-invalid="true"]{border-color:#ef4444}
+
+/* ─── MOBILE ─────────────────────────────────────────────── */
+@media(max-width:1024px){
+  .pricing-packages{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:768px){
+  :root{--pad:16px}
+  .nav__links,.nav__cta{display:none}
+  .nav__hamburger{display:flex}
+  .hero__grid{grid-template-columns:1fr}
+  .hero__panel{display:none}
+  .hero__stats{gap:20px}
+  .stack-grid{grid-template-columns:1fr 1fr}
+  .steps-track{grid-template-columns:1fr;gap:24px}
+  .steps-track::before{display:none}
+  .trades-grid{grid-template-columns:1fr 1fr}
+  .proof-cards{grid-template-columns:1fr}
+  .comparison{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .comparison__header,.comparison__row{grid-template-columns:140px 1fr 1fr;min-width:480px}
+  .who-cta-box{flex-direction:column}
+  .footer__top{flex-direction:column}
+  .footer__bottom{flex-direction:column;text-align:center}
+  .display{font-size:clamp(2.5rem,10vw,4.5rem)}
+  .display-sm{font-size:clamp(1.75rem,6vw,2.5rem)}
+  .cookie-banner{flex-direction:column;align-items:flex-start}
+  .cookie-btn-group{width:100%}
+  .cookie-btn{flex:1;text-align:center}
+  .form-cols{grid-template-columns:1fr!important}
+  .pricing-packages{grid-template-columns:1fr 1fr}
+  .retainers-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .pricing-packages{grid-template-columns:1fr}
+  .trades-grid{grid-template-columns:1fr}
+  .stack-grid{grid-template-columns:1fr}
+  .trade-grid{grid-template-columns:1fr 1fr}
+}
+/* ─── WIZARD FORM ────────────────────────────────────────── */
+.wiz{max-width:520px;margin:0 auto 32px;text-align:left}
+.wiz-progress{display:flex;gap:6px;justify-content:center;margin-bottom:28px}
+.wiz-dot{width:28px;height:3px;border-radius:2px;background:var(--border);transition:all .3s}
+.wiz-dot.done,.wiz-dot.active{background:var(--accent)}
+.wiz-dot.done{opacity:.4}
+.wiz-step{display:none}.wiz-step.active{display:block;animation:wizIn .3s cubic-bezier(.16,1,.3,1)}
+@keyframes wizIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wiz-title{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:4px}
+.wiz-sub{font-size:.85rem;color:var(--ink2);margin-bottom:18px;line-height:1.5}
+.wiz-label{font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px}
+.trade-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.trade-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;transition:border-color .2s,background .2s,color .2s;display:flex;align-items:center;gap:10px;font-family:inherit;line-height:1.3}
+.trade-btn:hover{border-color:rgba(0,153,255,.35);background:rgba(0,153,255,.05)}
+.trade-btn.selected{border-color:var(--accent);background:rgba(0,153,255,.1);color:var(--accent)}
+.trade-btn svg{flex-shrink:0;width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.wiz-nav{display:flex;gap:8px;margin-top:16px}
+.wiz-back{background:transparent;border:1px solid var(--border);color:var(--ink2);border-radius:8px;padding:11px 18px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.wiz-back:hover{color:var(--ink);border-color:rgba(255,255,255,.2)}
+.wiz-next{flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:.875rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
+.wiz-next:hover{background:var(--accent2)}.wiz-next:disabled{opacity:.35;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="#home" class="nav__logo">FORGE<span>.</span></a>
+  <ul class="nav__links">
+    <li><a href="#stack">What We Build</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#who">Who It's For</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#get-started">Contact</a></li>
+  </ul>
+  <button class="btn nav__cta" onclick="scrollToSection('get-started')">Deploy FORGE Today</button>
+  <button class="nav__hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE NAV -->
+<nav class="nav__mobile" id="mobileNav" aria-label="Mobile navigation">
+  <a href="#stack" onclick="closeMob()">What We Build</a>
+  <a href="#how" onclick="closeMob()">How It Works</a>
+  <a href="#who" onclick="closeMob()">Who It's For</a>
+  <a href="#pricing" onclick="closeMob()">Pricing</a>
+  <a href="#get-started" onclick="closeMob()">Contact</a>
+  <button class="btn btn--primary" onclick="scrollToSection('get-started');closeMob()">Deploy FORGE Today</button>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="home">
+  <div class="container">
+    <div class="hero__grid">
+      <div>
+        <div class="hero__badge">London's AI Marketing Department. Now Live.</div>
+        <h1 class="display">
+          Your entire<br>
+          marketing<br>
+          department.<br>
+          <em>Built in 10&nbsp;minutes.</em>
+        </h1>
+        <p class="hero__sub">FORGE deploys a team of AI agents that builds everything a London tradesperson needs to get found and win more jobs. Website, brand, CRM, social content, and sales system. In a single command.</p>
+        <div class="hero__actions">
+          <button class="btn btn--primary" onclick="scrollToSection('get-started')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Get Your Marketing Department Built
+          </button>
+          <a class="btn btn--ghost" href="https://calendly.com/builtbyaaronf/30min" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            See How It Works
+          </a>
+        </div>
+        <div class="hero__stats">
+          <div><div class="hero__stat-num">&lt;10</div><div class="hero__stat-label">Minutes to deploy</div></div>
+          <div><div class="hero__stat-num">5</div><div class="hero__stat-label">Deliverables built</div></div>
+          <div><div class="hero__stat-num">£0</div><div class="hero__stat-label">Agency overhead</div></div>
+        </div>
+      </div>
+      <div class="hero__panel" role="complementary" aria-label="Deployment process overview">
+        <p class="panel__title">Live Deployment Process</p>
+        <div class="panel__step" data-agent="scout" data-capability="market-research competitor-mapping positioning">
+          <div class="step__num" aria-hidden="true">1</div>
+          <div>
+            <div class="step__label">SCOUT gathers intelligence</div>
+            <div class="step__desc">Researches your business and 5 competitors. Maps the market. Finds your positioning gap.</div>
+          </div>
+        </div>
+        <div class="panel__step" data-agent="atlas" data-capability="website brand-kit crm strategy">
+          <div class="step__num" aria-hidden="true">2</div>
+          <div>
+            <div class="step__label">ATLAS builds your presence</div>
+            <div class="step__desc">Live website on Vercel. Canva brand kit. HubSpot CRM. Strategy pack.</div>
+          </div>
+        </div>
+        <div class="panel__step" data-agent="spark" data-capability="webhook-listener social-content geo-optimization reactive-engagement">
+          <div class="step__num" aria-hidden="true">3</div>
+          <div>
+            <div class="step__label">SPARK creates your content</div>
+            <div class="step__desc">Reactive webhook engine. Generates 20 hyper-local posts across 4 weeks. Deploys to your channels automatically.</div>
+          </div>
+        </div>
+        <div class="panel__step" data-agent="chase" data-capability="email-sequence lead-scoring sales-cadence">
+          <div class="step__num" aria-hidden="true">4</div>
+          <div>
+            <div class="step__label">CHASE builds your sales machine</div>
+            <div class="step__desc">6 email sequence, lead scoring, 30 day follow-up cadence.</div>
+          </div>
+        </div>
+        <div class="panel__timer">
+          <div class="timer__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="timer__text">Total deployment time: <strong>under 10 minutes</strong> for everything.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- THE FORGE STACK -->
+<section class="section stack" id="stack">
+  <div class="container">
+    <div class="stack__intro reveal">
+      <p class="label">The FORGE Stack</p>
+      <h2 class="display-sm">Not just a website.<br>A complete marketing department.</h2>
+      <p>Every competitor builds you one thing. FORGE builds you five. All connected. All live. All in under 10 minutes.</p>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-card reveal">
+        <div class="stack-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="stack-card__num">01</div>
+        <h3>Live Website</h3>
+        <p>Deployed to Vercel in minutes. Mobile first, conversion ready, built around what your competitors are missing.</p>
+      </div>
+      <div class="stack-card reveal reveal-d1">
+        <div class="stack-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M4.9 4.9l2.1 2.1M17 7l2.1-2.1M4.9 19.1l2.1-2.1M17 17l2.1 2.1M2 12h3M19 12h3M12 2v3M12 19v3"/></svg></div>
+        <div class="stack-card__num">02</div>
+        <h3>Brand Kit</h3>
+        <p>Colour palette card, social template, and Google Business cover. All in Canva, ready immediately.</p>
+      </div>
+      <div class="stack-card reveal reveal-d2">
+        <div class="stack-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="stack-card__num">03</div>
+        <h3>HubSpot CRM</h3>
+        <p>Company, deal, and contact records live in HubSpot. Every enquiry tracked from the moment it arrives.</p>
+      </div>
+      <div class="stack-card reveal reveal-d3">
+        <div class="stack-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5"/><path d="M11 13l9-9M15 3h6v6"/></svg></div>
+        <div class="stack-card__num">04</div>
+        <h3>Social Calendar</h3>
+        <p>20 posts across 4 weeks. Full captions, hooks, hashtags, and CSV export ready for Buffer or Later.</p>
+      </div>
+      <div class="stack-card reveal reveal-d3">
+        <div class="stack-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div>
+        <div class="stack-card__num">05</div>
+        <h3>Sales System</h3>
+        <p>6 email nurture sequence, 30 day follow up cadence, lead scoring, objection scripts, and 90 day targets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY FORGE -->
+<section class="section" id="why" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div style="margin-bottom:48px" class="reveal">
+      <p class="label">Why FORGE</p>
+      <h2 class="display-sm" style="max-width:720px;margin-bottom:16px">Every competitor does one thing. FORGE does everything. In the time it takes them to answer the phone.</h2>
+    </div>
+    <div class="comparison reveal" role="table" aria-label="FORGE vs traditional agency comparison">
+      <div class="comparison__header" role="row">
+        <div role="columnheader">What you get</div>
+        <div role="columnheader">Traditional agency</div>
+        <div class="forge-col" role="columnheader">FORGE</div>
+      </div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">Live website</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> 2 to 4 weeks</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> Under 10 minutes</div></div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">Brand kit</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> Extra cost</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> Included</div></div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">HubSpot CRM</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> Not offered</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> Included</div></div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">Social content</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> Not offered</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> 20 posts, 4 weeks</div></div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">Email sequence</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> Not offered</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> 6 emails, written</div></div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">Strategy pack</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> £1,500+/month</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> Included, every client</div></div>
+      <div class="comparison__row" role="row"><div class="comp-cell comp-cell--feature" role="cell">90 day roadmap</div><div class="comp-cell comp-cell--them" role="cell"><span class="cross" aria-hidden="true">✕</span> Weeks to produce</div><div class="comp-cell" role="cell"><span class="tick" aria-hidden="true">✓</span> Bespoke, always</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:56px" class="reveal">
+      <p class="label">How It Works</p>
+      <h2 class="display-sm" style="margin-bottom:16px">One command. Four agents.<br>Everything built.</h2>
+      <p style="color:var(--ink2);font-size:1.0625rem;max-width:480px;margin:0 auto">FORGE is not an agency. It is a team of AI specialists. Each one has a mission. Together they deliver in minutes what agencies take months to build.</p>
+    </div>
+    <div class="steps-track">
+      <div class="step-block reveal">
+        <div class="step-block__circle" aria-hidden="true">1</div>
+        <h3>Tell us about your business</h3>
+        <p>Your trade, your area, what makes you good. Takes 2 minutes. No briefs, no forms, no lengthy back and forth.</p>
+      </div>
+      <div class="step-block reveal reveal-d1" data-forge-phase="agent-deploy" data-agents="scout atlas spark chase">
+        <div class="step-block__circle" aria-hidden="true">2</div>
+        <h3>FORGE's agents go to work</h3>
+        <p>SCOUT researches your market. ATLAS builds your website, brand, and CRM. SPARK listens to live signals and fills your content calendar. CHASE builds your sales machine.</p>
+      </div>
+      <div class="step-block reveal reveal-d2">
+        <div class="step-block__circle" aria-hidden="true">3</div>
+        <h3>You receive everything, live</h3>
+        <p>A live website URL. Canva brand assets. A HubSpot CRM. 20 social posts. A 6 email sequence. A full strategy pack. In under 10 minutes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="section" id="who" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div style="margin-bottom:40px" class="reveal">
+      <p class="label">Who It's For</p>
+      <h2 class="display-sm" style="margin-bottom:16px">Built for London tradespeople who are invisible online.</h2>
+      <p style="color:var(--ink2);font-size:1.0625rem;max-width:520px">If someone Googles your trade in your postcode right now and cannot find you, that is a job you have already lost. FORGE fixes that today.</p>
+    </div>
+    <div class="trades-grid reveal">
+      <div class="trade-chip"><div class="trade-chip__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div><div class="trade-chip__name">Plumbers</div><div class="trade-chip__tag">Gas, heating and drainage</div></div></div>
+      <div class="trade-chip"><div class="trade-chip__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><div class="trade-chip__name">Electricians</div><div class="trade-chip__tag">Domestic and commercial</div></div></div>
+      <div class="trade-chip"><div class="trade-chip__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div><div class="trade-chip__name">Builders</div><div class="trade-chip__tag">Extensions and renovations</div></div></div>
+      <div class="trade-chip"><div class="trade-chip__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div><div class="trade-chip__name">Roofers</div><div class="trade-chip__tag">Repairs and installations</div></div></div>
+      <div class="trade-chip"><div class="trade-chip__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><div class="trade-chip__name">Painters</div><div class="trade-chip__tag">Interior and exterior</div></div></div>
+      <div class="trade-chip"><div class="trade-chip__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="trade-chip__name">Plasterers</div><div class="trade-chip__tag">Skimming and rendering</div></div></div>
+    </div>
+    <div class="who-cta-box reveal">
+      <p>Right now, there are <strong>thousands of tradespeople in Greater London</strong> with no website, a broken website, or a site that has not been updated since 2018. Every one of them is losing jobs to competitors who are visible online. <strong>FORGE fixes that in under 10 minutes.</strong></p>
+      <button class="btn btn--primary" onclick="scrollToSection('get-started')">Get Started Today</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="section" id="proof">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px" class="reveal">
+      <p class="label">What Tradespeople Say</p>
+      <h2 class="display-sm">Real results.<br>Real tradespeople.</h2>
+    </div>
+    <div class="proof-cards">
+      <div class="proof-card reveal">
+        <div class="proof-card__stars" aria-label="5 stars">★★★★★</div>
+        <p class="proof-card__quote">"I had no website at all. FORGE built me a full site, set up my CRM, and gave me a month of social posts. In about 10 minutes. I got my first enquiry from Google three days later."</p>
+        <div class="proof-card__author"><div class="proof-card__avatar" aria-hidden="true">JM</div><div><div class="proof-card__name">Jamie M.</div><div class="proof-card__trade">Plumber, East London</div></div></div>
+      </div>
+      <div class="proof-card reveal reveal-d1">
+        <div class="proof-card__stars" aria-label="5 stars">★★★★★</div>
+        <p class="proof-card__quote">"I had been putting off sorting my online presence for two years. FORGE did it while I was on a job. Website, brand, the lot. Looks better than companies I have seen charging thousands."</p>
+        <div class="proof-card__author"><div class="proof-card__avatar" aria-hidden="true">DT</div><div><div class="proof-card__name">Danny T.</div><div class="proof-card__trade">Electrician, South London</div></div></div>
+      </div>
+      <div class="proof-card reveal reveal-d2">
+        <div class="proof-card__stars" aria-label="5 stars">★★★★★</div>
+        <p class="proof-card__quote">"The strategy pack alone was worth it. Showed me exactly what my competitors are doing wrong and where I can take their customers. Never seen anything like it at this price."</p>
+        <div class="proof-card__author"><div class="proof-card__avatar" aria-hidden="true">KA</div><div><div class="proof-card__name">Karl A.</div><div class="proof-card__trade">Builder, North London</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="pricing-intro reveal">
+      <p class="label">Transparent Pricing</p>
+      <h2 class="display-sm">Everything you need.<br>Nothing you don't.</h2>
+      <p>One time builds. No retainer required. Upgrade any time. Each package includes everything in the one before it.</p>
+    </div>
+
+    <div class="pricing-packages reveal">
+
+      <!-- Package 1 -->
+      <div class="pkg-card">
+        <p class="pkg-num">Package 1</p>
+        <p class="pkg-name">Launch</p>
+        <div class="pkg-price-row"><div class="pkg-price">£74.99</div></div>
+        <p class="pkg-price-note">One new job covers the cost</p>
+        <hr class="pkg-divider">
+        <ul class="pkg-features">
+          <li>Live website with clear CTAs</li>
+          <li>SEO meta and Google Analytics</li>
+          <li>Floating WhatsApp button</li>
+          <li>Trust badges section</li>
+          <li>Cookie banner and Privacy Policy</li>
+          <li>Google Business Profile guide</li>
+        </ul>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p1')">Get Started</button>
+      </div>
+
+      <!-- Package 2 -->
+      <div class="pkg-card">
+        <p class="pkg-num">Package 2</p>
+        <p class="pkg-name">Brand</p>
+        <div class="pkg-price-row"><div class="pkg-price">£149.99</div></div>
+        <p class="pkg-price-note">Everything in Launch, plus:</p>
+        <hr class="pkg-divider">
+        <ul class="pkg-features">
+          <li><strong>AI imagery</strong> tailored to your trade</li>
+          <li><strong>Canva brand kit:</strong> logo, colours, fonts</li>
+          <li>Testimonials section</li>
+          <li>Service area map section</li>
+        </ul>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p2')">Get Started</button>
+      </div>
+
+      <!-- Package 3 — Featured -->
+      <div class="pkg-card pkg-card--featured">
+        <div class="pkg-badge">Most Popular</div>
+        <p class="pkg-num" style="margin-top:14px">Package 3</p>
+        <p class="pkg-name">Convert</p>
+        <div class="pkg-price-row"><div class="pkg-price">£299.99</div></div>
+        <p class="pkg-price-note">Everything in Brand, plus:</p>
+        <hr class="pkg-divider">
+        <ul class="pkg-features">
+          <li><strong>Quote wizard</strong> with photo upload</li>
+          <li>Direct call and WhatsApp CTA</li>
+          <li>Customer autoresponder email</li>
+          <li><strong>HubSpot CRM</strong> set up by us</li>
+          <li>Leads flow into CRM automatically</li>
+        </ul>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p3')">Get Started</button>
+      </div>
+
+      <!-- Package 4 -->
+      <div class="pkg-card">
+        <p class="pkg-num">Package 4</p>
+        <p class="pkg-name">Book</p>
+        <div class="pkg-price-row"><div class="pkg-price">£499.99</div></div>
+        <p class="pkg-price-note">Everything in Convert, plus:</p>
+        <hr class="pkg-divider">
+        <ul class="pkg-features">
+          <li><strong>Calendly</strong> set up with event types</li>
+          <li>Booking widget embedded on site</li>
+          <li>Google Calendar sync</li>
+          <li>Bookings to HubSpot pipeline</li>
+          <li>Client history in CRM</li>
+        </ul>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p4')">Get Started</button>
+      </div>
+
+      <!-- Package 5 -->
+      <div class="pkg-card">
+        <p class="pkg-num">Package 5</p>
+        <p class="pkg-name">Grow</p>
+        <div class="pkg-price-row"><div class="pkg-price">£624.99</div></div>
+        <p class="pkg-price-note">Everything in Book, plus:</p>
+        <hr class="pkg-divider">
+        <ul class="pkg-features">
+          <li>Social media accounts set up</li>
+          <li><strong>Full month of content</strong> created</li>
+          <li>Canva social templates</li>
+          <li>Consistent brand across all channels</li>
+        </ul>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p5')">Get Started</button>
+      </div>
+
+    </div>
+
+    <!-- Retainers -->
+    <div class="retainers-intro reveal">
+      <h3>Ongoing Services</h3>
+      <p>Keep the momentum going. Cancel any time.</p>
+    </div>
+    <div class="retainers-grid reveal">
+      <div class="retainer-card">
+        <p class="retainer-name">Content</p>
+        <p class="retainer-price">£149.99<span>/month</span></p>
+        <p class="retainer-desc">Monthly social content, captions, hashtags, and posting schedule across all platforms.</p>
+      </div>
+      <div class="retainer-card">
+        <p class="retainer-name">SEO and Reporting</p>
+        <p class="retainer-price">£199.99<span>/month</span></p>
+        <p class="retainer-desc">Monthly Ahrefs and Google Search Console reporting, keyword tracking, and ranking updates.</p>
+      </div>
+      <div class="retainer-card">
+        <p class="retainer-name">Managed</p>
+        <p class="retainer-price">£449.99<span>/month</span></p>
+        <p class="retainer-desc">Full campaign management, email flows, CRM maintenance, and monthly strategy review.</p>
+      </div>
+    </div>
+
+    <div class="pricing-note reveal">
+      <p>All prices are one off unless stated. VAT may apply. <a onclick="scrollToSection('get-started')">Get in touch</a> if you have questions about which package is right for you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT / GET STARTED -->
+<section class="section cta-section" id="get-started">
+  <div class="container">
+    <div class="cta-section__inner reveal">
+      <p class="label">Get Started</p>
+      <h2 class="display-sm">Deploy your marketing department today.</h2>
+      <p>Tell us your trade, your area, and what makes you good. We handle the rest. Live in under 10 minutes.</p>
+
+      <!-- FORGE Lead Wizard -->
+      <div class="wiz" id="wizForm">
+
+        <!-- Progress -->
+        <div class="wiz-progress">
+          <div class="wiz-dot active" id="wd0"></div>
+          <div class="wiz-dot" id="wd1"></div>
+          <div class="wiz-dot" id="wd2"></div>
+          <div class="wiz-dot" id="wd3"></div>
+        </div>
+
+        <!-- Step 1: Trade -->
+        <div class="wiz-step active" id="ws0">
+          <p class="wiz-title">What is your trade?</p>
+          <p class="wiz-sub">Tap yours and we move straight to the next step.</p>
+          <div class="trade-grid">
+            <button type="button" class="trade-btn" data-trade="Plumber" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><path d="M3 3h3l3 9-2 2a16 16 0 0 0 6 6l2-2 9 3v3a2 2 0 0 1-2 2C8 22 2 16 2 5a2 2 0 0 1 1-2z"/></svg>Plumber
+            </button>
+            <button type="button" class="trade-btn" data-trade="Electrician" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Electrician
+            </button>
+            <button type="button" class="trade-btn" data-trade="Builder" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Builder
+            </button>
+            <button type="button" class="trade-btn" data-trade="Roofer" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Roofer
+            </button>
+            <button type="button" class="trade-btn" data-trade="Painter and Decorator" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>Decorator
+            </button>
+            <button type="button" class="trade-btn" data-trade="Gas Engineer" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 6v6l4 2"/></svg>Gas Engineer
+            </button>
+            <button type="button" class="trade-btn" data-trade="Plasterer" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Plasterer
+            </button>
+            <button type="button" class="trade-btn" data-trade="Other" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Other trade
+            </button>
+          </div>
+          <div id="wiz-other-wrap" style="display:none;margin-top:10px">
+            <input type="text" id="wiz-trade-other" class="field" placeholder="Your trade (e.g. HVAC engineer, landscaper...)">
+            <div class="wiz-nav">
+              <button class="wiz-back" onclick="wizBack()">Back</button>
+              <button class="wiz-next" onclick="wizNext(0)">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Area -->
+        <div class="wiz-step" id="ws1">
+          <p class="wiz-title">Where are you based?</p>
+          <p class="wiz-sub">Your borough or area in London.</p>
+          <input id="wiz-area" type="text" class="field" autocomplete="off">
+          <div class="wiz-nav">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+            <button class="wiz-next" onclick="wizNext(1)">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Details -->
+        <div class="wiz-step" id="ws2">
+          <p class="wiz-title">Your details</p>
+          <p class="wiz-sub">Just your name and email. That is it.</p>
+          <div class="form-cols" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label class="wiz-label" for="wiz-fname">First name</label>
+              <input id="wiz-fname" type="text" class="field" autocomplete="given-name">
+            </div>
+            <div>
+              <label class="wiz-label" for="wiz-lname">Last name</label>
+              <input id="wiz-lname" type="text" class="field" autocomplete="family-name">
+            </div>
+          </div>
+          <label class="wiz-label" for="wiz-email">Email address</label>
+          <input id="wiz-email" type="email" class="field" autocomplete="email">
+          <div class="wiz-nav">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+            <button class="wiz-next" onclick="wizNext(2)">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Submit -->
+        <div class="wiz-step" id="ws3">
+          <p class="wiz-title">One last thing</p>
+          <p class="wiz-sub">Anything you want us to know? Totally optional.</p>
+          <textarea id="wiz-message" class="field" rows="3" style="resize:vertical;margin-bottom:16px" placeholder="Years trading, your specialisms, what makes you stand out..."></textarea>
+          <button type="button" id="wizSubmitBtn" class="btn btn--primary" style="width:100%;justify-content:center;padding:16px" onclick="wizSubmit()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Deploy My Marketing Department
+          </button>
+          <div id="wizSuccess" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:8px;font-size:.875rem;color:#22c55e;text-align:center;line-height:1.5">
+            Got it. Your deployment begins in the next 5 minutes.
+          </div>
+          <div id="wizError" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;font-size:.875rem;color:#ef4444;text-align:center">
+            Something went wrong. Email us at sales@forgeisagentic.tech
+          </div>
+          <div class="wiz-nav" style="margin-top:12px">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+          </div>
+          <p style="font-size:.775rem;color:var(--ink2);text-align:center;margin-top:12px">
+            By submitting you agree to our <a href="/privacy" style="color:var(--accent);text-decoration:underline">Privacy Policy</a> and <a href="/terms" style="color:var(--accent);text-decoration:underline">Terms and Conditions</a>.
+          </p>
+        </div>
+
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <a href="mailto:sales@forgeisagentic.tech" class="btn btn--ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          sales@forgeisagentic.tech
+        </a>
+        <a href="https://calendly.com/builtbyaaronf/30min" target="_blank" rel="noopener noreferrer" class="btn btn--ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          See How It Works
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__brand__name">FORGE<span>.</span></div>
+        <p class="footer__brand__tagline">The world's first fully agentic marketing department for London tradespeople.</p>
+      </div>
+      <div class="footer__links">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#stack">Website</a></li>
+          <li><a href="#stack">Brand Kit</a></li>
+          <li><a href="#stack">CRM</a></li>
+          <li><a href="#stack">Social Content</a></li>
+          <li><a href="#stack">Sales System</a></li>
+        </ul>
+      </div>
+      <div class="footer__links">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#who">Who It's For</a></li>
+          <li><a href="#get-started">Get Started</a></li>
+          <li><a href="mailto:sales@forgeisagentic.tech">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer__links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms &amp; Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2026 FORGE. All rights reserved. Registered in England &amp; Wales.</p>
+      <div class="footer__legal">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookie consent" aria-modal="true">
+  <p>We use essential cookies to make this site work. We'd also like to set analytics cookies to help us improve it. Read our <a href="/privacy">Cookie Policy</a>.</p>
+  <div class="cookie-btn-group">
+    <button class="cookie-btn cookie-btn--decline" onclick="dismissCookies('essential')">Essential only</button>
+    <button class="cookie-btn cookie-btn--accept" onclick="dismissCookies('all')">Accept all</button>
+  </div>
+</div>
+
+<script>
+/* ── Scroll utility ───────────────────────────────────────── */
+function scrollToSection(id, pkg) {
+  // Map the contact/get-started anchor
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (pkg) {
+    document.getElementById('selectedPackage').value = pkg;
+  }
+}
+
+/* ── Mobile nav ───────────────────────────────────────────── */
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+
+hamburger.addEventListener('click', () => {
+  const isOpen = mobileNav.classList.toggle('open');
+  hamburger.setAttribute('aria-expanded', isOpen);
+});
+
+function closeMob() {
+  mobileNav.classList.remove('open');
+  hamburger.setAttribute('aria-expanded', 'false');
+}
+
+// Close mobile nav on outside click
+document.addEventListener('click', (e) => {
+  if (mobileNav.classList.contains('open') && !mobileNav.contains(e.target) && !hamburger.contains(e.target)) {
+    closeMob();
+  }
+});
+
+// Close mobile nav on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mobileNav.classList.contains('open')) closeMob();
+});
+
+/* ── Scroll reveal ────────────────────────────────────────── */
+const obs = new IntersectionObserver(
+  (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+  { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+/* ── Lead Wizard ─────────────────────────────────────────── */
+var _wizStep = 0;
+var _wizData = { trade:'', area:'', fname:'', lname:'', email:'', message:'' };
+
+function wizSetStep(n) {
+  document.getElementById('ws' + _wizStep).classList.remove('active');
+  document.getElementById('ws' + n).classList.add('active');
+  for (var i = 0; i < 4; i++) {
+    var d = document.getElementById('wd' + i);
+    d.classList.remove('active','done');
+    if (i < n) d.classList.add('done');
+    else if (i === n) d.classList.add('active');
+  }
+  _wizStep = n;
+}
+
+function wizSelectTrade(btn) {
+  document.querySelectorAll('.trade-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  var trade = btn.getAttribute('data-trade');
+  var otherWrap = document.getElementById('wiz-other-wrap');
+  if (trade === 'Other') {
+    otherWrap.style.display = 'block';
+    document.getElementById('wiz-trade-other').focus();
+  } else {
+    otherWrap.style.display = 'none';
+    _wizData.trade = trade;
+    setTimeout(function(){ wizSetStep(1); document.getElementById('wiz-area').focus(); }, 150);
+  }
+}
+
+function wizNext(from) {
+  if (from === 0) {
+    var other = document.getElementById('wiz-trade-other').value.trim();
+    if (!other) { document.getElementById('wiz-trade-other').style.borderColor='#ef4444'; return; }
+    _wizData.trade = other;
+    document.getElementById('wiz-trade-other').style.borderColor='';
+    wizSetStep(1); document.getElementById('wiz-area').focus();
+  } else if (from === 1) {
+    var area = document.getElementById('wiz-area').value.trim();
+    if (!area) { document.getElementById('wiz-area').style.borderColor='#ef4444'; return; }
+    _wizData.area = area;
+    document.getElementById('wiz-area').style.borderColor='';
+    wizSetStep(2); document.getElementById('wiz-fname').focus();
+  } else if (from === 2) {
+    var fname = document.getElementById('wiz-fname').value.trim();
+    var lname = document.getElementById('wiz-lname').value.trim();
+    var email = document.getElementById('wiz-email').value.trim();
+    var ok = true;
+    [['wiz-fname',fname],['wiz-lname',lname],['wiz-email',email]].forEach(function(pair){
+      document.getElementById(pair[0]).style.borderColor = pair[1] ? '' : '#ef4444';
+      if (!pair[1]) ok = false;
+    });
+    if (!ok) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('wiz-email').style.borderColor='#ef4444'; return;
+    }
+    _wizData.fname = fname; _wizData.lname = lname; _wizData.email = email;
+    wizSetStep(3);
+  }
+}
+
+function wizBack() {
+  if (_wizStep > 0) wizSetStep(_wizStep - 1);
+}
+
+async function wizSubmit() {
+  _wizData.message = document.getElementById('wiz-message').value.trim();
+  var btn  = document.getElementById('wizSubmitBtn');
+  var succ = document.getElementById('wizSuccess');
+  var err  = document.getElementById('wizError');
+  succ.style.display = 'none';
+  err.style.display  = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  var payload = {
+    _subject:     'New FORGE Lead — ' + _wizData.fname + ' ' + _wizData.lname + ' (' + _wizData.trade + ')',
+    _template:    'table',
+    'First Name': _wizData.fname,
+    'Last Name':  _wizData.lname,
+    'Email':      _wizData.email,
+    'Trade':      _wizData.trade,
+    'Area':       _wizData.area,
+    'Message':    _wizData.message || 'None'
+  };
+
+  try {
+    var res = await fetch('https://formsubmit.co/ajax/sales@forgeisagentic.tech', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      succ.style.display = 'block';
+      btn.style.display  = 'none';
+    } else { throw new Error('HTTP ' + res.status); }
+  } catch(e) {
+    console.error(e);
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Deploy My Marketing Department';
+  }
+}
+
+/* ── Cookie banner ────────────────────────────────────────── */
+function dismissCookies(choice) {
+  try { localStorage.setItem('forge_cc', choice); } catch (e) {}
+  document.getElementById('cookieBanner').classList.add('hidden');
+}
+
+(function initCookieBanner() {
+  let consent;
+  try { consent = localStorage.getItem('forge_cc'); } catch (e) {}
+  if (consent) document.getElementById('cookieBanner').classList.add('hidden');
+})();
+</script>
+
+<!-- LIGHTWEIGHT LEGAL GATE - Drop into index.html -->
+<!-- This adds a consent modal that stores consent in localStorage -->
+<!-- No backend required. Works on static sites. -->
+
+<style>
+/* ─── LEGAL GATE MODAL ───────────────────────────────────── */
+.legal-gate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.legal-gate-overlay.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.legal-gate-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--rL);
+  padding: 40px;
+  max-width: 520px;
+  width: calc(100vw - 32px);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.legal-gate-modal h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+  color: var(--ink);
+}
+
+.legal-gate-modal p {
+  font-size: 0.95rem;
+  color: var(--ink2);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.legal-gate-modal ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.legal-gate-modal li {
+  font-size: 0.9rem;
+  color: var(--ink2);
+  padding-left: 20px;
+  position: relative;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.legal-gate-modal li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.legal-gate-checkbox-group {
+  margin: 24px 0;
+  padding: 16px;
+  background: var(--surface2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.legal-gate-checkbox-group label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.legal-gate-checkbox-group input[type="checkbox"] {
+  margin-top: 4px;
+  cursor: pointer;
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.legal-gate-checkbox-group span {
+  font-size: 0.9rem;
+  color: var(--ink2);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.legal-gate-checkbox-group a {
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.legal-gate-checkbox-group a:hover {
+  opacity: 0.8;
+}
+
+.legal-gate-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.legal-gate-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.legal-gate-btn--accept {
+  background: var(--accent);
+  color: #fff;
+}
+
+.legal-gate-btn--accept:hover:not(:disabled) {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 153, 255, 0.35);
+}
+
+.legal-gate-btn--accept:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.legal-gate-btn--decline {
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--border);
+}
+
+.legal-gate-btn--decline:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.legal-gate-error {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #ef4444;
+  text-align: center;
+}
+
+.legal-gate-error.show {
+  display: block;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .legal-gate-modal {
+    padding: 28px 20px;
+  }
+
+  .legal-gate-modal h2 {
+    font-size: 1.25rem;
+  }
+
+  .legal-gate-actions {
+    flex-direction: column;
+  }
+}
+</style>
+
+<!-- LEGAL GATE MODAL HTML -->
+<div class="legal-gate-overlay" id="legalGateOverlay">
+  <div class="legal-gate-modal" id="legalGateModal">
+    <h2>Legal Terms & Conditions</h2>
+
+    <p>Before you continue, please review and agree to our terms:</p>
+
+    <ul>
+      <li>You agree to our <a href="/terms" onclick="event.preventDefault(); window.open('/terms', '_blank')">Terms of Service</a></li>
+      <li>You understand our <a href="/privacy" onclick="event.preventDefault(); window.open('/privacy', '_blank')">Privacy Policy</a></li>
+      <li>You consent to the processing of your data as outlined</li>
+      <li>You confirm you are of legal age to use this service</li>
+    </ul>
+
+    <div class="legal-gate-checkbox-group">
+      <label>
+        <input type="checkbox" id="legalGateConsent" />
+        <span>I agree to the <a href="/terms" onclick="event.preventDefault(); window.open('/terms', '_blank')">Terms of Service</a> and <a href="/privacy" onclick="event.preventDefault(); window.open('/privacy', '_blank')">Privacy Policy</a></span>
+      </label>
+    </div>
+
+    <div class="legal-gate-error" id="legalGateError">
+      Please check the box to continue
+    </div>
+
+    <div class="legal-gate-actions">
+      <button class="legal-gate-btn legal-gate-btn--decline" id="legalGateDecline">
+        Decline & Leave
+      </button>
+      <button class="legal-gate-btn legal-gate-btn--accept" id="legalGateAccept" disabled>
+        Accept & Continue
+      </button>
+    </div>
+
+    <p style="font-size: 0.8rem; color: var(--ink2); text-align: center; margin-top: 20px;">
+      Your consent is stored securely and never expires.
+    </p>
+  </div>
+</div>
+
+<!-- LEGAL GATE SCRIPT -->
+<script>
+(function initLegalGate() {
+  const CONSENT_KEY = 'forge_legal_consent';
+  const CONSENT_VERSION = '1.0'; // Update this when terms change
+
+  const overlay = document.getElementById('legalGateOverlay');
+  const modal = document.getElementById('legalGateModal');
+  const checkbox = document.getElementById('legalGateConsent');
+  const acceptBtn = document.getElementById('legalGateAccept');
+  const declineBtn = document.getElementById('legalGateDecline');
+  const error = document.getElementById('legalGateError');
+
+  // Check if user has already consented
+  function hasUserConsented() {
+    try {
+      const consent = localStorage.getItem(CONSENT_KEY);
+      if (!consent) return false;
+      const data = JSON.parse(consent);
+      return data.version === CONSENT_VERSION && data.timestamp > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Show the gate
+  function showGate() {
+    overlay.classList.add('active');
+  }
+
+  // Hide the gate
+  function hideGate() {
+    overlay.classList.remove('active');
+  }
+
+  // Record consent
+  function recordConsent() {
+    try {
+      const consentData = {
+        version: CONSENT_VERSION,
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent,
+        accepted: true
+      };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+      hideGate();
+    } catch (e) {
+      console.error('Failed to save consent:', e);
+    }
+  }
+
+  // Handle decline
+  function handleDecline() {
+    try {
+      const consentData = {
+        version: CONSENT_VERSION,
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent,
+        accepted: false
+      };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+      // Redirect to a declining page or homepage
+      window.location.href = '/';
+    } catch (e) {
+      console.error('Failed to save decline:', e);
+    }
+  }
+
+  // Checkbox toggle
+  checkbox.addEventListener('change', () => {
+    acceptBtn.disabled = !checkbox.checked;
+    error.classList.remove('show');
+  });
+
+  // Accept button
+  acceptBtn.addEventListener('click', () => {
+    if (checkbox.checked) {
+      recordConsent();
+    }
+  });
+
+  // Decline button
+  declineBtn.addEventListener('click', handleDecline);
+
+  // Prevent closing by clicking overlay
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      e.preventDefault();
+    }
+  });
+
+  // Prevent ESC key from closing
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      e.preventDefault();
+    }
+  });
+
+  // Initialize
+  if (!hasUserConsented()) {
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', showGate);
+    } else {
+      showGate();
+    }
+  }
+
+  // Export for manual control if needed
+  window.LegalGate = {
+    show: showGate,
+    hide: hideGate,
+    reset: () => {
+      localStorage.removeItem(CONSENT_KEY);
+      showGate();
+    },
+    hasConsented: hasUserConsented,
+    getConsent: () => {
+      try {
+        return JSON.parse(localStorage.getItem(CONSENT_KEY));
+      } catch (e) {
+        return null;
+      }
+    }
+  };
+})();
+</script>
+
+</body>
+</html>
+                                 

@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
   const { logo, trade, filename } = req.body || {};
   if (!logo || !filename) return res.status(400).json({ error: 'Missing logo or filename' });
   const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey  = process.env.SUPABASE_SERVICE_KEY;
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceKey) return res.status(500).json({ error: 'Storage not configured' });
   try {
     const m = logo.match(/^data:([^;]+);base64,(.+)$/);

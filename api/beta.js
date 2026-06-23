@@ -481,7 +481,7 @@ module.exports = async (req, res) => {
       line-height: 1.4;
     }
     .pkg-features li::before {
-      content: '\2713';
+      content: '\u2713';
       color: var(--lime);
       font-weight: 700;
       font-size: 12px;

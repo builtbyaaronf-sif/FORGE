@@ -96,7 +96,7 @@ module.exports = async (req, res) => {
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="pkg-form">
         <input type="hidden" name="cmd" value="_xclick">
         <input type="hidden" name="business" value="${paypalEmail}">
-        <input type="hidden" name="item_name" value="FORGE Package ${pkg.id.toUpperCase()} â ${pkg.name} (Beta 90% off)">
+        <input type="hidden" name="item_name" value="FORGE Package ${pkg.id.toUpperCase()} — ${pkg.name} (Beta 90% off)">
         <input type="hidden" name="amount" value="${pkg.now}">
         <input type="hidden" name="currency_code" value="GBP">
         <input type="hidden" name="return" value="${baseUrl}/beta?success=1">
@@ -123,8 +123,8 @@ module.exports = async (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FORGE Beta â 90% Off | 10 Spots Only</title>
-  <meta name="description" content="FORGE beta cohort â 90% off any package for London tradespeople. 10 spots only.">
+  <title>FORGE Beta — 90% Off | 10 Spots Only</title>
+  <meta name="description" content="FORGE beta cohort — 90% off any package for London tradespeople. 10 spots only.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -669,7 +669,7 @@ module.exports = async (req, res) => {
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-eyebrow">Private Beta â Not Public</div>
+    <div class="hero-eyebrow">Private Beta — Not Public</div>
     <h1>Your <span class="accent">entire marketing</span><br>department.<br>For under a tenner.</h1>
     <p class="hero-sub">You were invited because your work is worth more than your online presence. We're fixing that today. 90% off. Live within hours.</p>
 
@@ -709,7 +709,7 @@ module.exports = async (req, res) => {
       <div class="one-ask-icon">&#127897;</div>
       <div>
         <div class="one-ask-title">One ask in return</div>
-        <div class="one-ask-text">After your site is live, click one link. You'll get a 5-minute AI video chat â answer 3 quick questions about how it went. No calls. No scheduling. No live conversation with anyone. One tap, 5 minutes, done. That's the entire deal.</div>
+        <div class="one-ask-text">After your site is live, click one link. You'll get a 5-minute AI video chat — answer 3 quick questions about how it went. No calls. No scheduling. No live conversation with anyone. One tap, 5 minutes, done. That's the entire deal.</div>
       </div>
     </div>
   </div>
@@ -742,7 +742,7 @@ module.exports = async (req, res) => {
         <div class="step-num">2</div>
         <div>
           <div class="step-title">FORGE builds everything</div>
-          <div class="step-body">Our AI agents get to work. Website, brand kit, CRM â all deployed and live. You'll hear from us within the hour.</div>
+          <div class="step-body">Our AI agents get to work. Website, brand kit, CRM — all deployed and live. You'll hear from us within the hour.</div>
         </div>
       </div>
       <div class="step">
@@ -865,7 +865,7 @@ module.exports = async (req, res) => {
           panelOpen = false;
         } else {
           panelOpen = true;
-          status.textContent = 'Capturing screenshotâ¦';
+          status.textContent = 'Capturing screenshot…';
           panel.style.display = 'block';
           takeScreenshot(function() { status.textContent = ''; });
         }
@@ -873,7 +873,7 @@ module.exports = async (req, res) => {
 
       send.addEventListener('click', function() {
         send.disabled = true;
-        status.textContent = 'Sendingâ¦';
+        status.textContent = 'Sending…';
         fetch(WIDGET_API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

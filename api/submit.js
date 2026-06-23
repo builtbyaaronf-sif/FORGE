@@ -2,6 +2,18 @@
 // Env vars: HUBSPOT_ACCESS_TOKEN, RESEND_API_KEY, RESEND_FROM_EMAIL, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, AARON_WHATSAPP_TO
 
 
+// ── Rate Limiter ─────────────────────────────────────────────────────────
+const RL_WINDOW = 60_000; // 60 seconds
+const RL_MAX    = 5;      // max submissions per IP per window
+const rlMap     = new Map();
+function isRateLimited(ip) {
+  const now  = Date.now();
+  const hits = (rlMap.get(ip) || []).filter(t => now - t < RL_WINDOW);
+  hits.push(now);
+  rlMap.set(ip, hits);
+  return hits.length > RL_MAX;
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://forgeisagentic.tech');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -9,6 +21,9 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests. Please try again later.' });
 
   const body      = req.body || {};
   const firstName = body['First Name'] || '';

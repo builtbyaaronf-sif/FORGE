@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
       features: [
         'Quote wizard with photo upload',
         'Direct call and WhatsApp CTA',
-        'Customer autoresponder email',
+        'Instant lead alerts to your phone &amp; email',
         'HubSpot CRM set up by us',
         'Leads flow into CRM automatically',
       ],
@@ -71,7 +71,7 @@ module.exports = async (req, res) => {
       now: '62.49',
       tagline: 'Everything in Book, plus a full month of content.',
       features: [
-        'Social media accounts set up',
+        'Social media profile setup guide &amp; optimisation tips',
         'Full month of content created',
         'Canva social templates',
         'Consistent brand across all channels',
@@ -85,8 +85,8 @@ module.exports = async (req, res) => {
       <div class="pkg-header">
         <div class="pkg-name">${pkg.name}</div>
         <div class="pkg-pricing">
-          <span class="pkg-was">Â£${pkg.was}</span>
-          <span class="pkg-now">Â£${pkg.now}</span>
+          <span class="pkg-was">&pound;${pkg.was}</span>
+          <span class="pkg-now">&pound;${pkg.now}</span>
         </div>
         <div class="pkg-tagline">${pkg.tagline}</div>
       </div>
@@ -104,7 +104,7 @@ module.exports = async (req, res) => {
         <input type="hidden" name="no_shipping" value="1">
         <input type="hidden" name="no_note" value="1">
         <button type="submit" class="pkg-cta">
-          Pay Â£${pkg.now} with PayPal
+          Pay &pound;${pkg.now} with PayPal
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
         </button>
       </form>
@@ -126,6 +126,9 @@ module.exports = async (req, res) => {
   <title>FORGE Beta â 90% Off | 10 Spots Only</title>
   <meta name="description" content="FORGE beta cohort â 90% off any package for London tradespeople. 10 spots only.">
   <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='200' height='200' fill='%23000'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23d4f060'/%3E%3Cstop offset='40%25' stop-color='%2360d4b0'/%3E%3Cstop offset='70%25' stop-color='%234ab0e8'/%3E%3Cstop offset='100%25' stop-color='%238040c0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='100,10 106,90 120,20 108,94 140,38 112,98 160,72 116,104 175,100 116,108 160,128 112,102 140,162 108,106 120,180 106,110 100,190 94,110 80,180 92,106 60,162 88,102 40,128 84,108 25,100 84,104 40,72 88,98 60,38 92,94 80,20 94,90' fill='url(%23g)'/%3E%3C/svg%3E">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -146,7 +149,7 @@ module.exports = async (req, res) => {
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
       min-height: 100vh;
     }
@@ -478,7 +481,7 @@ module.exports = async (req, res) => {
       line-height: 1.4;
     }
     .pkg-features li::before {
-      content: 'â';
+      content: '\2713';
       color: var(--lime);
       font-weight: 700;
       font-size: 12px;
@@ -659,7 +662,7 @@ module.exports = async (req, res) => {
 
   <nav>
     <a href="/" class="nav-logo">FORGE.</a>
-    <span class="nav-badge">Beta Cohort â 10 Spots</span>
+    <span class="nav-badge">Beta Cohort &mdash; 10 Spots</span>
   </nav>
 
   ${successBanner}
@@ -680,8 +683,8 @@ module.exports = async (req, res) => {
         <span class="stat-label">Off all packages</span>
       </div>
       <div class="stat">
-        <span class="stat-value">&lt;10</span>
-        <span class="stat-label">Hours to live</span>
+        <span class="stat-value">&lt;1</span>
+        <span class="stat-label">Hr to live</span>
       </div>
     </div>
   </section>
@@ -703,7 +706,7 @@ module.exports = async (req, res) => {
   <!-- ONE ASK -->
   <div style="padding: 0 24px; max-width: 1100px; margin: 0 auto 64px;">
     <div class="one-ask">
-      <div class="one-ask-icon">ð</div>
+      <div class="one-ask-icon">&#127897;</div>
       <div>
         <div class="one-ask-title">One ask in return</div>
         <div class="one-ask-text">After your site is live, click one link. You'll get a 5-minute AI video chat â answer 3 quick questions about how it went. No calls. No scheduling. No live conversation with anyone. One tap, 5 minutes, done. That's the entire deal.</div>
@@ -763,8 +766,8 @@ module.exports = async (req, res) => {
   <footer>
     <span class="forge-footer-logo">FORGE.</span>
     The AI marketing department for London tradespeople.<br>
-    <a href="/">forgeisagentic.tech</a> &nbsp;Â·&nbsp;
-    <a href="/privacy">Privacy</a> &nbsp;Â·&nbsp;
+    <a href="/">forgeisagentic.tech</a> &nbsp;&middot;&nbsp;
+    <a href="/privacy">Privacy</a> &nbsp;&middot;&nbsp;
     <a href="/terms">Terms</a><br>
     <span style="margin-top:8px; display:block;">Questions? <a href="mailto:sales@forgeisagentic.tech">sales@forgeisagentic.tech</a></span>
   </footer>
@@ -902,14 +905,10 @@ module.exports = async (req, res) => {
       });
     })();
   </script>
-
-  <!-- VERCEL ANALYTICS -->
-  <script defer src="/_vercel/insights/script.js"></script>
-
 </body>
 </html>`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-cache');
-  return res.status(200).send(html);
+  res.setHeader('Cache-Control', 'no-store');
+  res.status(200).send(html);
 };

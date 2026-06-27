@@ -24,8 +24,4 @@
       ]
     }
   ]
-}{
-  "rewrites": [
-    { "source": "/beta", "destination": "/api/beta" }
-  ]
 }

@@ -484,6 +484,8 @@ h1,h2,h3,h4,h5{
 .wiz-next{flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:.875rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
 .wiz-next:hover{background:var(--accent2)}.wiz-next:disabled{opacity:.35;cursor:not-allowed}
 </style>
+<!-- Vercel Analytics -->
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -819,6 +821,7 @@ h1,h2,h3,h4,h5{
           <div class="wiz-dot" id="wd1"></div>
           <div class="wiz-dot" id="wd2"></div>
           <div class="wiz-dot" id="wd3"></div>
+          <div class="wiz-dot" id="wd4"></div>
         </div>
 
         <!-- Step 1: Trade -->
@@ -862,9 +865,44 @@ h1,h2,h3,h4,h5{
 
         <!-- Step 2: Area -->
         <div class="wiz-step" id="ws1">
-          <p class="wiz-title">Where are you based?</p>
-          <p class="wiz-sub">Your borough or area in London.</p>
-          <input id="wiz-area" type="text" class="field" autocomplete="off">
+          <p class="wiz-title">Where are you located?</p>
+          <select id="wiz-area" class="field" style="cursor:pointer;">
+            <option value="">Select your area...</option>
+            <option>Barking and Dagenham</option>
+            <option>Barnet</option>
+            <option>Bexley</option>
+            <option>Brent</option>
+            <option>Bromley</option>
+            <option>Camden</option>
+            <option>City of London</option>
+            <option>Croydon</option>
+            <option>Ealing</option>
+            <option>Enfield</option>
+            <option>Greenwich</option>
+            <option>Hackney</option>
+            <option>Hammersmith and Fulham</option>
+            <option>Haringey</option>
+            <option>Harrow</option>
+            <option>Havering</option>
+            <option>Hillingdon</option>
+            <option>Hounslow</option>
+            <option>Islington</option>
+            <option>Kensington and Chelsea</option>
+            <option>Kingston upon Thames</option>
+            <option>Lambeth</option>
+            <option>Lewisham</option>
+            <option>Merton</option>
+            <option>Newham</option>
+            <option>Redbridge</option>
+            <option>Richmond upon Thames</option>
+            <option>Southwark</option>
+            <option>Sutton</option>
+            <option>Tower Hamlets</option>
+            <option>Waltham Forest</option>
+            <option>Wandsworth</option>
+            <option>Westminster</option>
+            <option value="Outside London">Outside London</option>
+          </select>
           <div class="wiz-nav">
             <button class="wiz-back" onclick="wizBack()">Back</button>
             <button class="wiz-next" onclick="wizNext(1)">Next</button>
@@ -893,14 +931,29 @@ h1,h2,h3,h4,h5{
           </div>
         </div>
 
-        <!-- Step 4: Submit -->
+        <!-- Step 4: Logo -->
         <div class="wiz-step" id="ws3">
+          <p class="wiz-title">Got a logo?</p>
+          <p class="wiz-sub">Upload it and we'll build your brand around it. Totally optional.</p>
+          <div id="logo-upload-area" style="display:none;margin-bottom:16px">
+            <input type="file" id="wiz-logo" accept="image/*,.svg" class="field" style="padding:10px;cursor:pointer">
+            <p id="logo-status" style="font-size:13px;color:#9ca3af;margin-top:8px;min-height:20px"></p>
+          </div>
+          <div class="wiz-nav" style="gap:10px">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+            <button class="wiz-next" onclick="wizSkipLogo()" style="background:transparent;border:1px solid #374151;color:#9ca3af">No logo</button>
+            <button class="wiz-next" id="wizLogoYesBtn" onclick="wizHaveLogo()">Upload logo</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Submit -->
+        <div class="wiz-step" id="ws4">
           <p class="wiz-title">One last thing</p>
           <p class="wiz-sub">Anything you want us to know? Totally optional.</p>
           <textarea id="wiz-message" class="field" rows="3" style="resize:vertical;margin-bottom:16px" placeholder="Years trading, your specialisms, what makes you stand out..."></textarea>
           <button type="button" id="wizSubmitBtn" class="btn btn--primary" style="width:100%;justify-content:center;padding:16px" onclick="wizSubmit()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Deploy My Marketing Department
+            Launch My Website
           </button>
           <div id="wizSuccess" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:8px;font-size:.875rem;color:#22c55e;text-align:center;line-height:1.5">
             Got it. Your deployment begins in the next 5 minutes.
@@ -1039,12 +1092,12 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
 /* ── Lead Wizard ─────────────────────────────────────────── */
 var _wizStep = 0;
-var _wizData = { trade:'', area:'', fname:'', lname:'', email:'', message:'' };
+var _wizData = { trade:'', area:'', fname:'', lname:'', email:'', message:'', logoUrl:'' };
 
 function wizSetStep(n) {
   document.getElementById('ws' + _wizStep).classList.remove('active');
   document.getElementById('ws' + n).classList.add('active');
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 5; i++) {
     var d = document.getElementById('wd' + i);
     d.classList.remove('active','done');
     if (i < n) d.classList.add('done');
@@ -1099,6 +1152,65 @@ function wizNext(from) {
   }
 }
 
+function wizSkipLogo() {
+  _wizData.logoUrl = '';
+  wizSetStep(4);
+}
+
+function wizHaveLogo() {
+  var uploadArea = document.getElementById('logo-upload-area');
+  var btn = document.getElementById('wizLogoYesBtn');
+  if (uploadArea.style.display === 'none') {
+    uploadArea.style.display = 'block';
+    btn.textContent = 'Continue →';
+    return;
+  }
+  var fileInput = document.getElementById('wiz-logo');
+  if (!fileInput.files.length) {
+    var st = document.getElementById('logo-status');
+    st.style.color = '#ef4444';
+    st.textContent = 'Please select a file first.';
+    return;
+  }
+  wizUploadLogo(fileInput.files[0]);
+}
+
+async function wizUploadLogo(file) {
+  var btn = document.getElementById('wizLogoYesBtn');
+  var status = document.getElementById('logo-status');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+  status.style.color = '#9ca3af';
+  status.textContent = 'Uploading your logo…';
+  try {
+    var base64 = await new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) { resolve(e.target.result); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    var res = await fetch('/api/upload-logo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ logo: base64, trade: _wizData.trade || 'unknown', filename: file.name })
+    });
+    var data = await res.json();
+    if (data.url) {
+      _wizData.logoUrl = data.url;
+      status.style.color = '#22c55e';
+      status.textContent = '✓ Logo uploaded!';
+      setTimeout(function(){ wizSetStep(4); }, 800);
+    } else {
+      throw new Error(data.error || 'Upload failed');
+    }
+  } catch(e) {
+    status.style.color = '#ef4444';
+    status.textContent = 'Upload failed — ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Try again';
+  }
+}
+
 function wizBack() {
   if (_wizStep > 0) wizSetStep(_wizStep - 1);
 }
@@ -1115,19 +1227,23 @@ async function wizSubmit() {
 
   var pkgLabels = { product1: 'Pop Up Website (£99)', product2: 'Master Website + Branding (£299.99)' };
   var payload = {
-    _subject:     'New FORGE Lead — ' + _wizData.fname + ' ' + _wizData.lname + ' (' + _wizData.trade + ')',
-    _template:    'table',
     'First Name': _wizData.fname,
     'Last Name':  _wizData.lname,
     'Email':      _wizData.email,
     'Trade':      _wizData.trade,
     'Area':       _wizData.area,
     'Message':    _wizData.message || 'None',
-    'Interested in': pkgLabels[window._selectedPackage] || 'Not specified from pricing'
+    'Logo':       _wizData.logoUrl || 'None',
+    'Package':    pkgLabels[window._selectedPackage] || 'Not specified'
   };
 
   try {
-    var res = await fetch('https://formsubmit.co/ajax/sales@forgeisagentic.tech', {
+    // /api/submit does more than a form-relay: creates/updates the HubSpot
+    // contact, sends a proper welcome email to the lead (not just a
+    // notification to us), and optionally pings Aaron on WhatsApp for
+    // approval. Real upgrade over the formsubmit.co fallback this used to
+    // point at.
+    var res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1140,7 +1256,7 @@ async function wizSubmit() {
     console.error(e);
     err.style.display = 'block';
     btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Deploy My Marketing Department';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Launch My Website';
   }
 }
 
@@ -1534,6 +1650,21 @@ function dismissCookies(choice) {
 })();
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var _orig = window.wizSetStep;
+    if (typeof _orig === 'function') {
+      window.wizSetStep = function(n) {
+        _orig(n);
+        if (window.va) window.va('event', { name: 'wizard_step_' + n });
+      };
+    }
+  });
+</script>
+
+<!-- FORGE Issue Reporter Widget — real, working, posts to /api/report-issue -->
+<script src="/widget/report-issue-widget.js"></script>
 </body>
 </html>
+                                 
                                  

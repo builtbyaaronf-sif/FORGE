@@ -73,38 +73,64 @@ Examples of what to write:
 
 FORGE deploys agents in sequence. Each agent has a single role, a defined input, and a defined output. No agent starts until its predecessor signals completion.
 
+**Two-product model** — replaces the old 5-tier p1-p5 structure (see `FORGE_PRODUCT_ARCHITECTURE_v2.md` for the full redesign rationale).
+
 ```
-SCOUT [Intel] → ATLAS [Build] → MARK [Logo] → PIXEL [Brand] → WIRE [CRM] → BOOK [Booking] → SPARK [Content] → FORGE [QA]
+Product 1 — Pop Up Website:
+SCOUT [Intel] → ATLAS [Build] → BOOK [Booking]
+                    ↓
+              MARK [Logo] (concurrent, non-blocking)
+                    ↓
+              FORGE [QA]
+
+Product 2 — Master Website + Branding:
+SCOUT [Intel] → ATLAS [Build] → PIXEL [Brand] → WIRE [CRM] → BOOK [Booking]
+                                                      ↓
+                                              LEDGER [Accounts]
+                                                      ↓
+                                              PULSE [Nurture]
+                                                      ↓
+                                              SPARK [Content]
+                                                      ↓
+                                          BEACON [Dashboard]
+                                                      ↓
+                                          FORGE [QA]
 ```
+
+MARK is Product 1 only. Product 2 drops MARK — new logo approach TBD, out of scope until designed.
 
 ### Agent map
 
-| Agent | Codename | Skill / Endpoint | Package |
+| Agent | Codename | Skill / Endpoint | Product |
 |---|---|---|---|
-| SCOUT | [Intel] | `website-content-extractor` | All |
-| ATLAS | [Build] | `one-click-website` | All |
-| MARK | [Logo] | `/api/logo-gen` + `/api/logo-confirm` + `logo-wizard.html` | All |
-| PIXEL | [Brand] | `brand-kit` | 2+ |
-| WIRE | [CRM] | `quote-wizard` + `hubspot-setup` | 3+ |
-| BOOK | [Booking] | `calendly-setup` | 4+ |
-| SPARK | [Content] | `social-media-machine` | 5 |
-| FORGE | [QA] | `site-audit` + `client-handover` | All |
+| SCOUT | [Intel] | `website-content-extractor` | Both |
+| ATLAS | [Build] | `one-click-website` | Both |
+| MARK | [Logo] | `/api/logo-gen` + `/api/logo-confirm` + `logo-wizard.html` | 1 only |
+| PIXEL | [Brand] | `brand-kit` | 2 |
+| WIRE | [CRM] | `quote-wizard` + `hubspot-setup` | 2 |
+| BOOK | [Booking] | `calendly-setup` | Both |
+| LEDGER | [Accounts] | `ledger-setup` (not yet built — see `FORGE_CODE_SIGNATURES_v1.md`) | 2 |
+| PULSE | [Nurture] | `nurture-setup` (not yet built) | 2 |
+| SPARK | [Content] | `social-media-machine` | 2 |
+| BEACON | [Dashboard] | `beacon-dashboard` (not yet built) | 2 |
+| FORGE | [QA] | `site-audit` + `client-handover` | Both |
 
-### MARK [Logo] — how it works
+### MARK [Logo] — how it works (Product 1 only)
 
-MARK runs **concurrently with the build** (non-blocking). ATLAS deploys the site immediately with a text placeholder. MARK sends the client a logo wizard link in their confirmation email. The client picks from 3 styles generated live in their exact brand colours. On confirmation, 9 named assets are generated and Aaron is notified. Site is re-deployed with the chosen logo (2 min manual step, or future Vercel API automation). 24hr timeout auto-selects Style A.
+MARK runs **concurrently with the build** (non-blocking). ATLAS deploys the site immediately with a text placeholder. If the client said "design one for me" in `client-intake.html`, MARK sends a logo wizard link (fires from `api/client-intake.js`, not at payment time — see the sequencing fix below). The client picks from 3 styles generated live in their exact brand colours. On confirmation, 9 named assets are generated and Aaron is notified. If the client said "I have one" in the intake wizard, MARK is skipped entirely — their uploaded logo is applied directly instead.
 
-**Logo wizard:** `https://forgeisagentic.tech/logo-wizard.html?slug=SLUG&name=NAME&trade=TRADE&color=HEX&email=EMAIL&pkg=PKG`
+**Logo wizard:** `https://forgeisagentic.tech/logo-wizard.html?slug=SLUG&name=NAME&trade=TRADE&color=HEX&email=EMAIL`
 
-### Package tiers
+**Sequencing note:** the "choose your logo" email used to fire immediately at payment (before the client had any chance to say they already have one). Fixed — payment now sends a link to `client-intake.html` instead, and the logo email (if needed) fires after that wizard is submitted, from `api/client-intake.js`.
 
-| Package | Price | Agents activated |
+### Products and pricing
+
+| Product | Price | Agents activated |
 |---|---|---|
-| 1 — Launch | £74.99 | SCOUT + ATLAS + FORGE |
-| 2 — Brand | £149.99 | + PIXEL |
-| 3 — Convert | £299.99 | + WIRE |
-| 4 — Book | £499.99 | + BOOK |
-| 5 — Grow | £624.99 | + SPARK |
+| Pop Up Website | £99 | SCOUT + ATLAS + BOOK + MARK + FORGE |
+| Master Website + Branding | £299.99 | SCOUT + ATLAS + PIXEL + WIRE + BOOK + LEDGER + PULSE + SPARK + BEACON + FORGE |
+
+`pkg` values in `custom_id` are now `product1` / `product2` (legacy `p1`-`p5` values are aliased in `api/session.js` and `build-status.html` so any order placed before this change still resolves).
 
 ---
 
@@ -151,11 +177,12 @@ FORGE_OUTPUT_DIR=./outputs          # optional override
 |---|---|
 | Trigger | PayPal `PAYMENT.CAPTURE.COMPLETED` event |
 | Verification | PayPal signature verification (skip if env vars absent — dev only) |
-| On success | 1. Email Aaron via FormSubmit (`notifyDeployment`) 2. Email client via Resend (`sendClientConfirmation`) |
-| client data | Decoded from `custom_id` (base64 JSON: `{name, location, email, pkg}`) |
+| On success | 1. Email Aaron via Resend (`notifyDeployment`) 2. Email client via Resend (`sendPaymentConfirmedEmail`, in `api/_lib/emails.js`) — payment receipt + link to `client-intake.html`, no logo CTA (see sequencing note below) |
+| client data | Decoded from `custom_id` (base64 JSON: `{name, location, email, pkg}`, `pkg` is now `product1`/`product2`) |
 | Error strategy | Always returns HTTP 200. Logs errors internally. |
+| Idempotency | ✅ Fixed — KV-backed dedup on `orderId`, duplicate PayPal events are ignored. |
 
-**Known issue:** No idempotency guard. PayPal can retry the same event and trigger duplicate emails.
+**Logo sequencing:** the "choose your logo" email used to fire here, immediately at payment — before the client had any chance to say they already have one. Fixed: this endpoint no longer sends a logo CTA at all. `api/client-intake.js` sends it after the build brief is submitted, gated on `logoChoice`.
 
 **Required Vercel env vars:**
 ```
@@ -163,9 +190,23 @@ PAYPAL_WEBHOOK_ID
 PAYPAL_CLIENT_ID
 PAYPAL_CLIENT_SECRET
 PAYPAL_MODE=live|sandbox
-NOTIFY_EMAIL=builtbyaaronf@gmail.com
+NOTIFY_EMAIL=sales@forgeisagentic.tech
 RESEND_API_KEY
 RESEND_FROM_EMAIL
+```
+
+### `/api/client-intake` + `/api/client-intake-photo`
+
+| Field | Value |
+|---|---|
+| Trigger | `client-intake.html` submission (post-payment build brief: trade, services, hours, WhatsApp, Google Business, Instagram, photos, logo choice, accreditations) |
+| Photo handling | `client-intake-photo.js` receives ONE compressed image per request (client-side canvas resize to ~1600px before upload) and returns a Vercel Blob URL. `client-intake.js` never receives image bytes — only URLs. This is a deliberate fix: batching all photos into one request would exceed Vercel's serverless body size limit. |
+| On success | Stores the brief in KV (`intake:{orderId}`), emails Aaron, sends the client either `sendLogoWizardEmail` (design 3 options) or `sendLogoReceivedEmail` (already uploaded) depending on `logoChoice` |
+| Storage | KV for the structured record (30 day TTL), Vercel Blob for images (`public` access) |
+
+**Required Vercel env vars (in addition to the ones above):**
+```
+BLOB_READ_WRITE_TOKEN
 ```
 
 ### `/api/tavus-conversation`
@@ -196,9 +237,14 @@ TAVUS_PERSONA_ID        # optional
 | `DIAGNOSTICS-001.md` | Post-mortem from Deploy #001 (FORGE internal). Architecture lessons. |
 | `index.html` | FORGE main website. Built. Needs `vercel --prod` to deploy. |
 | `vercel.json` | Vercel routing config. **Missing security headers** — see Security section. |
-| `build-status.html` | Post-payment page. Loads Tavus video agent. |
-| `start.html` | Quick-start / internal nav page. |
+| `build-status.html` | Post-payment page. Loads Tavus video agent. Links to `client-intake.html`. |
+| `start.html` | **The checkout wizard.** Package selection, business details, PayPal payment. Not an internal nav page — this is the actual purchase flow. |
+| `client-intake.html` | Post-payment build brief wizard — trade, services, photos, logo choice, accreditations. Feeds ATLAS's build. |
 | `api/paypal-webhook.js` | Payment handler. |
+| `api/session.js` | Verifies a PayPal order server-side, returns client data + upgrade grid for `build-status.html`. |
+| `api/client-intake.js` | Stores the build brief, fires the logo follow-up email. |
+| `api/client-intake-photo.js` | Single-image upload endpoint (compress client-side, upload one at a time — see Serverless API section). |
+| `api/_lib/emails.js` | Shared email templates (`sendPaymentConfirmedEmail`, `sendLogoWizardEmail`, `sendLogoReceivedEmail`). |
 | `api/tavus-conversation.js` | Post-payment video agent creator. |
 | `forge-strategy-pack.html` | FORGE's own strategy pack. Reference for client packs. |
 | `forge-chase-sales-system.md` | Sales email sequences, cadences, objection scripts. |

@@ -12,9 +12,10 @@
 
 import { getActivePlans } from './_config/plans.js';
 
-const PRICES = { p1: 74.99, p2: 149.99, p3: 299.99, p4: 499.99, p5: 624.99 };
-const LABELS = { p1: 'Launch', p2: 'Brand', p3: 'Convert', p4: 'Book', p5: 'Grow' };
-const ETAs = { p1: '~10 mins', p2: '~15 mins', p3: '~20 mins', p4: '~25 mins', p5: '~35 mins' };
+// Two-product model — replaces the old p1-p5 tiers.
+const PRICES = { product1: 99, product2: 299.99 };
+const LABELS = { product1: 'Pop Up Website', product2: 'Master Website + Branding' };
+const ETAs = { product1: '~10 mins', product2: '~25 mins' };
 
 const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live'
   ? 'https://api-m.paypal.com'
@@ -109,9 +110,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'invalid_custom_id' });
     }
 
-    const pkg = decoded.pkg || 'p1';
-    const currentPrice = PRICES[pkg];
+    const pkg = decoded.pkg || 'product1';
+    const currentPrice = PRICES[pkg] ?? PRICES.product1;
 
+    // Two-product model has exactly one upgrade path: Product 1 -> Product 2.
+    // Grid stays an array (build-status.html already iterates it) but it's
+    // one card now instead of up to four.
     const proRataGrid = Object.entries(PRICES)
       .filter(([key]) => PRICES[key] > currentPrice)
       .map(([key, price]) => ({
@@ -119,9 +123,7 @@ export default async function handler(req, res) {
         label: LABELS[key],
         retail_price: price,
         pro_rata_price: parseFloat((price - currentPrice).toFixed(2)),
-        is_recommended:
-          (key === 'p3' && pkg === 'p1') ||
-          (key === 'p5' && (pkg === 'p3' || pkg === 'p4'))
+        is_recommended: key === 'product2' && pkg === 'product1',
       }));
 
     const activePlans = getActivePlans();
@@ -153,8 +155,33 @@ export default async function handler(req, res) {
       email: decoded.email,
       location: decoded.location || '',
       pkg,
-      pkgLabel: LABELS[pkg],
+      pkgLabel: LABELS[pkg] || pkg,
       pkgPrice: `£${currentPrice.toFixed(2)}`,
-      eta: ETAs[pkg],
+      eta: ETAs[pkg] || 'within the hour',
       business_type: businessType,
-      paypal_client_id: process.env.PAYPAL_CLIEN
+      paypal_client_id: process.env.PAYPAL_CLIENT_ID || null,
+      proRataGrid,
+      subscriptionOptions,
+    });
+  } catch (err) {
+    console.error(`[SESSION] Failed to verify order:`, err.message);
+    // Fail open with sane defaults rather than a raw 500 — build-status.html
+    // still needs to render something for the client even if PayPal's API
+    // is briefly unreachable. This mirrors the fallback object already
+    // hardcoded further down in build-status.html for the no-orderId case.
+    return res.status(200).json({
+      name: '',
+      email: '',
+      location: '',
+      pkg: 'product1',
+      pkgLabel: LABELS.product1,
+      pkgPrice: `£${PRICES.product1.toFixed(2)}`,
+      eta: 'within the hour',
+      business_type: 'sole_trader',
+      paypal_client_id: process.env.PAYPAL_CLIENT_ID || null,
+      proRataGrid: [],
+      subscriptionOptions: [],
+      warning: 'session_verification_failed',
+    });
+  }
+}

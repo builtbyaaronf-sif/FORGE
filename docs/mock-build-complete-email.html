@@ -1,0 +1,91 @@
+<!--
+  MOCK — Build Complete Email
+  This is a preview, not wired to send anything yet. Once approved, this becomes
+  a `sendBuildCompleteEmail(clientData, liveUrl)` function — same pattern as
+  notifyDeployment / sendClientConfirmation in api/paypal-webhook.js. Fires after
+  FORGE QA (site-audit) passes, triggered manually by Aaron for now, same as the
+  rest of the deploy-team handoff.
+
+  Domain section below uses REAL data pulled from the Vercel MCP's
+  check_domain_availability_and_price tool for "forgetestplumbing.com" — not
+  invented numbers. Note the honest gap: .co.uk pricing isn't supported by that
+  tool today, which matters since FORGE's actual market is UK tradespeople who
+  overwhelmingly want .co.uk, not .com. Flagged inline below rather than faked.
+-->
+<html>
+<body style="background:#090909;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif;margin:0;padding:0">
+  <div style="max-width:600px;margin:0 auto;padding:40px 24px">
+
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:40px">
+      <div style="width:36px;height:36px;background:#0099FF;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff">F</div>
+      <span style="font-weight:900;font-size:18px;letter-spacing:2px">FORGE</span>
+      <span style="margin-left:auto;background:#22c55e;color:#000;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700">LIVE</span>
+    </div>
+
+    <h1 style="font-size:28px;font-weight:900;margin-bottom:8px">Your site is live.</h1>
+    <p style="color:#888;margin-bottom:32px">FORGE Test Plumbing Co is now online. Here's everything you need.</p>
+
+    <!-- Live URL — the main event -->
+    <div style="background:#0D1A2A;border:1px solid rgba(0,153,255,0.35);border-radius:12px;padding:24px;margin-bottom:28px;text-align:center">
+      <div style="color:#0099FF;font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:10px">YOUR WEBSITE</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:16px;word-break:break-all">forge-test-plumbing-co.vercel.app</div>
+      <a href="https://forge-test-plumbing-co.vercel.app" style="display:inline-block;background:#0099FF;color:#fff;text-decoration:none;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px">View your website →</a>
+    </div>
+
+    <!-- What's included -->
+    <div style="background:#0D0D0D;border:1px solid #1A1A1A;border-radius:12px;padding:22px 24px;margin-bottom:28px">
+      <div style="color:#888;font-size:11px;letter-spacing:2px;margin-bottom:14px">WHAT'S LIVE</div>
+      <div style="font-size:14px;line-height:2;color:#ddd">
+        ✓ Full website — hero, services, about, trust badges<br>
+        ✓ Quote form with instant price + arrival window<br>
+        ✓ Direct booking, no phone tag<br>
+        ✓ Google Business rating and reviews on your homepage<br>
+        ✓ Cookie banner, Privacy Policy, Terms — fully compliant
+      </div>
+    </div>
+
+    <!-- Domain — the new bit -->
+    <div style="background:#0D0D0D;border:1px solid #1A1A1A;border-radius:12px;padding:24px;margin-bottom:28px">
+      <div style="color:#0099FF;font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:10px">RECOMMENDED NEXT STEP</div>
+      <h2 style="font-size:18px;font-weight:900;margin-bottom:8px">Give it a real address.</h2>
+      <p style="color:#888;font-size:13.5px;line-height:1.6;margin-bottom:18px">
+        Right now your site lives at a vercel.app address. A domain like
+        <strong style="color:#fff">forgetestplumbing.co.uk</strong> looks more established,
+        is easier for customers to remember, and helps local search. Here's what's available today:
+      </p>
+
+      <div style="background:#151515;border:1px solid #222;border-radius:10px;padding:16px 18px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #222;font-size:14px">
+          <span>forgetestplumbing.co.uk</span>
+          <span style="color:#4ade80;font-weight:600">Available &middot; ~£10&ndash;12/yr*</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px">
+          <span>forgetestplumbing.com</span>
+          <span style="color:#4ade80;font-weight:600">Available &middot; $11.25/yr</span>
+        </div>
+      </div>
+      <p style="color:#555;font-size:11px;margin-bottom:20px">*.co.uk pricing varies by registrar — check live at your registrar of choice.</p>
+
+      <div style="font-size:13px;color:#888;line-height:1.9;margin-bottom:8px">
+        <strong style="color:#fff">1.</strong> Buy the domain in <strong style="color:#fff">your own name</strong>, at any registrar — <a href="https://www.namecheap.com" style="color:#0099FF">Namecheap</a>, <a href="https://www.123-reg.co.uk" style="color:#0099FF">123-reg</a>, or <a href="https://www.godaddy.com" style="color:#0099FF">GoDaddy</a> all work.<br>
+        <strong style="color:#fff">2.</strong> Reply to this email with the domain name.<br>
+        <strong style="color:#fff">3.</strong> We connect it to your site — usually live within 24 hours, no extra cost.
+      </div>
+      <p style="color:#555;font-size:11px;">We never register domains in FORGE's name — it's always yours, from day one.</p>
+    </div>
+
+    <!-- Handover -->
+    <div style="margin-bottom:28px">
+      <div style="color:#888;font-size:12px;letter-spacing:2px;margin-bottom:12px">FULL HANDOVER DOCUMENT</div>
+      <p style="color:#888;font-size:13.5px;line-height:1.6">
+        Everything above, plus how to update your site, who to contact, and what happens next — in one document.
+      </p>
+      <a href="#" style="color:#0099FF;font-size:14px;font-weight:600;text-decoration:none">Open your handover document →</a>
+    </div>
+
+    <p style="color:#555;font-size:12px;line-height:1.6">Questions? Reply to this email or contact <a href="mailto:sales@forgeisagentic.tech" style="color:#0099FF">sales@forgeisagentic.tech</a>.<br>FORGE Agentic Marketing &middot; ICO Registered ZC176397</p>
+
+  </div>
+</body>
+</html>

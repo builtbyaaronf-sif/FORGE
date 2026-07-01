@@ -140,17 +140,14 @@
     /* ── PACKAGE CARDS ── */
     .packages {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
       width: 100%;
-      max-width: 1060px;
+      max-width: 720px;
       margin-bottom: 24px;
     }
-    @media (max-width: 900px) {
-      .packages { grid-template-columns: repeat(2, 1fr); max-width: 560px; }
-    }
-    @media (max-width: 500px) {
-      .packages { grid-template-columns: 1fr; max-width: 380px; }
+    @media (max-width: 640px) {
+      .packages { grid-template-columns: 1fr; max-width: 400px; }
     }
     .pkg-card {
       background: var(--bg2);
@@ -208,6 +205,12 @@
       opacity: 0; transition: opacity 0.15s;
     }
     .pkg-card.selected .pkg-select-indicator::after { opacity: 1; }
+
+    /* Business type toggle — stacks on narrow screens instead of squeezing
+       "Sole Trader / Self-Employed" into ~110px and wrapping to 3 lines. */
+    @media (max-width: 420px) {
+      .biztype-row { flex-direction: column; }
+    }
 
     /* ── TEXT INPUTS ── */
     .input-wrap { width: 100%; max-width: 540px; margin-bottom: 28px; }
@@ -362,6 +365,23 @@
     .pay-btn:hover { opacity: 0.9; transform: translateY(-1px); }
     .pay-note { font-size: 12px; color: var(--grey2); text-align: center; max-width: 400px; }
     .pay-note a { color: var(--accent); text-decoration: none; }
+
+    /* ── PAYMENT CARD ──
+       PayPal's own hosted card fields render with light/default styling that
+       PayPal doesn't let us re-theme without the separate Advanced Card Fields
+       integration. Rather than fight that, we give it a proper light card to
+       live inside — same pattern most checkout pages use — so it never looks
+       like it's floating, unstyled, on a black background. */
+    .payment-card {
+      width: 100%; max-width: 480px; margin: 0 auto 20px;
+      background: #FFFFFF; border-radius: 16px;
+      padding: 28px 24px 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+    .payment-card-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #9CA3AF; margin-bottom: 16px; text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -396,78 +416,40 @@
   <!-- ── SLIDE 1: Package ── -->
   <div class="slide" data-step="1">
     <div class="slide-label">Question 1 of 6</div>
-    <h2 class="slide-title">Which package<br /><em>is right for you?</em></h2>
-    <p class="slide-sub">Not sure? The Standard Deploy is our most popular — it gives you everything you need to look established and start generating leads from day one.</p>
+    <h2 class="slide-title">Which one<br /><em>is right for you?</em></h2>
+    <p class="slide-sub">Two options, no confusing tiers. Most tradespeople starting out choose Pop Up Website — upgrade any time.</p>
     <div class="packages">
 
-      <!-- P1 Launch -->
-      <div class="pkg-card" id="pkg-p1" onclick="selectPackage('p1')">
+      <!-- Product 1: Pop Up Website -->
+      <div class="pkg-card" id="pkg-product1" onclick="selectPackage('product1')">
         <div class="pkg-select-indicator"></div>
-        <div class="pkg-name">Launch</div>
-        <div class="pkg-price">£74.99</div>
-        <div class="pkg-time">~5 minutes</div>
+        <div class="pkg-name">Pop Up Website</div>
+        <div class="pkg-price">£99</div>
+        <div class="pkg-time">~10 minutes</div>
         <ul class="pkg-features">
-          <li>Live website + CTAs</li>
-          <li>SEO meta + Analytics</li>
-          <li>WhatsApp button</li>
-          <li>Cookie banner + Privacy Policy</li>
+          <li>Live website with real pricing + arrival times</li>
+          <li>Instant quote form, no phone tag</li>
+          <li>Direct booking calendar</li>
+          <li>Instagram showcase + Google reviews on your homepage</li>
+          <li>Cookie banner, Privacy Policy, Terms — fully compliant</li>
         </ul>
       </div>
 
-      <!-- P2 Brand -->
-      <div class="pkg-card" id="pkg-p2" onclick="selectPackage('p2')">
+      <!-- Product 2: Master Website + Branding -->
+      <div class="pkg-card" id="pkg-product2" onclick="selectPackage('product2')">
+        <div class="pkg-badge">Full service</div>
         <div class="pkg-select-indicator"></div>
-        <div class="pkg-name">Brand</div>
-        <div class="pkg-price">£149.99</div>
-        <div class="pkg-time">~8 minutes</div>
-        <ul class="pkg-features">
-          <li>Everything in Launch</li>
-          <li>AI imagery</li>
-          <li>Canva brand kit</li>
-          <li>Testimonials section</li>
-        </ul>
-      </div>
-
-      <!-- P3 Convert — Featured -->
-      <div class="pkg-card" id="pkg-p3" onclick="selectPackage('p3')">
-        <div class="pkg-badge">Most popular</div>
-        <div class="pkg-select-indicator"></div>
-        <div class="pkg-name">Convert</div>
+        <div class="pkg-name">Master Website + Branding</div>
         <div class="pkg-price">£299.99</div>
-        <div class="pkg-time">~12 minutes</div>
+        <div class="pkg-time">~25 minutes</div>
         <ul class="pkg-features">
-          <li>Everything in Brand</li>
-          <li>Quote wizard + photos</li>
-          <li>HubSpot CRM setup</li>
-          <li>Leads auto-flow to CRM</li>
-        </ul>
-      </div>
-
-      <!-- P4 Book -->
-      <div class="pkg-card" id="pkg-p4" onclick="selectPackage('p4')">
-        <div class="pkg-select-indicator"></div>
-        <div class="pkg-name">Book</div>
-        <div class="pkg-price">£499.99</div>
-        <div class="pkg-time">~15 minutes</div>
-        <ul class="pkg-features">
-          <li>Everything in Convert</li>
-          <li>Calendly setup</li>
-          <li>Booking widget on site</li>
-          <li>Google Calendar sync</li>
-        </ul>
-      </div>
-
-      <!-- P5 Grow -->
-      <div class="pkg-card" id="pkg-p5" onclick="selectPackage('p5')">
-        <div class="pkg-select-indicator"></div>
-        <div class="pkg-name">Grow</div>
-        <div class="pkg-price">£624.99</div>
-        <div class="pkg-time">~18 minutes</div>
-        <ul class="pkg-features">
-          <li>Everything in Book</li>
-          <li>Full month of social content</li>
-          <li>Canva social templates</li>
-          <li>Brand across all channels</li>
+          <li>Everything in Pop Up Website</li>
+          <li>Full brand kit — logo, letterhead, signage</li>
+          <li>CRM with leads auto-flowing in</li>
+          <li>Invoicing that tracks what's owed and paid</li>
+          <li>Automated follow-up emails to new leads</li>
+          <li>A dashboard summarising everything, always up to date</li>
+          <li>A month of social content, ready to post</li>
         </ul>
       </div>
 
@@ -498,7 +480,7 @@
     <!-- Business type toggle -->
     <div class="input-wrap" style="margin-top:20px;">
       <label class="field-label">Are you a...</label>
-      <div style="display:flex;gap:10px;margin-top:4px;">
+      <div class="biztype-row" style="display:flex;gap:10px;margin-top:4px;">
         <button type="button" id="biz-type-sole" onclick="setBizType('sole_trader')" style="
           flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid var(--accent);
           background:var(--accent-dim);color:#fff;font-size:15px;font-weight:600;
@@ -649,17 +631,22 @@
     <div class="slide-label">You're all set</div>
     <h2 class="slide-title">Looking good.<br /><em>Ready to launch?</em></h2>
     <div class="summary-box" id="summaryBox"></div>
-    <div id="paypal-button-container" style="max-width:440px;margin:0 auto 12px;"></div>
-    <div id="paypal-loading" style="text-align:center;padding:18px;color:var(--grey);font-size:14px;display:none;">Initialising secure checkout…</div>
-    <div id="paypal-error" style="text-align:center;padding:12px;color:#f87171;font-size:13px;display:none;"></div>
-    <!-- LEGACY fallback (hidden by default, shown if SDK fails) -->
-    <a class="pay-btn" id="payBtn" href="#" target="_blank" rel="noopener" style="display:none;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72A.775.775 0 0 1 5.71 3h7.332c2.636 0 4.446 1.15 4.934 3.218.13.552.157 1.13.08 1.73-.022.16-.048.32-.08.48h.002c.82 2.87-.77 5.18-4.34 5.18H11.3l-.74 4.73a.641.641 0 0 1-.634.54H7.076zm9.374-11.8c-.34 2.26-2.05 3.14-4.07 3.14H10.6l.84-5.39h1.79c1.6 0 2.75.41 3.22 2.25z"/></svg>
-      Pay with PayPal
-    </a>
+
+    <div class="payment-card">
+      <div class="payment-card-label">🔒 Secure checkout via PayPal</div>
+      <div id="paypal-button-container"></div>
+      <div id="paypal-loading" style="text-align:center;padding:18px;color:#6B7280;font-size:14px;display:none;">Initialising secure checkout…</div>
+      <div id="paypal-error" style="text-align:center;padding:12px;color:#DC2626;font-size:13px;display:none;"></div>
+      <!-- LEGACY fallback (hidden by default, shown if SDK fails) -->
+      <a class="pay-btn" id="payBtn" href="#" target="_blank" rel="noopener" style="display:none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72A.775.775 0 0 1 5.71 3h7.332c2.636 0 4.446 1.15 4.934 3.218.13.552.157 1.13.08 1.73-.022.16-.048.32-.08.48h.002c.82 2.87-.77 5.18-4.34 5.18H11.3l-.74 4.73a.641.641 0 0 1-.634.54H7.076zm9.374-11.8c-.34 2.26-2.05 3.14-4.07 3.14H10.6l.84-5.39h1.79c1.6 0 2.75.41 3.22 2.25z"/></svg>
+        Pay with PayPal
+      </a>
+    </div>
+
     <div class="pay-note">
       Taken to PayPal to pay securely. Invoice also sent to your email.<br />
-      Questions? <a href="mailto:builtbyaaronf@gmail.com">builtbyaaronf@gmail.com</a>
+      Questions? <a href="mailto:sales@forgeisagentic.tech">sales@forgeisagentic.tech</a>
     </div>
     <button class="btn-back" onclick="back()" style="margin-top:20px;">← Edit answers</button>
   </div>
@@ -667,13 +654,11 @@
 </div><!-- /viewport -->
 
 <script>
-  // ── PACKAGE CONFIG ────────────────────────────────────────────────────────
+  // ── PRODUCT CONFIG ────────────────────────────────────────────────────────
+  // Two-product model — replaces the old p1-p5 tiers.
   const PACKAGES = {
-    p1: { name: 'Launch',  price: '74.99',  label: 'Package 1 — Launch — £74.99',  eta: '~5 minutes' },
-    p2: { name: 'Brand',   price: '149.99', label: 'Package 2 — Brand — £149.99',  eta: '~8 minutes' },
-    p3: { name: 'Convert', price: '299.99', label: 'Package 3 — Convert — £299.99', eta: '~12 minutes' },
-    p4: { name: 'Book',    price: '499.99', label: 'Package 4 — Book — £499.99',   eta: '~15 minutes' },
-    p5: { name: 'Grow',    price: '624.99', label: 'Package 5 — Grow — £624.99',   eta: '~18 minutes' },
+    product1: { name: 'Pop Up Website',              price: '99',     label: 'Pop Up Website — £99',                       eta: '~10 minutes' },
+    product2: { name: 'Master Website + Branding',   price: '299.99', label: 'Master Website + Branding — £299.99',        eta: '~25 minutes' },
   };
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -687,11 +672,13 @@
 
   const slides = document.querySelectorAll('.slide');
 
-  // Pre-select package from URL param (?package=p1..p5 or legacy quick/standard/full)
+  // Pre-select package from URL param (?package=product1|product2, plus legacy
+  // aliases so old marketing links / bookmarks from the p1-p5 era still land
+  // somewhere sensible instead of a blank selector).
   const params = new URLSearchParams(window.location.search);
   const pkgParam = (params.get('package') || '').toLowerCase();
-  const legacyMap = { quick: 'p1', standard: 'p3', full: 'p5' };
-  const normalised = legacyMap[pkgParam] || (['p1','p2','p3','p4','p5'].includes(pkgParam) ? pkgParam : null);
+  const legacyMap = { quick: 'product1', p1: 'product1', standard: 'product2', p2: 'product2', p3: 'product2', p4: 'product2', full: 'product2', p5: 'product2' };
+  const normalised = legacyMap[pkgParam] || (['product1', 'product2'].includes(pkgParam) ? pkgParam : null);
   if (normalised) window._preselect = normalised;
 
   // ── NAVIGATION ────────────────────────────────────────────────────────────
@@ -876,7 +863,7 @@
     `;
 
     // Silent notification via FormSubmit (fires immediately on summary view)
-    fetch('https://formsubmit.co/ajax/builtbyaaronf@gmail.com', {
+    fetch('https://formsubmit.co/ajax/sales@forgeisagentic.tech', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
@@ -938,4 +925,36 @@
               currency_code: 'GBP'
             },
             description: pkgConfig.label,
-            custom_id:  
+            custom_id:  customId
+          }]
+        });
+      },
+
+      onApprove: function(data, actions) {
+        errEl.style.display = 'none';
+        return actions.order.capture().then(function(details) {
+          window.location.href = 'build-status.html?orderId=' + encodeURIComponent(data.orderID);
+        }).catch(function(err) {
+          console.error('PayPal capture error:', err);
+          errEl.textContent = 'Payment could not be completed. Please try again or contact sales@forgeisagentic.tech.';
+          errEl.style.display = 'block';
+        });
+      },
+
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        errEl.textContent = 'Something went wrong with checkout. Please try again or contact sales@forgeisagentic.tech.';
+        errEl.style.display = 'block';
+      },
+
+      onCancel: function() {
+        errEl.textContent = 'Checkout cancelled. Your details are saved — click the button again when ready.';
+        errEl.style.display = 'block';
+      }
+
+    }).render('#paypal-button-container');
+  }
+</script>
+
+</body>
+</html>

@@ -1,1 +1,2 @@
-FORGE - AI Marketing Department
+# FORGE
+FORGE - Agentic Marketing for London Tradespeople

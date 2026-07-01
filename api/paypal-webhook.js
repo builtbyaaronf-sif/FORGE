@@ -1,7 +1,15 @@
 import { createClient } from '@vercel/kv';
+import { sendPaymentConfirmedEmail } from './_lib/emails.js';
 
 const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
-const PRICES = { p1: 74.99, p2: 149.99, p3: 299.99, p4: 499.99, p5: 624.99 };
+const PRICES = {
+  // Two-product model — replaces the old 5-tier p1-p5 structure.
+  product1: 99,       // Pop Up Website
+  product2: 299.99,   // Master Website + Branding
+  // Beta (founding 10) — 90% off
+  product1b: 9.90,
+  product2b: 29.99,
+};
 const RETAINER_TIERS = { t1: 99, t2: 249, t3: 499 };
 const kv = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN ? createClient({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN }) : null;
 
@@ -19,33 +27,108 @@ async function verifyWebhook(req, rawBody) {
 
 async function notifyDeployment(clientData, orderId, amount, options = {}) {
   const pkg = clientData.pkg || 'unknown';
-  const pkgNames = { p1: 'Launch', p2: 'Brand', p3: 'Convert', p4: 'Book', p5: 'Grow' };
+  const pkgNames = {
+    product1: 'Pop Up Website', product2: 'Master Website + Branding',
+    product1b: 'Pop Up Website (Beta)', product2b: 'Master Website + Branding (Beta)',
+  };
   const isUpgrade = options.isUpgrade || false;
   const upgradeFrom = options.upgradeFrom || null;
   const isSubscription = options.isSubscription || false;
   const isRecurringCharge = options.isRecurringCharge || false;
-  let action, subject;
+  const isOneTimeOrder = !isUpgrade && !isSubscription && !isRecurringCharge;
 
+  let subject;
   if (isSubscription) {
     const tierLabel = { t1: 'Local SEO Maintenance', t2: 'Hyper-Local Dominator', t3: 'Total Agentic Dominance' }[clientData.tier] || clientData.tier;
-    action = `SUBSCRIPTION: Activate retainer tier ${clientData.tier}`;
     subject = `SUBSCRIPTION NEW -- ${clientData.name} -- ${tierLabel}`;
   } else if (isRecurringCharge) {
     const tierLabel = { t1: 'Local SEO Maintenance', t2: 'Hyper-Local Dominator', t3: 'Total Agentic Dominance' }[clientData.tier] || clientData.tier;
-    action = `SUBSCRIPTION RECURRING: Run monthly cycle for tier ${clientData.tier}`;
     subject = `SUBSCRIPTION RECURRING -- ${clientData.name} -- ${tierLabel} -- £${amount}`;
   } else if (isUpgrade) {
-    action = `UPGRADE: ${upgradeFrom} to ${pkg}`;
     subject = `UPGRADE -- ${clientData.name} -- ${pkgNames[pkg]} (from ${pkgNames[upgradeFrom]})`;
   } else {
-    action = 'DEPLOY: Run deploy-team skill';
-    subject = `DEPLOY NOW -- ${clientData.name} -- ${pkgNames[pkg] || pkg}`;
+    subject = `DEPLOY NOW -- ${clientData.name} -- ${pkgNames[pkg] || pkg} -- £${amount}`;
   }
 
-  await fetch('https://formsubmit.co/ajax/builtbyaaronf@gmail.com', {
+  // Build one-click deploy URL for standard orders
+  let deployButtonHtml = '';
+  if (isOneTimeOrder && process.env.DEPLOY_TRIGGER_SECRET && process.env.VERCEL_API_TOKEN) {
+    const slug = (clientData.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const params = new URLSearchParams({
+      token:    process.env.DEPLOY_TRIGGER_SECRET,
+      slug,
+      name:     clientData.name || '',
+      trade:    clientData.trade || clientData.business_type || '',
+      location: clientData.location || '',
+      pkg,
+      email:    clientData.email || '',
+    });
+    const deployUrl = `https://forgeisagentic.tech/api/deploy-trigger?${params.toString()}`;
+    deployButtonHtml = `
+      <div style="background:#0a1a0a;border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:24px;margin:24px 0;text-align:center">
+        <div style="color:#22c55e;font-size:11px;letter-spacing:3px;font-weight:700;margin-bottom:10px">ONE-CLICK DEPLOY</div>
+        <p style="color:#888;font-size:13px;margin-bottom:16px">Creates Vercel project + deploys starter template. Click once. Done.</p>
+        <a href="${deployUrl}" style="display:inline-block;background:#22c55e;color:#000;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:800;font-size:15px">
+          Deploy ${clientData.name} →
+        </a>
+        <p style="color:#444;font-size:11px;margin-top:10px">Then run full deploy-team skill in Cowork for the complete site.</p>
+      </div>`;
+  }
+
+  // Send via Resend for rich HTML (falls back to FormSubmit for subscriptions/upgrades)
+  if (isOneTimeOrder && process.env.RESEND_API_KEY) {
+    const notifyHtml = `
+<html>
+<body style="background:#090909;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif;margin:0;padding:0">
+  <div style="max-width:600px;margin:0 auto;padding:40px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
+      <div style="width:32px;height:32px;background:#0099FF;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff">F</div>
+      <span style="font-weight:900;font-size:16px;letter-spacing:2px;color:#fff">FORGE</span>
+      <span style="margin-left:auto;background:#22c55e;color:#000;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700">NEW ORDER</span>
+    </div>
+    <h1 style="font-size:26px;font-weight:900;margin-bottom:4px">${clientData.name}</h1>
+    <p style="color:#888;margin-bottom:24px">${pkgNames[pkg] || pkg} &middot; £${amount} &middot; ${clientData.location || 'London'}</p>
+    <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:20px;margin-bottom:8px;font-size:14px;line-height:2">
+      <div><span style="color:#555">Business:</span> <strong>${clientData.name}</strong></div>
+      <div><span style="color:#555">Trade:</span> ${clientData.trade || clientData.business_type || 'Unknown'}</div>
+      <div><span style="color:#555">Location:</span> ${clientData.location || 'Unknown'}</div>
+      <div><span style="color:#555">Email:</span> ${clientData.email}</div>
+      <div><span style="color:#555">Package:</span> ${pkgNames[pkg] || pkg}</div>
+      <div><span style="color:#555">Amount:</span> £${amount}</div>
+      <div><span style="color:#555">Order ID:</span> <span style="font-family:monospace;font-size:12px;color:#666">${orderId}</span></div>
+    </div>
+    ${deployButtonHtml}
+    <p style="color:#333;font-size:12px;margin-top:24px">FORGE Agentic Marketing &middot; ICO Registered ZC176397</p>
+  </div>
+</body>
+</html>`;
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM_EMAIL,
+        to: ['sales@forgeisagentic.tech'],
+        subject,
+        html: notifyHtml,
+      }),
+    });
+    return;
+  }
+
+  // Fallback: FormSubmit for subscriptions, upgrades, or if Resend not configured
+  const action = isSubscription
+    ? `SUBSCRIPTION: Activate retainer tier ${clientData.tier}`
+    : isRecurringCharge
+      ? `SUBSCRIPTION RECURRING: Run monthly cycle for tier ${clientData.tier}`
+      : isUpgrade
+        ? `UPGRADE: ${upgradeFrom} to ${pkg}`
+        : 'DEPLOY: Run deploy-team skill in Cowork';
+
+  await fetch('https://formsubmit.co/ajax/sales@forgeisagentic.tech', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ _subject: subject, ACTION: action, Package: pkg, Business: clientData.name, 'Business Type': clientData.business_type === 'limited_company' ? 'Limited Company' : 'Sole Trader', Location: clientData.location || '--', Email: clientData.email, 'Order ID': orderId, Amount: amount, _template: 'table' })
+    body: JSON.stringify({ _subject: subject, ACTION: action, Package: pkg, Business: clientData.name, 'Business Type': clientData.business_type === 'limited_company' ? 'Limited Company' : 'Sole Trader', Location: clientData.location || '--', Email: clientData.email, 'Order ID': orderId, Amount: amount, _template: 'table' }),
   });
 }
 
@@ -71,82 +154,12 @@ async function updateHubSpotContact(email, utmSource, utmCampaign) {
   }
 }
 
-async function sendClientConfirmation(clientData, orderId, amount) {
-  if (!process.env.RESEND_API_KEY) return;
-  const pkg = clientData.pkg || 'p1';
-  const pkgNames = { p1: 'Launch', p2: 'Brand', p3: 'Convert', p4: 'Book', p5: 'Grow' };
-
-  // Build logo wizard URL — client picks their logo identity
-  const slug  = (clientData.name || 'client').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const trade = clientData.trade || clientData.business_type || 'professional';
-  const color = encodeURIComponent('#0099FF'); // default; ATLAS will pass the real palette colour in future
-  const wizardUrl = `https://forgeisagentic.tech/logo-wizard.html?slug=${encodeURIComponent(slug)}&name=${encodeURIComponent(clientData.name)}&trade=${encodeURIComponent(trade)}&color=${color}&email=${encodeURIComponent(clientData.email)}&pkg=${encodeURIComponent(pkg)}`;
-
-  const html = `
-<html>
-<body style="background:#090909;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif;margin:0;padding:0">
-  <div style="max-width:600px;margin:0 auto;padding:40px 24px">
-
-    <!-- Logo -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:40px">
-      <div style="width:36px;height:36px;background:#0099FF;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff">F</div>
-      <span style="font-weight:900;font-size:18px;letter-spacing:2px">FORGE</span>
-    </div>
-
-    <h1 style="font-size:28px;font-weight:900;margin-bottom:8px">Your order is confirmed.</h1>
-    <p style="color:#888;margin-bottom:32px">Here's what happens next.</p>
-
-    <!-- Order summary -->
-    <div style="background:#0D0D0D;border:1px solid #1A1A1A;border-radius:12px;padding:24px;margin-bottom:32px">
-      <div style="margin-bottom:12px"><span style="color:#888;font-size:13px">Business</span><br><strong>${clientData.name}</strong></div>
-      <div style="margin-bottom:12px"><span style="color:#888;font-size:13px">Package</span><br><strong>${pkgNames[pkg] || pkg}</strong></div>
-      <div style="margin-bottom:12px"><span style="color:#888;font-size:13px">Amount paid</span><br><strong>£${amount}</strong></div>
-      <div><span style="color:#888;font-size:13px">Order ID</span><br><span style="font-family:monospace;font-size:12px;color:#888">${orderId}</span></div>
-    </div>
-
-    <!-- Logo wizard CTA -->
-    <div style="background:#0D1A2A;border:1px solid rgba(0,153,255,0.3);border-radius:12px;padding:24px;margin-bottom:32px">
-      <div style="color:#0099FF;font-size:11px;letter-spacing:3px;font-weight:700;margin-bottom:12px">ACTION NEEDED: 60 SECONDS</div>
-      <h2 style="font-size:20px;font-weight:900;margin-bottom:8px">Choose your logo.</h2>
-      <p style="color:#888;font-size:14px;margin-bottom:20px">Before we finalise your build, choose your logo identity. Three options, all designed to match your site. Your choice gets applied across your website, social profiles, and all business assets.</p>
-      <a href="${wizardUrl}"
-         style="display:inline-block;background:#0099FF;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:700;font-size:15px">
-        Choose my logo →
-      </a>
-      <p style="color:#555;font-size:12px;margin-top:12px">No action = we'll select the best option for your business automatically after 24 hours.</p>
-    </div>
-
-    <!-- What's next -->
-    <div style="margin-bottom:32px">
-      <div style="color:#888;font-size:12px;letter-spacing:2px;margin-bottom:16px">WHAT HAPPENS NEXT</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:24px;height:24px;background:#0099FF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
-          <div><strong>Choose your logo</strong> using the button above</div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:24px;height:24px;background:#1A1A1A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#888">2</div>
-          <div style="color:#888">FORGE builds your complete digital presence</div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:24px;height:24px;background:#1A1A1A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#888">3</div>
-          <div style="color:#888">You receive all assets + a handover document</div>
-        </div>
-      </div>
-    </div>
-
-    <p style="color:#555;font-size:12px;line-height:1.6">Questions? Reply to this email or visit <a href="https://forgeisagentic.tech" style="color:#0099FF">forgeisagentic.tech</a>.<br>FORGE Agentic Marketing · ICO Registered ZC176397</p>
-
-  </div>
-</body>
-</html>`;
-
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: process.env.RESEND_FROM_EMAIL, to: [clientData.email], subject: `Your FORGE order is confirmed. One quick step.`, html }),
-  });
-}
+// sendClientConfirmation used to live here — it sent the "choose your logo"
+// CTA immediately at payment, before the client had any chance to say "I
+// already have one" via client-intake.html. That email now lives in
+// _lib/emails.js as sendPaymentConfirmedEmail (payment receipt + link to the
+// build brief, no logo CTA), and the logo choice itself is emailed from
+// api/client-intake.js once the brief actually says what the client wants.
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -229,7 +242,7 @@ export default async function handler(req, res) {
 
       await Promise.all([
         notifyDeployment(clientData, orderId, amount),
-        sendClientConfirmation(clientData, orderId, amount)
+        sendPaymentConfirmedEmail(clientData, orderId, amount)
       ]);
 
       console.log(`Deployment triggered for ${clientData.name}`);

@@ -9,6 +9,8 @@
 <meta property="og:description" content="Complete digital presence for London tradespeople. Built by AI in 10 minutes.">
 <meta property="og:type" content="website">
 <title>FORGE: The AI Marketing Department for London Tradespeople</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -307,9 +309,10 @@ h1,h2,h3,h4,h5{
 .pricing-intro p{color:var(--ink2);font-size:1.0625rem;max-width:560px;margin:0 auto}
 .pricing-packages{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-  margin-bottom:56px;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  max-width:900px;
+  margin:0 auto 56px;
   align-items:stretch;
 }
 .pkg-card{
@@ -425,7 +428,7 @@ h1,h2,h3,h4,h5{
 
 /* ─── MOBILE ─────────────────────────────────────────────── */
 @media(max-width:1024px){
-  .pricing-packages{grid-template-columns:repeat(3,1fr)}
+  /* pricing-packages already 2-col at base — nothing to override here now */
 }
 @media(max-width:768px){
   :root{--pad:16px}
@@ -457,7 +460,29 @@ h1,h2,h3,h4,h5{
   .pricing-packages{grid-template-columns:1fr}
   .trades-grid{grid-template-columns:1fr}
   .stack-grid{grid-template-columns:1fr}
+  .trade-grid{grid-template-columns:1fr 1fr}
 }
+/* ─── WIZARD FORM ────────────────────────────────────────── */
+.wiz{max-width:520px;margin:0 auto 32px;text-align:left}
+.wiz-progress{display:flex;gap:6px;justify-content:center;margin-bottom:28px}
+.wiz-dot{width:28px;height:3px;border-radius:2px;background:var(--border);transition:all .3s}
+.wiz-dot.done,.wiz-dot.active{background:var(--accent)}
+.wiz-dot.done{opacity:.4}
+.wiz-step{display:none}.wiz-step.active{display:block;animation:wizIn .3s cubic-bezier(.16,1,.3,1)}
+@keyframes wizIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wiz-title{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:4px}
+.wiz-sub{font-size:.85rem;color:var(--ink2);margin-bottom:18px;line-height:1.5}
+.wiz-label{font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px}
+.trade-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.trade-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;transition:border-color .2s,background .2s,color .2s;display:flex;align-items:center;gap:10px;font-family:inherit;line-height:1.3}
+.trade-btn:hover{border-color:rgba(0,153,255,.35);background:rgba(0,153,255,.05)}
+.trade-btn.selected{border-color:var(--accent);background:rgba(0,153,255,.1);color:var(--accent)}
+.trade-btn svg{flex-shrink:0;width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.wiz-nav{display:flex;gap:8px;margin-top:16px}
+.wiz-back{background:transparent;border:1px solid var(--border);color:var(--ink2);border-radius:8px;padding:11px 18px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.wiz-back:hover{color:var(--ink);border-color:rgba(255,255,255,.2)}
+.wiz-next{flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:.875rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
+.wiz-next:hover{background:var(--accent2)}.wiz-next:disabled{opacity:.35;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -712,89 +737,38 @@ h1,h2,h3,h4,h5{
 
     <div class="pricing-packages reveal">
 
-      <!-- Package 1 -->
+      <!-- Product 1: Pop Up Website -->
       <div class="pkg-card">
-        <p class="pkg-num">Package 1</p>
-        <p class="pkg-name">Launch</p>
-        <div class="pkg-price-row"><div class="pkg-price">£74.99</div></div>
+        <p class="pkg-name">Pop Up Website</p>
+        <div class="pkg-price-row"><div class="pkg-price">£99</div></div>
         <p class="pkg-price-note">One new job covers the cost</p>
         <hr class="pkg-divider">
         <ul class="pkg-features">
-          <li>Live website with clear CTAs</li>
-          <li>SEO meta and Google Analytics</li>
-          <li>Floating WhatsApp button</li>
-          <li>Trust badges section</li>
-          <li>Cookie banner and Privacy Policy</li>
-          <li>Google Business Profile guide</li>
+          <li>Live website with real pricing and arrival times</li>
+          <li>Instant quote form, no phone tag</li>
+          <li>Direct booking calendar</li>
+          <li>Instagram showcase and Google reviews on your homepage</li>
+          <li>Cookie banner, Privacy Policy, Terms — fully compliant</li>
         </ul>
-        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p1')">Get Started</button>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'product1')">Get Started</button>
       </div>
 
-      <!-- Package 2 -->
-      <div class="pkg-card">
-        <p class="pkg-num">Package 2</p>
-        <p class="pkg-name">Brand</p>
-        <div class="pkg-price-row"><div class="pkg-price">£149.99</div></div>
-        <p class="pkg-price-note">Everything in Launch, plus:</p>
-        <hr class="pkg-divider">
-        <ul class="pkg-features">
-          <li><strong>AI imagery</strong> tailored to your trade</li>
-          <li><strong>Canva brand kit:</strong> logo, colours, fonts</li>
-          <li>Testimonials section</li>
-          <li>Service area map section</li>
-        </ul>
-        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p2')">Get Started</button>
-      </div>
-
-      <!-- Package 3 — Featured -->
+      <!-- Product 2: Master Website + Branding — Featured -->
       <div class="pkg-card pkg-card--featured">
-        <div class="pkg-badge">Most Popular</div>
-        <p class="pkg-num" style="margin-top:14px">Package 3</p>
-        <p class="pkg-name">Convert</p>
+        <div class="pkg-badge">Full Service</div>
+        <p class="pkg-name" style="margin-top:14px">Master Website + Branding</p>
         <div class="pkg-price-row"><div class="pkg-price">£299.99</div></div>
-        <p class="pkg-price-note">Everything in Brand, plus:</p>
+        <p class="pkg-price-note">Everything in Pop Up Website, plus:</p>
         <hr class="pkg-divider">
         <ul class="pkg-features">
-          <li><strong>Quote wizard</strong> with photo upload</li>
-          <li>Direct call and WhatsApp CTA</li>
-          <li>Customer autoresponder email</li>
-          <li><strong>HubSpot CRM</strong> set up by us</li>
-          <li>Leads flow into CRM automatically</li>
+          <li><strong>Full brand kit:</strong> logo, letterhead, signage</li>
+          <li><strong>CRM</strong> with leads auto-flowing in</li>
+          <li>Invoicing that tracks what's owed and paid</li>
+          <li>Automated follow-up emails to new leads</li>
+          <li>A dashboard summarising everything, always up to date</li>
+          <li>A full month of social content, ready to post</li>
         </ul>
-        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p3')">Get Started</button>
-      </div>
-
-      <!-- Package 4 -->
-      <div class="pkg-card">
-        <p class="pkg-num">Package 4</p>
-        <p class="pkg-name">Book</p>
-        <div class="pkg-price-row"><div class="pkg-price">£499.99</div></div>
-        <p class="pkg-price-note">Everything in Convert, plus:</p>
-        <hr class="pkg-divider">
-        <ul class="pkg-features">
-          <li><strong>Calendly</strong> set up with event types</li>
-          <li>Booking widget embedded on site</li>
-          <li>Google Calendar sync</li>
-          <li>Bookings to HubSpot pipeline</li>
-          <li>Client history in CRM</li>
-        </ul>
-        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p4')">Get Started</button>
-      </div>
-
-      <!-- Package 5 -->
-      <div class="pkg-card">
-        <p class="pkg-num">Package 5</p>
-        <p class="pkg-name">Grow</p>
-        <div class="pkg-price-row"><div class="pkg-price">£624.99</div></div>
-        <p class="pkg-price-note">Everything in Book, plus:</p>
-        <hr class="pkg-divider">
-        <ul class="pkg-features">
-          <li>Social media accounts set up</li>
-          <li><strong>Full month of content</strong> created</li>
-          <li>Canva social templates</li>
-          <li>Consistent brand across all channels</li>
-        </ul>
-        <button class="pkg-cta" onclick="scrollToSection('get-started', 'p5')">Get Started</button>
+        <button class="pkg-cta" onclick="scrollToSection('get-started', 'product2')">Get Started</button>
       </div>
 
     </div>
@@ -836,64 +810,113 @@ h1,h2,h3,h4,h5{
       <h2 class="display-sm">Deploy your marketing department today.</h2>
       <p>Tell us your trade, your area, and what makes you good. We handle the rest. Live in under 10 minutes.</p>
 
-      <form
-        id="contactForm"
-        data-forge-form="lead-capture"
-        data-spark-listener="true"
-        style="max-width:520px;margin:0 auto 32px;text-align:left"
-        novalidate
-        onsubmit="handleSubmit(event)"
-      >
-        <div class="form-cols" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <label for="fname" style="font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px">First name</label>
-            <input id="fname" name="fname" type="text" placeholder="Dave" required autocomplete="given-name" class="field">
+      <!-- FORGE Lead Wizard -->
+      <div class="wiz" id="wizForm">
+
+        <!-- Progress -->
+        <div class="wiz-progress">
+          <div class="wiz-dot active" id="wd0"></div>
+          <div class="wiz-dot" id="wd1"></div>
+          <div class="wiz-dot" id="wd2"></div>
+          <div class="wiz-dot" id="wd3"></div>
+        </div>
+
+        <!-- Step 1: Trade -->
+        <div class="wiz-step active" id="ws0">
+          <p class="wiz-title">What is your trade?</p>
+          <p class="wiz-sub">Tap yours and we move straight to the next step.</p>
+          <div class="trade-grid">
+            <button type="button" class="trade-btn" data-trade="Plumber" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><path d="M3 3h3l3 9-2 2a16 16 0 0 0 6 6l2-2 9 3v3a2 2 0 0 1-2 2C8 22 2 16 2 5a2 2 0 0 1 1-2z"/></svg>Plumber
+            </button>
+            <button type="button" class="trade-btn" data-trade="Electrician" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Electrician
+            </button>
+            <button type="button" class="trade-btn" data-trade="Builder" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Builder
+            </button>
+            <button type="button" class="trade-btn" data-trade="Roofer" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Roofer
+            </button>
+            <button type="button" class="trade-btn" data-trade="Painter and Decorator" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>Decorator
+            </button>
+            <button type="button" class="trade-btn" data-trade="Gas Engineer" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 6v6l4 2"/></svg>Gas Engineer
+            </button>
+            <button type="button" class="trade-btn" data-trade="Plasterer" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Plasterer
+            </button>
+            <button type="button" class="trade-btn" data-trade="Other" onclick="wizSelectTrade(this)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Other trade
+            </button>
           </div>
-          <div>
-            <label for="lname" style="font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px">Last name</label>
-            <input id="lname" name="lname" type="text" placeholder="Smith" required autocomplete="family-name" class="field">
+          <div id="wiz-other-wrap" style="display:none;margin-top:10px">
+            <input type="text" id="wiz-trade-other" class="field" placeholder="Your trade (e.g. HVAC engineer, landscaper...)">
+            <div class="wiz-nav">
+              <button class="wiz-back" onclick="wizBack()">Back</button>
+              <button class="wiz-next" onclick="wizNext(0)">Next</button>
+            </div>
           </div>
         </div>
-        <div style="margin-bottom:12px">
-          <label for="email" style="font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px">Email address</label>
-          <input id="email" name="email" type="email" placeholder="dave@daveelectrical.co.uk" required autocomplete="email" class="field">
+
+        <!-- Step 2: Area -->
+        <div class="wiz-step" id="ws1">
+          <p class="wiz-title">Where are you based?</p>
+          <p class="wiz-sub">Your borough or area in London.</p>
+          <input id="wiz-area" type="text" class="field" autocomplete="off">
+          <div class="wiz-nav">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+            <button class="wiz-next" onclick="wizNext(1)">Next</button>
+          </div>
         </div>
-        <div style="margin-bottom:12px">
-          <label for="trade" style="font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px">Your trade</label>
-          <select id="trade" name="trade" required class="field" style="cursor:pointer">
-            <option value="" disabled selected>Select your trade</option>
-            <option value="plumber">Plumber</option>
-            <option value="electrician">Electrician</option>
-            <option value="builder">Builder</option>
-            <option value="roofer">Roofer</option>
-            <option value="painter">Painter and Decorator</option>
-            <option value="plasterer">Plasterer</option>
-            <option value="other">Other trade</option>
-          </select>
+
+        <!-- Step 3: Details -->
+        <div class="wiz-step" id="ws2">
+          <p class="wiz-title">Your details</p>
+          <p class="wiz-sub">Just your name and email. That is it.</p>
+          <div class="form-cols" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label class="wiz-label" for="wiz-fname">First name</label>
+              <input id="wiz-fname" type="text" class="field" autocomplete="given-name">
+            </div>
+            <div>
+              <label class="wiz-label" for="wiz-lname">Last name</label>
+              <input id="wiz-lname" type="text" class="field" autocomplete="family-name">
+            </div>
+          </div>
+          <label class="wiz-label" for="wiz-email">Email address</label>
+          <input id="wiz-email" type="email" class="field" autocomplete="email">
+          <div class="wiz-nav">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+            <button class="wiz-next" onclick="wizNext(2)">Next</button>
+          </div>
         </div>
-        <div style="margin-bottom:12px">
-          <label for="area" style="font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px">Your area in London</label>
-          <input id="area" name="area" type="text" placeholder="e.g. East London, Hackney, SE London" required class="field">
+
+        <!-- Step 4: Submit -->
+        <div class="wiz-step" id="ws3">
+          <p class="wiz-title">One last thing</p>
+          <p class="wiz-sub">Anything you want us to know? Totally optional.</p>
+          <textarea id="wiz-message" class="field" rows="3" style="resize:vertical;margin-bottom:16px" placeholder="Years trading, your specialisms, what makes you stand out..."></textarea>
+          <button type="button" id="wizSubmitBtn" class="btn btn--primary" style="width:100%;justify-content:center;padding:16px" onclick="wizSubmit()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Deploy My Marketing Department
+          </button>
+          <div id="wizSuccess" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:8px;font-size:.875rem;color:#22c55e;text-align:center;line-height:1.5">
+            Got it. Your deployment begins in the next 5 minutes.
+          </div>
+          <div id="wizError" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;font-size:.875rem;color:#ef4444;text-align:center">
+            Something went wrong. Email us at sales@forgeisagentic.tech
+          </div>
+          <div class="wiz-nav" style="margin-top:12px">
+            <button class="wiz-back" onclick="wizBack()">Back</button>
+          </div>
+          <p style="font-size:.775rem;color:var(--ink2);text-align:center;margin-top:12px">
+            By submitting you agree to our <a href="/privacy" style="color:var(--accent);text-decoration:underline">Privacy Policy</a> and <a href="/terms" style="color:var(--accent);text-decoration:underline">Terms and Conditions</a>.
+          </p>
         </div>
-        <input type="hidden" id="selectedPackage" name="package" value="">
-        <div style="margin-bottom:20px">
-          <label for="message" style="font-size:.8rem;color:var(--ink2);display:block;margin-bottom:6px">Anything else? (optional)</label>
-          <textarea id="message" name="message" rows="3" placeholder="Years trading, your best service, what makes you different..." class="field" style="resize:vertical"></textarea>
-        </div>
-        <button type="submit" id="submitBtn" class="btn btn--primary" style="width:100%;justify-content:center;padding:16px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Deploy My Marketing Department
-        </button>
-        <div id="formSuccess" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:8px;font-size:.875rem;color:#22c55e;text-align:center;line-height:1.5">
-          ✓ Got it. Your deployment begins in the next 5 minutes.
-        </div>
-        <div id="formError" role="alert" aria-live="polite" style="display:none;margin-top:16px;padding:14px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;font-size:.875rem;color:#ef4444;text-align:center">
-          Please fill in all required fields.
-        </div>
-        <p style="font-size:.775rem;color:var(--ink2);text-align:center;margin-top:12px">
-          By submitting you agree to our <a href="/privacy" style="color:var(--accent);text-decoration:underline">Privacy Policy</a> and <a href="/terms" style="color:var(--accent);text-decoration:underline">Terms &amp; Conditions</a>.
-        </p>
-      </form>
+
+      </div>
 
       <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
         <a href="mailto:sales@forgeisagentic.tech" class="btn btn--ghost">
@@ -970,9 +993,15 @@ function scrollToSection(id, pkg) {
   const el = document.getElementById(id);
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  if (pkg) {
-    document.getElementById('selectedPackage').value = pkg;
-  }
+  // NOTE: this used to write into '#selectedPackage', an element that does
+  // not exist anywhere in this page — every pricing-card click silently
+  // threw a TypeError in the console. Pre-existing bug, not introduced by
+  // the two-product rewrite. Fixed by tracking it properly instead: the
+  // #get-started wizard is a free lead form (no payment, no package choice
+  // in its own right), so the package someone clicked from pricing is
+  // genuinely useful context for a human following up — store it in
+  // memory and fold it into the lead payload in wizSubmit() below.
+  if (pkg) window._selectedPackage = pkg;
 }
 
 /* ── Mobile nav ───────────────────────────────────────────── */
@@ -1008,77 +1037,110 @@ const obs = new IntersectionObserver(
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-/* ── Async form handler ───────────────────────────────────── */
-async function handleSubmit(e) {
-  e.preventDefault();
-  const form    = document.getElementById('contactForm');
-  const succ    = document.getElementById('formSuccess');
-  const err     = document.getElementById('formError');
-  const btn     = document.getElementById('submitBtn');
-  const origBtnHTML = btn.innerHTML;
+/* ── Lead Wizard ─────────────────────────────────────────── */
+var _wizStep = 0;
+var _wizData = { trade:'', area:'', fname:'', lname:'', email:'', message:'' };
 
-  // Reset state
+function wizSetStep(n) {
+  document.getElementById('ws' + _wizStep).classList.remove('active');
+  document.getElementById('ws' + n).classList.add('active');
+  for (var i = 0; i < 4; i++) {
+    var d = document.getElementById('wd' + i);
+    d.classList.remove('active','done');
+    if (i < n) d.classList.add('done');
+    else if (i === n) d.classList.add('active');
+  }
+  _wizStep = n;
+}
+
+function wizSelectTrade(btn) {
+  document.querySelectorAll('.trade-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  var trade = btn.getAttribute('data-trade');
+  var otherWrap = document.getElementById('wiz-other-wrap');
+  if (trade === 'Other') {
+    otherWrap.style.display = 'block';
+    document.getElementById('wiz-trade-other').focus();
+  } else {
+    otherWrap.style.display = 'none';
+    _wizData.trade = trade;
+    setTimeout(function(){ wizSetStep(1); document.getElementById('wiz-area').focus(); }, 150);
+  }
+}
+
+function wizNext(from) {
+  if (from === 0) {
+    var other = document.getElementById('wiz-trade-other').value.trim();
+    if (!other) { document.getElementById('wiz-trade-other').style.borderColor='#ef4444'; return; }
+    _wizData.trade = other;
+    document.getElementById('wiz-trade-other').style.borderColor='';
+    wizSetStep(1); document.getElementById('wiz-area').focus();
+  } else if (from === 1) {
+    var area = document.getElementById('wiz-area').value.trim();
+    if (!area) { document.getElementById('wiz-area').style.borderColor='#ef4444'; return; }
+    _wizData.area = area;
+    document.getElementById('wiz-area').style.borderColor='';
+    wizSetStep(2); document.getElementById('wiz-fname').focus();
+  } else if (from === 2) {
+    var fname = document.getElementById('wiz-fname').value.trim();
+    var lname = document.getElementById('wiz-lname').value.trim();
+    var email = document.getElementById('wiz-email').value.trim();
+    var ok = true;
+    [['wiz-fname',fname],['wiz-lname',lname],['wiz-email',email]].forEach(function(pair){
+      document.getElementById(pair[0]).style.borderColor = pair[1] ? '' : '#ef4444';
+      if (!pair[1]) ok = false;
+    });
+    if (!ok) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('wiz-email').style.borderColor='#ef4444'; return;
+    }
+    _wizData.fname = fname; _wizData.lname = lname; _wizData.email = email;
+    wizSetStep(3);
+  }
+}
+
+function wizBack() {
+  if (_wizStep > 0) wizSetStep(_wizStep - 1);
+}
+
+async function wizSubmit() {
+  _wizData.message = document.getElementById('wiz-message').value.trim();
+  var btn  = document.getElementById('wizSubmitBtn');
+  var succ = document.getElementById('wizSuccess');
+  var err  = document.getElementById('wizError');
   succ.style.display = 'none';
   err.style.display  = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
 
-  // Validate required fields
-  let valid = true;
-  form.querySelectorAll('[required]').forEach(f => {
-    if (!f.value.trim()) {
-      valid = false;
-      f.style.borderColor = '#ef4444';
-      f.setAttribute('aria-invalid', 'true');
-    } else {
-      f.style.borderColor = '';
-      f.removeAttribute('aria-invalid');
-    }
-  });
-
-  if (!valid) {
-    err.style.display = 'block';
-    err.textContent   = 'Please fill in all required fields.';
-    return;
-  }
-
-  // Disable form while submitting
-  btn.disabled     = true;
-  btn.textContent  = 'Sending…';
-
-  const payload = {
-    _subject:  `New FORGE Lead — ${form.fname.value} ${form.lname.value} (${form.trade.value})`,
-    _template: 'table',
-    'First Name':    form.fname.value,
-    'Last Name':     form.lname.value,
-    'Email':         form.email.value,
-    'Trade':         form.trade.value,
-    'Area':          form.area.value,
-    'Package':       form.package.value || 'Not specified',
-    'Message':       form.message.value || 'None'
+  var pkgLabels = { product1: 'Pop Up Website (£99)', product2: 'Master Website + Branding (£299.99)' };
+  var payload = {
+    _subject:     'New FORGE Lead — ' + _wizData.fname + ' ' + _wizData.lname + ' (' + _wizData.trade + ')',
+    _template:    'table',
+    'First Name': _wizData.fname,
+    'Last Name':  _wizData.lname,
+    'Email':      _wizData.email,
+    'Trade':      _wizData.trade,
+    'Area':       _wizData.area,
+    'Message':    _wizData.message || 'None',
+    'Interested in': pkgLabels[window._selectedPackage] || 'Not specified from pricing'
   };
 
   try {
-    const res = await fetch('https://formsubmit.co/ajax/sales@forgeisagentic.tech', {
-      method:  'POST',
+    var res = await fetch('https://formsubmit.co/ajax/sales@forgeisagentic.tech', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body:    JSON.stringify(payload)
+      body: JSON.stringify(payload)
     });
-
     if (res.ok) {
       succ.style.display = 'block';
-      form.reset();
-      document.getElementById('selectedPackage').value = '';
-      // Reset field borders
-      form.querySelectorAll('.field').forEach(f => { f.style.borderColor = ''; });
-    } else {
-      throw new Error(`HTTP ${res.status}`);
-    }
-  } catch (fetchErr) {
-    console.error('Form submission error:', fetchErr);
-    err.textContent   = 'Something went wrong. Email us directly at sales@forgeisagentic.tech';
+      btn.style.display  = 'none';
+    } else { throw new Error('HTTP ' + res.status); }
+  } catch(e) {
+    console.error(e);
     err.style.display = 'block';
-  } finally {
-    btn.disabled  = false;
-    btn.innerHTML = origBtnHTML;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Deploy My Marketing Department';
   }
 }
 

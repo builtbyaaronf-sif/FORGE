@@ -15,7 +15,7 @@
   --border: #222222;
   --ink:    #F0F0F0;
   --ink2:   #888888;
-  --orange: #FF4A1C;
+  --orange: #0099FF; /* kept the variable name to avoid touching every rule below — was #FF4A1C (orange), now FORGE brand blue for consistency with start.html and client-intake.html */
   --green:  #4ade80;
   --blue:   #0099FF;
   --font:   'Inter', system-ui, sans-serif;
@@ -257,50 +257,36 @@ html, body {
   background: var(--bg2);
   aspect-ratio: 16/9;
 }
-.agent-loading {
+#welcomeVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.video-placeholder {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  background: var(--bg2);
-  transition: opacity 0.5s ease;
-}
-.agent-loading.hidden { opacity: 0; pointer-events: none; }
-.agent-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--orange);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.agent-loading-text {
-  font-size: 13px;
-  color: var(--ink2);
-  font-weight: 500;
-}
-.agent-unavailable {
-  display: none;
-  padding: 28px 20px;
+  gap: 10px;
+  padding: 24px;
   text-align: center;
-  font-size: 13px;
-  color: var(--ink2);
-  line-height: 1.6;
 }
-#tavusFrame {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  opacity: 0;
-  transition: opacity 0.6s ease;
+.video-placeholder-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,74,28,0.12);
+  border: 1px solid rgba(255,74,28,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
 }
-#tavusFrame.ready { opacity: 1; }
+.video-placeholder p { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+.video-placeholder strong { color: var(--ink); }
 
 /* ── UPGRADE SECTION ── */
 .upgrade-section {
@@ -540,22 +526,29 @@ html, body {
     <span id="etaBadge">Building your package…</span>
   </div>
 
-  <!-- Tavus AI Video Agent -->
+  <!-- Welcome video from Aaron -->
   <div class="agent-section" id="agentSection">
-    <div class="agent-label">Your FORGE agent is live</div>
+    <div class="agent-label">A message from Aaron</div>
     <div class="agent-frame">
-      <div class="agent-loading" id="agentLoading">
-        <div class="agent-spinner"></div>
-        <div class="agent-loading-text">Connecting to your FORGE agent…</div>
+      <!-- Replace VIDEO_URL with your hosted video link once recorded -->
+      <video
+        id="welcomeVideo"
+        controls
+        playsinline
+        preload="metadata"
+        poster=""
+        style="display:none"
+      >
+        <source src="" type="video/mp4">
+      </video>
+      <div class="video-placeholder" id="videoPlaceholder">
+        <div class="video-placeholder-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+        <p><strong>Your build is running.</strong><br>Aaron's welcome message loads here once recorded.</p>
       </div>
-      <div class="agent-unavailable" id="agentUnavailable">
-        Your handover document will be emailed to you shortly.
-      </div>
-      <iframe
-        id="tavusFrame"
-        allow="camera; microphone; fullscreen; display-capture"
-        allowfullscreen
-      ></iframe>
     </div>
   </div>
 
@@ -578,6 +571,14 @@ html, body {
 
   <!-- Build steps (populated by JS) -->
   <div class="build-steps" id="buildSteps"></div>
+
+  <!-- Client intake CTA — collects photos, services, logo preference before ATLAS assembles the final site -->
+  <div class="intake-card" id="intakeCard" style="display:none;background:#0D1A2A;border:1px solid rgba(0,153,255,0.3);border-radius:14px;padding:24px 28px;max-width:560px;margin:0 auto 20px;text-align:left;">
+    <div style="color:#0099FF;font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:10px;">ACTION NEEDED &middot; 3 MINUTES</div>
+    <div style="font-size:19px;font-weight:900;margin-bottom:6px;">Tell us about the business.</div>
+    <p style="color:#888;font-size:13.5px;line-height:1.6;margin-bottom:18px;">Your trade, services, photos, and logo preference — this is what makes your site look like yours, not a template. We start assembling the final build once this is in.</p>
+    <a id="intakeLink" href="client-intake.html" style="display:inline-block;background:#0099FF;color:#fff;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:700;font-size:14px;">Complete your build brief →</a>
+  </div>
 
   <!-- Delivery card -->
   <div class="delivery-card" id="deliveryCard" style="display:none">
@@ -605,7 +606,7 @@ html, body {
 
   <p class="footer-note">
     Your handover document (live URL, login details, and next steps) will be emailed to you within the estimated delivery time.
-    Questions? <a href="mailto:builtbyaaronf@gmail.com">builtbyaaronf@gmail.com</a>
+    Questions? <a href="mailto:sales@forgeisagentic.tech">sales@forgeisagentic.tech</a>
   </p>
 
 </div>
@@ -618,59 +619,40 @@ let sessionData = null;
 const urlParams = new URLSearchParams(window.location.search);
 const orderId = urlParams.get('token') || urlParams.get('orderId');
 
-// ── Package config ─────────────────────────────────────────────────────────
+// ── Product config ────────────────────────────────────────────────────────
+// Two-product model — replaces the old p1-p5 tiers. Legacy keys (p1-p5) are
+// aliased below so any in-flight order placed before this change still
+// resolves to a sensible step list instead of showing nothing.
 const PKG_CONFIG = {
-  p1: {
-    label: 'Package 1: Launch',
+  product1: {
+    label: 'Pop Up Website',
     steps: [
       { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
-      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
+      { label: 'ATLAS: Building your website',         sub: 'Quote form, booking, Instagram showcase, deploying to Vercel' },
+      { label: 'MARK: Preparing your logo options',    sub: 'Runs alongside the build — check your email' },
       { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all links' },
     ]
   },
-  p2: {
-    label: 'Package 2: Brand',
+  product2: {
+    label: 'Master Website + Branding',
     steps: [
       { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
-      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
-      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
-      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
-    ]
-  },
-  p3: {
-    label: 'Package 3: Convert',
-    steps: [
-      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
-      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
-      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
-      { label: 'WIRE: Setting up your CRM and forms',   sub: 'HubSpot pipeline, quote wizard, lead routing' },
-      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
-    ]
-  },
-  p4: {
-    label: 'Package 4: Book',
-    steps: [
-      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
-      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
-      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
-      { label: 'WIRE: Setting up your CRM and forms',   sub: 'HubSpot pipeline, quote wizard, lead routing' },
-      { label: 'BOOK: Configuring Calendly',           sub: 'Event types, availability, booking widget on your site' },
-      { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
-    ]
-  },
-  p5: {
-    label: 'Package 5: Grow',
-    steps: [
-      { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
-      { label: 'ATLAS: Building your website',         sub: 'Generating copy, layout, and deploying to Vercel' },
-      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo concept, social templates in Canva' },
-      { label: 'WIRE: Setting up your CRM and forms',   sub: 'HubSpot pipeline, quote wizard, lead routing' },
-      { label: 'BOOK: Configuring Calendly',           sub: 'Event types, availability, booking widget on your site' },
+      { label: 'ATLAS: Building your website',         sub: 'Quote form, booking, Instagram showcase, deploying to Vercel' },
+      { label: 'PIXEL: Creating your brand kit',       sub: 'Colour palette, logo, letterhead, signage in Canva' },
+      { label: 'WIRE: Setting up your CRM and forms',  sub: 'HubSpot pipeline, quote wizard, lead routing' },
+      { label: 'BOOK: Configuring your booking calendar', sub: 'Event types, availability, booking widget on your site' },
+      { label: 'LEDGER: Setting up invoicing',         sub: 'Tracks what’s owed and what’s been paid' },
+      { label: 'PULSE: Building your follow-up flows', sub: 'Automated nurture emails for new leads' },
       { label: 'SPARK: Building your social content',  sub: 'Full month of captions, hashtags, and posting schedule' },
+      { label: 'BEACON: Building your dashboard',      sub: 'One page summarising everything, always up to date' },
       { label: 'FORGE: Quality checking everything',   sub: 'Running site audit and validating all deliverables' },
     ]
   }
 };
+// Legacy p1-p5 orders (placed before the two-product switch) map to whichever
+// new product covers the same ground, so old in-flight builds still render.
+['p1', 'p2'].forEach(k => PKG_CONFIG[k] = PKG_CONFIG.product1);
+['p3', 'p4', 'p5'].forEach(k => PKG_CONFIG[k] = PKG_CONFIG.product2);
 
 // ── Init session (verify PayPal order server-side) ──────────────────────────
 async function initSession() {
@@ -680,10 +662,10 @@ async function initSession() {
       name: urlParams.get('name') || 'your business',
       email: urlParams.get('email') || '...',
       location: urlParams.get('location') || '',
-      pkg: urlParams.get('pkg') || 'p1',
-      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'p1']?.label || 'Package 1: Launch',
-      pkgPrice: '£74.99',
-      eta: '~10 minutes',
+      pkg: urlParams.get('pkg') || 'product1',
+      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'product1']?.label || 'Pop Up Website',
+      pkgPrice: '£99.00',
+      eta: 'within the hour',
       paypal_client_id: null,
       proRataGrid: []
     };
@@ -702,10 +684,10 @@ async function initSession() {
       name: urlParams.get('name') || 'your business',
       email: urlParams.get('email') || '...',
       location: urlParams.get('location') || '',
-      pkg: urlParams.get('pkg') || 'p1',
-      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'p1']?.label || 'Package 1: Launch',
-      pkgPrice: '£74.99',
-      eta: '~10 minutes',
+      pkg: urlParams.get('pkg') || 'product1',
+      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'product1']?.label || 'Pop Up Website',
+      pkgPrice: '£99.00',
+      eta: 'within the hour',
       paypal_client_id: null,
       proRataGrid: []
     };
@@ -716,7 +698,7 @@ async function initSession() {
 
 // ── Populate UI with verified session data ──────────────────────────────────
 function populateUI(data) {
-  const config = PKG_CONFIG[data.pkg] || PKG_CONFIG.p1;
+  const config = PKG_CONFIG[data.pkg] || PKG_CONFIG.product1;
 
   // Populate delivery card
   document.getElementById('dPkg').textContent   = data.pkgLabel;
@@ -725,6 +707,13 @@ function populateUI(data) {
   document.getElementById('dOrder').textContent = orderId || '...';
   document.getElementById('dEta').textContent   = data.eta;
   document.getElementById('deliveryCard').style.display = 'block';
+
+  // Show the client intake CTA — carries orderId so client-intake.html can
+  // attach the submission to this order (looked up server-side, not re-entered)
+  if (orderId) {
+    document.getElementById('intakeLink').href = 'client-intake.html?orderId=' + encodeURIComponent(orderId);
+    document.getElementById('intakeCard').style.display = 'block';
+  }
 
   // Update subline with business name
   document.getElementById('subline').innerHTML =
@@ -824,7 +813,7 @@ function renderUpgradeGrid(data) {
     card.className = `upgrade-card${tier.is_recommended ? ' recommended' : ''}`;
     card.innerHTML = `
       ${tier.is_recommended ? '<div class="upgrade-badge">Recommended</div>' : ''}
-      <div class="upgrade-pkg-name">Package ${tier.pkg.replace('p','')} ${tier.label}</div>
+      <div class="upgrade-pkg-name">${tier.label}</div>
       <div class="upgrade-retail">Retail: £${tier.retail_price.toFixed(2)}</div>
       <div class="upgrade-price">£${tier.pro_rata_price.toFixed(2)} <span>pay the difference</span></div>
       <div class="paypal-btn-wrap" id="${cardId}"></div>
@@ -929,40 +918,25 @@ function renderRetainerGrid(data) {
   document.getElementById('retainerSection').style.display = 'block';
 }
 
-// ── Tavus CVI — initialise video agent ────────────────────────────────────
-async function initTavusAgent(data) {
-  const frame    = document.getElementById('tavusFrame');
-  const loading  = document.getElementById('agentLoading');
-  const unavail  = document.getElementById('agentUnavailable');
-  const config   = PKG_CONFIG[data.pkg] || PKG_CONFIG.p1;
+// ── Welcome video — show if src is set ────────────────────────────────────
+function initWelcomeVideo() {
+  const video       = document.getElementById('welcomeVideo');
+  const placeholder = document.getElementById('videoPlaceholder');
 
-  try {
-    const res = await fetch('/api/tavus-conversation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pkg: data.pkg, name: data.name, eta: data.eta, pkgLabel: data.pkgLabel })
-    });
-
-    if (!res.ok) throw new Error(`API ${res.status}`);
-
-    const tavusData = await res.json();
-
-    if (!tavusData.conversation_url) throw new Error('No conversation URL returned');
-
-    // Load the conversation into the iframe
-    frame.src = tavusData.conversation_url;
-    frame.onload = () => {
-      loading.classList.add('hidden');
-      frame.classList.add('ready');
-    };
-
-  } catch (err) {
-    console.warn('Tavus agent unavailable:', err.message);
-    loading.classList.add('hidden');
-    unavail.style.display = 'block';
-    document.getElementById('agentSection').style.display = 'none';
+  // VIDEO_SRC is set at build time (or injected at runtime).
+  // If empty, show the placeholder instead.
+  const src = typeof WELCOME_VIDEO_SRC !== 'undefined' ? WELCOME_VIDEO_SRC : '';
+  if (src) {
+    video.querySelector('source').src = src;
+    video.load();
+    video.style.display = 'block';
+    placeholder.style.display = 'none';
   }
 }
+
+// Set this constant to your hosted video URL when ready (MP4 recommended).
+// Example: const WELCOME_VIDEO_SRC = 'https://pub-xxx.r2.dev/forge-welcome.mp4';
+const WELCOME_VIDEO_SRC = '/welcome-to-forge.mp4';
 
 // ── Main execution flow ────────────────────────────────────────────────────
 async function main() {
@@ -979,8 +953,8 @@ async function main() {
     // Load PayPal SDK and render upgrade grid (if available)
     loadPayPalAndRenderUpgrades(sessionData);
 
-    // Initialise Tavus agent (after session resolves)
-    setTimeout(() => initTavusAgent(sessionData), 800);
+    // Show welcome video (if recorded and URL is set above)
+    initWelcomeVideo();
 
   } catch (err) {
     console.error('Session init failed:', err);

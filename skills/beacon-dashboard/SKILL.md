@@ -19,18 +19,19 @@ description: >
 
 ## What you need to do per client
 
-1. **Register the client's owner email** so login works: `kv.set('beacon_owner:{their-email}', '{client_slug}')`. No UI for this yet — run it manually via the Supabase/KV connector at handover time, or add it to `client-intake.js` in a later pass so it happens automatically.
+1. **Registering the client's owner email — now automatic (fixed 1 Jul 2026).** `api/client-intake.js` writes `beacon_owner:{email} -> {client_slug}` to KV as soon as a Scale (`product2`) client submits their intake form, using a `slugify()` derived from their business name. **Real risk, not fully closed:** this slug must exactly match the slug used for the Vercel project name, HubSpot's `forge_client_slug`, and every `client_slug` column elsewhere — there's no single shared slugify function across the codebase, each place derives it independently. If ATLAS/deploy-team ever slugifies differently (different truncation, apostrophe handling, etc.), BEACON logins resolve to a slug matching nothing, and every card silently shows empty. Verify a real client's slug matches across all four systems before trusting this end-to-end.
 
 2. **Tag HubSpot deals with `forge_client_slug`.** The dashboard filters deals by a custom property of this exact name — if it's not set on that client's deals, the Leads card will just show empty, not broken, but it also won't show anything useful. Add this property when running `hubspot-setup` for a client.
 
-3. **No extra Klaviyo setup needed** — the PULSE integration already tags every event with `client_slug`, so the activity card works as soon as `nurture-setup` is done for the client.
+3. **Activity card is honestly not implemented yet (confirmed 1 Jul 2026, corrected from earlier "just works" claim).** Klaviyo's Events API only supports filtering by `metric_id`, `profile_id`, `datetime` — there is no way to filter by a custom property like `client_slug`. `getPulseActivity()` returns `not_implemented` on purpose rather than making a call that would 400 forever. Real fix needs either: storing a `klaviyo_list_id` per client (nothing tracks this today) and querying via list membership, or researching whether `query_metric_aggregates`/segment-based querying supports broader filtering. Don't promise a client this card works until one of those is built.
 
 ## Known limits (flag these, don't hide them)
 
 - No account recovery beyond "request another magic link" — there's no password to reset because there's no password.
 - Sessions last 48 hours. After that, the client needs a fresh link. Not currently configurable per client.
 - The Leads card depends on a HubSpot custom property (`forge_client_slug`) that has to be set up manually per client — it is not automatic just because `hubspot-setup` ran.
-- `beacon_owner` mappings are set manually via KV right now. If a client's dashboard shows "no such email," check this mapping first before assuming something's broken.
+- **The activity card doesn't work at all yet** — see point 3 above. It will always show "not connected" until the Klaviyo querying approach is actually built.
+- `beacon_owner` mappings are now written automatically at intake time for Scale clients (see point 1) — no longer a manual step, but the slug-consistency risk noted there still applies.
 
 ## Handover language (use this, don't improvise)
 

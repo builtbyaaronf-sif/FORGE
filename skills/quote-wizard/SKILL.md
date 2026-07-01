@@ -108,6 +108,8 @@ The wizard must submit via `fetch()` to `/api/quote` with a JSON body containing
 - `RESEND_API_KEY` — FORGE's shared Resend API key
 - `QUOTE_TO_EMAIL` — tradesperson's email address
 - `BUSINESS_NAME` — client business name
+- `FORGE_CLIENT_SLUG` — this client's slug (added 1 Jul 2026, Scale only). Must exactly match the slug used everywhere else for this client — Vercel project name, HubSpot's `forge_client_slug`, Supabase `client_slug` columns. No shared slugify function exists across FORGE's codebase yet; verify by hand rather than assume it matches.
+- `FORGE_WEBHOOK_SECRET` — shared secret for `api/pulse-track-event.js` on FORGE's own domain (added 1 Jul 2026, Scale only). Fires `quote_submitted` into PULSE. Get the actual value from Vercel env vars on FORGE's own project, not this client's.
 
 ### WhatsApp
 
@@ -255,11 +257,13 @@ Document these in the client handover notes — must be set in the Vercel projec
 | `RESEND_API_KEY` | FORGE's shared Resend API key |
 | `QUOTE_TO_EMAIL` | Client's email address |
 | `BUSINESS_NAME` | Client business name |
+| `FORGE_CLIENT_SLUG` | Client's slug — must match Vercel project name, HubSpot `forge_client_slug`, Supabase `client_slug` exactly (Scale only) |
+| `FORGE_WEBHOOK_SECRET` | Shared secret for `api/pulse-track-event.js` on FORGE's own domain (Scale only) |
 
 ### End-to-end deployment flow
 
 ```
-one-click-website receives Package 3/4/5 prompt
+one-click-website receives a Scale (Product 2) build prompt
   → website-content-extractor produces brief (if not already done)
   → one-click-website generates base index.html (hero, services, about, footer)
   → quote-wizard reads brief → generates <section id="quote-wizard"> + api/quote.js

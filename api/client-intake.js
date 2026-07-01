@@ -11,6 +11,24 @@ const kv = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
   ? createClient({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN })
   : null;
 
+// Standard slug derivation — lowercase, non-alphanumeric collapsed to single
+// hyphens, trimmed. CRITICAL: this must produce the exact same slug that
+// gets used as the Vercel project name (forge-[slug]), HubSpot's
+// forge_client_slug deal property, and every client_slug column in Supabase
+// and Klaviyo. There is currently no single shared slugify function across
+// the codebase — each place derives it independently. If ATLAS/deploy-team
+// ever slugifies a business name differently than this (e.g. truncates at a
+// different length, handles apostrophes differently), BEACON logins will
+// resolve to a client_slug that matches nothing in HubSpot/Supabase, and
+// every card will silently show empty. Verify this matches deploy-team's
+// actual slugification before trusting it on a real client.
+function slugify(name) {
+  return String(name || '').toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 50);
+}
+
 // client-intake.js only receives orderId + form fields — name/email live in
 // the PayPal order itself, not in this payload. Reuse the exact same
 // verify-and-decode path api/session.js already uses, rather than storing a
@@ -25,7 +43,7 @@ async function resolveClientFromOrder(orderId, req) {
   if (!res.ok) return null;
   const data = await res.json();
   if (!data.name || !data.email) return null;
-  return { name: data.name, email: data.email, trade: null };
+  return { name: data.name, email: data.email, pkg: data.pkg || null, trade: null };
 }
 
 export default async function handler(req, res) {
@@ -88,18 +106,39 @@ export default async function handler(req, res) {
           }),
         }).catch(err => console.error('[INTAKE] Aaron notify email failed:', err.message))
       );
+    }
 
-      const client = await resolveClientFromOrder(orderId, req);
-      if (client) {
-        client.trade = record.trade;
+    // Resolving the client and registering beacon_owner happen regardless of
+    // whether RESEND_API_KEY is set — a missing email key must not silently
+    // skip BEACON dashboard registration, they're unrelated concerns.
+    const client = await resolveClientFromOrder(orderId, req);
+    if (client) {
+      client.trade = record.trade;
+
+      if (process.env.RESEND_API_KEY) {
         notifyPromises.push(
           record.logoChoice === 'have'
             ? sendLogoReceivedEmail(client)
             : sendLogoWizardEmail(client, orderId)
         );
-      } else {
-        console.warn(`[INTAKE] Could not resolve client name/email for order ${orderId} — logo follow-up email skipped`);
       }
+
+      // BEACON login only matters for Scale (product2) — Launch clients
+      // don't get a dashboard. This replaces what used to be a manual
+      // "run this by hand at handover" KV write (see beacon-dashboard/
+      // SKILL.md) with an automatic one at intake time, so a Scale
+      // client's dashboard login works before anyone remembers to set it
+      // up manually.
+      if (client.pkg === 'product2') {
+        const clientSlug = slugify(client.name);
+        notifyPromises.push(
+          kv.set(`beacon_owner:${client.email.toLowerCase()}`, clientSlug)
+            .then(() => console.log(`[INTAKE] beacon_owner registered: ${client.email} -> ${clientSlug}`))
+            .catch(err => console.error('[INTAKE] beacon_owner registration failed:', err.message))
+        );
+      }
+    } else {
+      console.warn(`[INTAKE] Could not resolve client name/email for order ${orderId} — logo follow-up email + beacon_owner registration skipped`);
     }
 
     await Promise.all(notifyPromises);

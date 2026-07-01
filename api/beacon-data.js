@@ -66,30 +66,24 @@ async function getHubspotDeals(clientSlug) {
 }
 
 async function getPulseActivity(clientSlug) {
-  const apiKey = process.env.KLAVIYO_PRIVATE_API_KEY;
-  if (!apiKey) return { ok: false, error: 'not_configured' };
-  try {
-    // UNVERIFIED (flagged during the 1 Jul 2026 Scale dry run): Klaviyo's
-    // Events API filter DSL is documented to support metric_id/profile_id/
-    // datetime reliably; filtering on a nested custom `properties.X` field
-    // like this has not been confirmed against a live account (no MCP path
-    // exists to test it from a session, and the site isn't deployed with
-    // real KLAVIYO_PRIVATE_API_KEY access yet). If this filter syntax is
-    // wrong, Klaviyo returns a 400, which the !res.ok check below already
-    // catches safely (this card just shows "not connected" instead of
-    // crashing the dashboard) — but confirm this against a live account
-    // before assuming the activity card actually works.
-    const res = await fetch(
-      `https://a.klaviyo.com/api/events?filter=equals(properties.client_slug,"${clientSlug}")&sort=-datetime&page[size]=10`,
-      { headers: { Authorization: `Klaviyo-API-Key ${apiKey}`, revision: '2025-04-15' } }
-    );
-    if (!res.ok) return { ok: false, error: 'fetch_failed' };
-    const data = await res.json();
-    return { ok: true, events: (data.data || []).map(e => ({ metric: e.attributes?.metric?.data?.attributes?.name, at: e.attributes?.datetime })) };
-  } catch (err) {
-    console.error('[BEACON] Klaviyo fetch failed:', err.message);
-    return { ok: false, error: 'exception' };
-  }
+  // CONFIRMED BROKEN (verified against Klaviyo's actual API docs 1 Jul
+  // 2026): GET /api/events only supports filtering by metric_id (equals),
+  // profile_id (equals), profile (has), datetime, and timestamp. There is
+  // NO way to filter by a custom event property like `properties.
+  // client_slug` — the original implementation here would have 400'd on
+  // every single call, forever, silently (safely, but uselessly).
+  //
+  // The real fix requires either:
+  //   (a) storing a klaviyo_list_id per client (set when nurture-setup
+  //       creates their List — nothing currently tracks this) and using
+  //       Klaviyo's list-members endpoint to enumerate profiles, then
+  //       querying events per profile_id, or
+  //   (b) using query_metric_aggregates / segment-based querying instead of
+  //       the raw Events list endpoint, which may support broader filtering
+  //       — unconfirmed, needs its own research pass.
+  // Neither is built. Rather than ship a call that guarantees a 400 every
+  // time, this returns not_implemented honestly.
+  return { ok: false, error: 'not_implemented' };
 }
 
 export default async function handler(req, res) {

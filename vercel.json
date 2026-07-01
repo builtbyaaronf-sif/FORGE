@@ -20,9 +20,10 @@
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/build-status", "destination": "/build-status.html" },
     { "source": "/brand-assets", "destination": "/brand-assets.html" },
+    { "source": "/beacon", "destination": "/beacon.html" },
     { "source": "/beta", "destination": "/api/beta.js" },
     { "source": "/beta.css", "destination": "/public/beta.css" },
     { "source": "/beta-client.js", "destination": "/public/beta-client.js" },
-    { "source": "/((?!start|privacy|terms|build-status|brand-assets|beta|beta.css|beta-client.js|api).*)", "destination": "/index.html" }
+    { "source": "/((?!start|privacy|terms|build-status|brand-assets|beacon|beta|beta.css|beta-client.js|api).*)", "destination": "/index.html" }
   ]
 }

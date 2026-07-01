@@ -76,14 +76,14 @@ FORGE deploys agents in sequence. Each agent has a single role, a defined input,
 **Two-product model** — replaces the old 5-tier p1-p5 structure (see `FORGE_PRODUCT_ARCHITECTURE_v2.md` for the full redesign rationale).
 
 ```
-Product 1 — Pop Up Website:
+Product 1 — Launch:
 SCOUT [Intel] → ATLAS [Build] → BOOK [Booking]
                     ↓
               MARK [Logo] (concurrent, non-blocking)
                     ↓
               FORGE [QA]
 
-Product 2 — Master Website + Branding:
+Product 2 — Scale:
 SCOUT [Intel] → ATLAS [Build] → PIXEL [Brand] → WIRE [CRM] → BOOK [Booking]
                                                       ↓
                                               LEDGER [Accounts]
@@ -109,10 +109,10 @@ MARK is Product 1 only. Product 2 drops MARK — new logo approach TBD, out of s
 | PIXEL | [Brand] | `brand-kit` | 2 |
 | WIRE | [CRM] | `quote-wizard` + `hubspot-setup` | 2 |
 | BOOK | [Booking] | `calendly-setup` | Both |
-| LEDGER | [Accounts] | `ledger-setup` (not yet built — see `FORGE_CODE_SIGNATURES_v1.md`) | 2 |
-| PULSE | [Nurture] | `nurture-setup` (not yet built) | 2 |
+| LEDGER | [Accounts] | `ledger-setup` — built 1 Jul 2026: `api/ledger-invoice-create.js` + `api/ledger-mark-paid.js`, Supabase table `forge_invoices` | 2 |
+| PULSE | [Nurture] | `nurture-setup` — built 1 Jul 2026: `api/_lib/pulse.js` (event tracking, wired into `api/submit.js`). Klaviyo Lists/Flows are manual per client — API doesn't expose creating them | 2 |
 | SPARK | [Content] | `social-media-machine` | 2 |
-| BEACON | [Dashboard] | `beacon-dashboard` (not yet built) | 2 |
+| BEACON | [Dashboard] | `beacon-dashboard` — built 1 Jul 2026: `beacon.html` + `api/beacon-auth-request.js` + `api/beacon-auth-verify.js` + `api/beacon-data.js`, magic-link auth via KV | 2 |
 | FORGE | [QA] | `site-audit` + `client-handover` | Both |
 
 ### MARK [Logo] — how it works (Product 1 only)
@@ -127,8 +127,8 @@ MARK runs **concurrently with the build** (non-blocking). ATLAS deploys the site
 
 | Product | Price | Agents activated |
 |---|---|---|
-| Pop Up Website | £99 | SCOUT + ATLAS + BOOK + MARK + FORGE |
-| Master Website + Branding | £299.99 | SCOUT + ATLAS + PIXEL + WIRE + BOOK + LEDGER + PULSE + SPARK + BEACON + FORGE |
+| Launch | £99 | SCOUT + ATLAS + BOOK + MARK + FORGE |
+| Scale | £299.99 | SCOUT + ATLAS + PIXEL + WIRE + BOOK + LEDGER + PULSE + SPARK + BEACON + FORGE |
 
 `pkg` values in `custom_id` are now `product1` / `product2` (legacy `p1`-`p5` values are aliased in `api/session.js` and `build-status.html` so any order placed before this change still resolves).
 
@@ -246,6 +246,13 @@ TAVUS_PERSONA_ID        # optional
 | `api/client-intake-photo.js` | Single-image upload endpoint (compress client-side, upload one at a time — see Serverless API section). |
 | `api/_lib/emails.js` | Shared email templates (`sendPaymentConfirmedEmail`, `sendLogoWizardEmail`, `sendLogoReceivedEmail`). |
 | `api/tavus-conversation.js` | Post-payment video agent creator. |
+| `api/submit.js` | Lead capture from `index.html`'s wizard — HubSpot contact, sales + welcome emails via Resend, WhatsApp approval ping, PULSE event tracking. |
+| `api/upload-logo.js` | Logo upload to Supabase Storage bucket `forge-lead-assets`, used by the lead wizard's logo step. |
+| `api/report-issue.js` | Backend for the floating "Something wrong?" widget (`widget/report-issue-widget.js`) — emails a screenshot + description to `FORGE_OWNER_EMAIL`. |
+| `api/beta.js` | Legacy beta landing page (old 5-tier p1-p5 pricing, £74.99-£624.99). **Stale — contradicts the two-product model. Do not link to `/beta` anywhere new; needs a decision on whether to retire or rebuild.** |
+| `api/ledger-invoice-create.js` / `api/ledger-mark-paid.js` | LEDGER — receivables tracker. See `skills/ledger-setup/SKILL.md`. |
+| `api/_lib/pulse.js` | PULSE — Klaviyo event tracking + profile subscription, called from `api/submit.js`. See `skills/nurture-setup/SKILL.md`. |
+| `beacon.html` / `api/beacon-auth-request.js` / `api/beacon-auth-verify.js` / `api/beacon-data.js` | BEACON — client dashboard, magic-link auth. See `skills/beacon-dashboard/SKILL.md`. |
 | `forge-strategy-pack.html` | FORGE's own strategy pack. Reference for client packs. |
 | `forge-chase-sales-system.md` | Sales email sequences, cadences, objection scripts. |
 | `forge-social-calendar.csv` | 20-post social calendar. Starts 23 June 2026. |
@@ -259,6 +266,9 @@ TAVUS_PERSONA_ID        # optional
 | `skills/hubspot-setup/SKILL.md` | HubSpot CRM setup skill. |
 | `skills/calendly-setup/SKILL.md` | Booking system skill. |
 | `skills/client-handover/SKILL.md` | Handover doc skill. |
+| `skills/ledger-setup/SKILL.md` | LEDGER receivables tracker skill. |
+| `skills/nurture-setup/SKILL.md` | PULSE nurture email skill — flags the Klaviyo manual-flow limitation. |
+| `skills/beacon-dashboard/SKILL.md` | BEACON client dashboard skill. |
 | `sales/FORGE_Proposal_Template.html` | Proposal template. |
 
 ---
@@ -285,6 +295,10 @@ FORGE's own brand uses **Creative Dark** (`#090909` canvas, `#0099FF` accent, Sp
 ### Critical (fix before scaling)
 
 1. **Shared Resend API key** — `RESEND_API_KEY` is one key used for all client quote wizard emails. If it's rate-limited or revoked, all client email pipelines die simultaneously. Solution: isolate per client or use sub-accounts.
+
+1b. **Shared Klaviyo account (same class of risk, added 1 Jul 2026)** — PULSE runs on one shared Klaviyo account across FORGE and Aaron's other projects, not a dedicated FORGE or per-client account. All client sending shares one account's domain reputation — one client's list going spam-heavy can hurt deliverability for others. Fine at current volume, revisit before scaling past a handful of Product 2 clients. See `skills/nurture-setup/SKILL.md`.
+
+1c. **Supabase project is a shared, generic project** (`jhsswflacyzwdulokgrn`, "builtbyaaronf-sif's Project") — not FORGE-dedicated. LEDGER's `forge_invoices` table lives here with RLS locked to service-role-only, which limits blast radius, but the project itself auto-pauses on inactivity (had to be restored 1 Jul 2026 before first use). Check project status before assuming LEDGER is live.
 
 2. **No idempotency on PayPal webhook** — Same event can fire twice and trigger duplicate emails + duplicate deployment notifications. Solution: store processed `orderId`s in KV or check for duplicates.
 
@@ -325,7 +339,7 @@ FORGE's own brand uses **Creative Dark** (`#090909` canvas, `#0099FF` accent, Sp
 1. New Enquiry
 2. First Contact Made
 3. Discovery Complete
-4. Proposal Sent
+4. Quote Sent
 5. Negotiation
 6. Closed Won
 7. Closed Lost

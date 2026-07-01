@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Your Dashboard — FORGE</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --canvas:#090909; --surface:#111111; --surface2:#161616;
+  --ink:#F0F0F0; --ink2:#999999; --accent:#0099FF; --accent2:#0077CC;
+  --border:rgba(255,255,255,0.07); --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--canvas);color:var(--ink);font-family:Inter,-apple-system,sans-serif;min-height:100vh}
+h1,h2,.logo{font-family:'Space Grotesk',sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:48px 20px}
+.logo{font-size:20px;font-weight:700;margin-bottom:32px}
+.logo span{color:var(--accent)}
+
+/* ── Login ── */
+#loginPanel{max-width:400px;margin:80px auto;padding:32px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+#loginPanel h1{font-size:22px;margin-bottom:8px}
+#loginPanel p{color:var(--ink2);font-size:14px;margin-bottom:20px;line-height:1.5}
+.field{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--ink);font-size:14px;margin-bottom:12px}
+.field:focus{outline:none;border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;width:100%}
+.btn--primary{background:var(--accent);color:#fff}
+.btn--primary:hover{background:var(--accent2)}
+.btn--primary:disabled{opacity:.5;cursor:not-allowed}
+.msg{font-size:13px;margin-top:12px;padding:10px 12px;border-radius:8px;display:none}
+.msg--ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--ok)}
+.msg--err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--err)}
+
+/* ── Dashboard ── */
+#dashboard{display:none}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px}
+.card h2{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.card h2 small{color:var(--ink2);font-weight:400;font-size:12px}
+.stat-row{display:flex;gap:16px;margin-bottom:24px}
+.stat{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.stat-val{font-size:26px;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.stat-label{font-size:12px;color:var(--ink2);margin-top:4px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px}
+.row:last-child{border-bottom:none}
+.pill{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600;text-transform:uppercase}
+.pill--outstanding{background:rgba(245,158,11,.15);color:var(--warn)}
+.pill--paid{background:rgba(34,197,94,.15);color:var(--ok)}
+.mini-btn{background:var(--surface2);border:1px solid var(--border);color:var(--ink);font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer}
+.mini-btn:hover{border-color:var(--accent)}
+.empty{color:var(--ink2);font-size:13px;padding:12px 0}
+.unavailable{color:var(--ink2);font-size:13px;font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="logo">FORGE<span>.</span></div>
+
+  <div id="loginPanel">
+    <h1>Your dashboard</h1>
+    <p>Enter the email you used when we set you up. We'll send a one-time link — no password needed.</p>
+    <input type="email" id="loginEmail" class="field" placeholder="you@yourbusiness.com" autocomplete="email">
+    <button class="btn btn--primary" id="loginBtn" onclick="requestLink()">Send me a link</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="dashboard">
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val" id="statOutstanding">—</div><div class="stat-label">Outstanding</div></div>
+      <div class="stat"><div class="stat-val" id="statDeals">—</div><div class="stat-label">Active leads</div></div>
+      <div class="stat"><div class="stat-val" id="statActivity">—</div><div class="stat-label">Recent activity</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Invoices <small id="invoicesNote"></small></h2>
+      <div id="invoicesList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Leads <small id="dealsNote"></small></h2>
+      <div id="dealsList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Recent activity <small id="pulseNote"></small></h2>
+      <div id="pulseList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const magicToken = params.get('token');
+
+function showMsg(text, ok) {
+  const el = document.getElementById('loginMsg');
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'msg--ok' : 'msg--err');
+  el.style.display = 'block';
+}
+
+async function requestLink() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const btn = document.getElementById('loginBtn');
+  if (!email) { showMsg('Enter your email first.', false); return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await fetch('/api/beacon-auth-request', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    showMsg('If that email is registered, a link is on its way. Check your inbox (and spam folder).', true);
+  } catch (e) {
+    showMsg('Something went wrong. Try again in a moment.', false);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send me a link';
+  }
+}
+
+async function verifyMagicToken(token) {
+  try {
+    const res = await fetch('/api/beacon-auth-verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.sessionToken) {
+      showMsg(data.error || 'That link has expired. Request a new one below.', false);
+      return;
+    }
+    localStorage.setItem('beacon_session', data.sessionToken);
+    // Clean the token out of the URL so it can't be reused/leaked via history.
+    history.replaceState({}, '', '/beacon.html');
+    loadDashboard(data.sessionToken);
+  } catch (e) {
+    showMsg('Could not verify that link. Request a new one below.', false);
+  }
+}
+
+function renderInvoices(section) {
+  const list = document.getElementById('invoicesList');
+  const note = document.getElementById('invoicesNote');
+  if (!section.ok) { list.innerHTML = '<div class="unavailable">Invoices are temporarily unavailable.</div>'; return; }
+  const invoices = section.invoices || [];
+  document.getElementById('statOutstanding').textContent = '£' + ((section.outstandingPence || 0) / 100).toFixed(2);
+  note.textContent = invoices.length + ' total';
+  if (!invoices.length) { list.innerHTML = '<div class="empty">No invoices yet.</div>'; return; }
+  list.innerHTML = invoices.map(inv => `
+    <div class="row">
+      <div>
+        <div>${inv.customer_name}</div>
+        <div style="color:var(--ink2);font-size:12px">£${(inv.amount_pence/100).toFixed(2)} · due ${new Date(inv.due_date).toLocaleDateString('en-GB')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="pill pill--${inv.status === 'paid' ? 'paid' : 'outstanding'}">${inv.status}</span>
+        ${inv.status !== 'paid' ? `<button class="mini-btn" onclick="markPaid('${inv.id}', this)">Mark paid</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function renderDeals(section) {
+  const list = document.getElementById('dealsList');
+  const note = document.getElementById('dealsNote');
+  if (!section.ok) { list.innerHTML = '<div class="unavailable">Lead data isn\'t connected yet — ask FORGE to finish wiring this up.</div>'; document.getElementById('statDeals').textContent = '—'; return; }
+  const deals = section.deals || [];
+  document.getElementById('statDeals').textContent = deals.length;
+  note.textContent = deals.length + ' shown';
+  if (!deals.length) { list.innerHTML = '<div class="empty">No leads yet.</div>'; return; }
+  list.innerHTML = deals.map(d => `
+    <div class="row">
+      <div>${d.dealname || 'Untitled'}</div>
+      <span class="pill pill--outstanding">${d.dealstage || '—'}</span>
+    </div>`).join('');
+}
+
+function renderPulse(section) {
+  const list = document.getElementById('pulseList');
+  const note = document.getElementById('pulseNote');
+  if (!section.ok) { list.innerHTML = '<div class="unavailable">Activity feed isn\'t connected yet.</div>'; document.getElementById('statActivity').textContent = '—'; return; }
+  const events = section.events || [];
+  document.getElementById('statActivity').textContent = events.length;
+  note.textContent = 'last ' + events.length;
+  if (!events.length) { list.innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
+  list.innerHTML = events.map(e => `
+    <div class="row">
+      <div>${(e.metric || 'event').replace(/_/g,' ')}</div>
+      <div style="color:var(--ink2);font-size:12px">${e.at ? new Date(e.at).toLocaleDateString('en-GB') : ''}</div>
+    </div>`).join('');
+}
+
+async function markPaid(invoiceId, btn) {
+  const sessionToken = localStorage.getItem('beacon_session');
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res = await fetch('/api/ledger-mark-paid', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invoiceId, sessionToken }),
+    });
+    if (res.ok) { loadDashboard(sessionToken); } else { btn.textContent = 'Failed — retry'; btn.disabled = false; }
+  } catch (e) { btn.textContent = 'Failed — retry'; btn.disabled = false; }
+}
+
+async function loadDashboard(sessionToken) {
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  try {
+    const res = await fetch('/api/beacon-data', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionToken }),
+    });
+    if (!res.ok) {
+      localStorage.removeItem('beacon_session');
+      document.getElementById('loginPanel').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+      showMsg('Your session expired. Request a new link below.', false);
+      return;
+    }
+    const data = await res.json();
+    renderInvoices(data.invoices || {});
+    renderDeals(data.deals || {});
+    renderPulse(data.pulse || {});
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────
+if (magicToken) {
+  verifyMagicToken(magicToken);
+} else {
+  const existing = localStorage.getItem('beacon_session');
+  if (existing) loadDashboard(existing);
+}
+</script>
+</body>
+</html>

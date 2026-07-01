@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://forgeisagentic.tech');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -22,4 +22,4 @@ module.exports = async (req, res) => {
     if (!up.ok) { const e = await up.json().catch(()=>({})); return res.status(500).json({ error:'Upload failed', detail:e }); }
     return res.status(200).json({ url: supabaseUrl+'/storage/v1/object/public/forge-lead-assets/'+path });
   } catch(e) { return res.status(500).json({ error: e.message }); }
-};
+}

@@ -1,5 +1,7 @@
 // api/submit.js — FORGE lead capture + email notifications
-// Env vars: HUBSPOT_ACCESS_TOKEN, RESEND_API_KEY, RESEND_FROM_EMAIL, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, AARON_WHATSAPP_TO
+// Env vars: HUBSPOT_ACCESS_TOKEN, RESEND_API_KEY, RESEND_FROM_EMAIL, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, AARON_WHATSAPP_TO, KLAVIYO_PRIVATE_API_KEY
+
+import { trackPulseEvent } from './_lib/pulse.js';
 
 
 // ── Rate Limiter ─────────────────────────────────────────────────────────
@@ -14,7 +16,7 @@ function isRateLimited(ip) {
   return hits.length > RL_MAX;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', 'https://forgeisagentic.tech');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -185,6 +187,16 @@ module.exports = async (req, res) => {
   }
 
 
+  // ── PULSE — track the lead in Klaviyo so a nurture flow can pick it up ──
+  // Fire-and-forget: a Klaviyo hiccup should never block the lead response.
+  trackPulseEvent({
+    email,
+    firstName,
+    clientSlug: (body['Client Slug'] || 'forge-direct'),
+    metricName: 'lead_captured',
+    properties: { trade, area, package: pkg },
+  }).catch(err => console.error('[PULSE] Non-fatal:', err.message));
+
   // ── WhatsApp approval prompt ──────────────────────────────────
   if (twilioSid && twilioToken && twilioFrom && aaronWA) {
     const waMsg = [
@@ -210,4 +222,4 @@ module.exports = async (req, res) => {
     ).catch(e => console.error('Twilio WA:', e.message));
   }
   return res.status(200).json({ success: true });
-};
+}

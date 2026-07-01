@@ -13,7 +13,7 @@ rlMap.set(ip, hits);
 return hits.length > RL_MAX;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
 const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
 if (isRateLimited(ip)) return res.status(429).send('Too many requests.');
 
@@ -22,60 +22,31 @@ const paypalEmail = process.env.PAYPAL_MERCHANT_EMAIL || 'builtbyaaronf@gmail.co
 const baseUrl = 'https://forgeisagentic.tech';
 
 // ── Package data ─────────────────────────────────────────────────────
+// Two-product model — replaces the old 5-tier p1-p5 structure. Beta pricing
+// (90% off) matches product1b/product2b in api/paypal-webhook.js.
 const packages = [
 {
-id: 'p1', name: 'Launch', was: '74.99', now: '7.49',
+id: 'product1b', name: 'Launch', was: '99', now: '9.90',
 tagline: 'Your business, live online today.',
 features: [
-'Live website with clear CTAs',
-'SEO meta and Google Analytics',
-'Floating WhatsApp button',
-'Trust badges section',
-'Cookie banner and Privacy Policy',
-'Google Business Profile guide',
+'Live website with real pricing + arrival times',
+'Instant quote form, no phone tag',
+'Direct booking calendar',
+'Instagram showcase + Google reviews on your homepage',
+'Cookie banner, Privacy Policy, Terms — fully compliant',
 ],
 },
 {
-id: 'p2', name: 'Brand', was: '149.99', now: '14.99',
-tagline: 'Everything in Launch, plus a brand that stands out.',
-features: [
-'AI imagery tailored to your trade',
-'Canva brand kit: logo, colours, fonts',
-'Testimonials section',
-'Service area map section',
-],
-},
-{
-id: 'p3', name: 'Convert', was: '299.99', now: '29.99',
-tagline: 'Everything in Brand, plus a machine that captures leads.',
+id: 'product2b', name: 'Scale', was: '299.99', now: '29.99',
+tagline: 'Everything in Launch, plus the machine that runs your marketing.',
 popular: true,
 features: [
-'Quote wizard with photo upload',
-'Direct call and WhatsApp CTA',
-'Instant lead alerts to your phone &amp; email',
-'HubSpot CRM set up by us',
-'Leads flow into CRM automatically',
-],
-},
-{
-id: 'p4', name: 'Book', was: '499.99', now: '49.99',
-tagline: 'Everything in Convert, plus online booking.',
-features: [
-'Setmore booking set up with appointment types',
-'Booking widget embedded on site',
-'Google Calendar sync',
-'Bookings to HubSpot pipeline',
-'Client history in CRM',
-],
-},
-{
-id: 'p5', name: 'Grow', was: '624.99', now: '62.49',
-tagline: 'Everything in Book, plus a full month of content.',
-features: [
-'Social media profile setup guide &amp; optimisation tips',
-'Full month of content created',
-'Canva social templates',
-'Consistent brand across all channels',
+'Full brand kit — logo, letterhead, signage',
+'CRM with leads auto-flowing in',
+'Invoicing that tracks what\'s owed and paid',
+'Automated follow-up emails to new leads',
+'A dashboard summarising everything, always up to date',
+'A month of social content, ready to post',
 ],
 },
 ];
@@ -333,4 +304,4 @@ Something wrong?
 res.setHeader('Content-Type', 'text/html; charset=utf-8');
 res.setHeader('Cache-Control', 'no-store');
 res.status(200).send(html);
-};
+}

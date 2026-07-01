@@ -4,8 +4,8 @@ import { sendPaymentConfirmedEmail } from './_lib/emails.js';
 const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 const PRICES = {
   // Two-product model — replaces the old 5-tier p1-p5 structure.
-  product1: 99,       // Pop Up Website
-  product2: 299.99,   // Master Website + Branding
+  product1: 99,       // Launch
+  product2: 299.99,   // Scale
   // Beta (founding 10) — 90% off
   product1b: 9.90,
   product2b: 29.99,
@@ -28,8 +28,8 @@ async function verifyWebhook(req, rawBody) {
 async function notifyDeployment(clientData, orderId, amount, options = {}) {
   const pkg = clientData.pkg || 'unknown';
   const pkgNames = {
-    product1: 'Pop Up Website', product2: 'Master Website + Branding',
-    product1b: 'Pop Up Website (Beta)', product2b: 'Master Website + Branding (Beta)',
+    product1: 'Launch', product2: 'Scale',
+    product1b: 'Launch (Beta)', product2b: 'Scale (Beta)',
   };
   const isUpgrade = options.isUpgrade || false;
   const upgradeFrom = options.upgradeFrom || null;

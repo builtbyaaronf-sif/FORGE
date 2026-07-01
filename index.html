@@ -739,9 +739,9 @@ h1,h2,h3,h4,h5{
 
     <div class="pricing-packages reveal">
 
-      <!-- Product 1: Pop Up Website -->
+      <!-- Product 1: Launch -->
       <div class="pkg-card">
-        <p class="pkg-name">Pop Up Website</p>
+        <p class="pkg-name">Launch</p>
         <div class="pkg-price-row"><div class="pkg-price">£99</div></div>
         <p class="pkg-price-note">One new job covers the cost</p>
         <hr class="pkg-divider">
@@ -755,12 +755,12 @@ h1,h2,h3,h4,h5{
         <button class="pkg-cta" onclick="scrollToSection('get-started', 'product1')">Get Started</button>
       </div>
 
-      <!-- Product 2: Master Website + Branding — Featured -->
+      <!-- Product 2: Scale — Featured -->
       <div class="pkg-card pkg-card--featured">
         <div class="pkg-badge">Full Service</div>
-        <p class="pkg-name" style="margin-top:14px">Master Website + Branding</p>
+        <p class="pkg-name" style="margin-top:14px">Scale</p>
         <div class="pkg-price-row"><div class="pkg-price">£299.99</div></div>
-        <p class="pkg-price-note">Everything in Pop Up Website, plus:</p>
+        <p class="pkg-price-note">Everything in Launch, plus:</p>
         <hr class="pkg-divider">
         <ul class="pkg-features">
           <li><strong>Full brand kit:</strong> logo, letterhead, signage</li>
@@ -1225,7 +1225,7 @@ async function wizSubmit() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  var pkgLabels = { product1: 'Pop Up Website (£99)', product2: 'Master Website + Branding (£299.99)' };
+  var pkgLabels = { product1: 'Launch (£99)', product2: 'Scale (£299.99)' };
   var payload = {
     'First Name': _wizData.fname,
     'Last Name':  _wizData.lname,

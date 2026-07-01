@@ -625,7 +625,7 @@ const orderId = urlParams.get('token') || urlParams.get('orderId');
 // resolves to a sensible step list instead of showing nothing.
 const PKG_CONFIG = {
   product1: {
-    label: 'Pop Up Website',
+    label: 'Launch',
     steps: [
       { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
       { label: 'ATLAS: Building your website',         sub: 'Quote form, booking, Instagram showcase, deploying to Vercel' },
@@ -634,7 +634,7 @@ const PKG_CONFIG = {
     ]
   },
   product2: {
-    label: 'Master Website + Branding',
+    label: 'Scale',
     steps: [
       { label: 'SCOUT: Researching your market',       sub: 'Analysing competitors and local search landscape' },
       { label: 'ATLAS: Building your website',         sub: 'Quote form, booking, Instagram showcase, deploying to Vercel' },
@@ -663,7 +663,7 @@ async function initSession() {
       email: urlParams.get('email') || '...',
       location: urlParams.get('location') || '',
       pkg: urlParams.get('pkg') || 'product1',
-      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'product1']?.label || 'Pop Up Website',
+      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'product1']?.label || 'Launch',
       pkgPrice: '£99.00',
       eta: 'within the hour',
       paypal_client_id: null,
@@ -685,7 +685,7 @@ async function initSession() {
       email: urlParams.get('email') || '...',
       location: urlParams.get('location') || '',
       pkg: urlParams.get('pkg') || 'product1',
-      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'product1']?.label || 'Pop Up Website',
+      pkgLabel: PKG_CONFIG[urlParams.get('pkg') || 'product1']?.label || 'Launch',
       pkgPrice: '£99.00',
       eta: 'within the hour',
       paypal_client_id: null,

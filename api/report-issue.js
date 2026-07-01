@@ -13,7 +13,7 @@ function isRateLimited(ip) {
   return hits.length > RL_MAX;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -111,4 +111,4 @@ module.exports = async (req, res) => {
     console.error('Report issue error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
-};
+}

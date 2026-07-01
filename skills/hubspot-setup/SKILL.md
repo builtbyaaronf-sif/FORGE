@@ -130,11 +130,11 @@ If pipeline creation via MCP returns an error (HubSpot free tier restriction): u
 
 ---
 
-## Step 5: Add custom contact properties (quote wizard fields)
+## Step 5: Add custom contact + deal properties (quote wizard fields, multi-tenant tagging)
 
-These properties capture the structured data that comes through the quote wizard. Use `manage_crm_objects` or `search_properties` + create as needed.
+**Correction (verified 1 Jul 2026 during the Scale dry run): the HubSpot MCP cannot create custom property definitions.** `manage_crm_objects` creates/updates records (companies, contacts, deals), not property schema. `search_properties`/`get_properties` are read-only. Creating a new custom property is a manual step in HubSpot's own UI — Settings → Properties → [object type] → Create property. Don't tell a client or Aaron this step is automated.
 
-Properties to create (all of type `string` unless noted):
+Contact properties to create (all `string` type unless noted):
 
 | Internal name | Label | Field type |
 |---|---|---|
@@ -147,7 +147,17 @@ Properties to create (all of type `string` unless noted):
 | `forge_objection_raised` | Objection Raised | `textarea` |
 | `forge_package_tier` | FORGE Package | `text` |
 
-After creating, verify properties exist using `get_properties` with `object_type: contacts`.
+**Deal property (required for Scale, added 1 Jul 2026):**
+
+| Internal name | Label | Field type |
+|---|---|---|
+| `forge_client_slug` | FORGE Client Slug | `text` |
+
+BEACON's Leads card and LEDGER's Zapier trigger both filter deals by this property — if it's missing on a client's deals, those features return empty results, not an error. Set it on every deal for every Scale client, every time, or the multi-tenancy model silently breaks.
+
+After creating, verify properties exist using `get_properties` with `object_type: contacts` (or `deals`).
+
+**Also verified during the dry run:** HubSpot's `industry` company property is a closed enum — trades like "Electrician" or "Plumber" aren't options. Use `CONSTRUCTION` as the closest fit for trades clients unless a better match exists in the enum list (fetch it via `get_properties` on `companies`/`industry` if unsure).
 
 ---
 

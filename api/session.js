@@ -14,7 +14,7 @@ import { getActivePlans } from './_config/plans.js';
 
 // Two-product model — replaces the old p1-p5 tiers.
 const PRICES = { product1: 99, product2: 299.99 };
-const LABELS = { product1: 'Pop Up Website', product2: 'Master Website + Branding' };
+const LABELS = { product1: 'Launch', product2: 'Scale' };
 const ETAs = { product1: '~10 mins', product2: '~25 mins' };
 
 const PAYPAL_BASE = process.env.PAYPAL_MODE === 'live'
